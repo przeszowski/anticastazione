@@ -1,21 +1,16 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 
-const stations = [
-  { id: 1, name: 'Kuchnia', dept: 'Kuchnia', procedures: 8, hours: '06:00 – 23:00', active: true },
-  { id: 2, name: 'Bar', dept: 'Bar', procedures: 5, hours: '14:00 – 02:00', active: true },
-  { id: 3, name: 'Sala', dept: 'Sala', procedures: 6, hours: '11:00 – 23:30', active: true },
-  { id: 4, name: 'Obsługa gości', dept: 'Obsługa', procedures: 4, hours: '10:00 – 22:00', active: true },
-  { id: 5, name: 'Zarządzanie', dept: 'Zarządzanie', procedures: 3, hours: '08:00 – 20:00', active: false }
-]
+const { stanowiska, loading, error, fetch } = useStanowiska()
+
+onMounted(fetch)
 
 const columns = [
-  { key: 'name', label: 'Stanowisko' },
-  { key: 'dept', label: 'Dział' },
-  { key: 'procedures', label: 'Procedury' },
-  { key: 'hours', label: 'Godziny otwarcia' },
-  { key: 'active', label: 'Status' },
-  { key: 'actions', label: '' }
+  { accessorKey: 'nazwa', header: 'Stanowisko' },
+  { accessorKey: 'dzial', header: 'Dział' },
+  { accessorKey: 'godziny_od', header: 'Godziny otwarcia' },
+  { accessorKey: 'aktywne', header: 'Status' },
+  { id: 'actions', header: '' }
 ]
 </script>
 
@@ -29,32 +24,33 @@ const columns = [
     </div>
 
     <div class="p-5">
+      <UAlert v-if="error" color="error" icon="i-lucide-alert-circle" :description="error" class="mb-4" />
+
       <UTable
-        :rows="stations"
+        :data="stanowiska"
         :columns="columns"
-        @select="(row) => navigateTo('/stanowiska/' + row.id)"
+        :loading="loading"
+        @select="(row) => navigateTo('/stanowiska/' + row.original.id)"
         class="border border-muted rounded-xl overflow-hidden cursor-pointer"
       >
-        <template #name-data="{ row }">
-          <div class="font-medium">{{ row.name }}</div>
+        <template #nazwa-cell="{ row }">
+          <div class="font-medium">{{ row.original.nazwa }}</div>
+          <div v-if="row.original.opis" class="text-xs text-muted mt-0.5">{{ row.original.opis }}</div>
         </template>
-        <template #dept-data="{ row }">
-          <UBadge color="primary" variant="subtle" size="sm">{{ row.dept }}</UBadge>
+        <template #dzial-cell="{ row }">
+          <UBadge color="primary" variant="subtle" size="sm">{{ row.original.dzial }}</UBadge>
         </template>
-        <template #procedures-data="{ row }">
-          <span class="text-sm">{{ row.procedures }} procedur</span>
+        <template #godziny_od-cell="{ row }">
+          <span class="text-sm text-muted">{{ row.original.godziny_od?.slice(0,5) }} – {{ row.original.godziny_do?.slice(0,5) }}</span>
         </template>
-        <template #active-data="{ row }">
-          <UBadge :color="row.active ? 'success' : 'neutral'" variant="subtle" size="sm">
-            {{ row.active ? 'Aktywne' : 'Nieaktywne' }}
+        <template #aktywne-cell="{ row }">
+          <UBadge :color="row.original.aktywne ? 'success' : 'neutral'" variant="subtle" size="sm">
+            {{ row.original.aktywne ? 'Aktywne' : 'Nieaktywne' }}
           </UBadge>
         </template>
-        <template #actions-data="{ row }">
+        <template #actions-cell="{ row }">
           <div class="flex justify-end">
-            <UButton
-              color="neutral" variant="ghost" icon="i-lucide-ellipsis" size="xs"
-              @click.stop
-            />
+            <UButton color="neutral" variant="ghost" icon="i-lucide-ellipsis" size="xs" @click.stop />
           </div>
         </template>
       </UTable>

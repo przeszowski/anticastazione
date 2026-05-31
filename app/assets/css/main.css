@@ -1,3 +1,6 @@
+/* DM Sans z Google Fonts — musi być pierwszy */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap');
+
 @import "tailwindcss";
 @import "@nuxt/ui";
 
@@ -18,5 +21,19 @@
   --font-family-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
 }
 
-/* DM Sans z Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap');
+/* ── NuxtUI v3: override --ui-primary do złotego brandu ─────────── */
+:root {
+  --ui-primary: oklch(68% 0.105 62);       /* #c59d5f */
+  --ui-primary-50: oklch(97% 0.02 80);     /* #fdf6ec */
+  --ui-primary-100: oklch(93% 0.04 75);
+  --ui-primary-200: oklch(87% 0.07 70);
+  --ui-primary-300: oklch(80% 0.10 67);
+  --ui-primary-400: oklch(74% 0.11 64);
+  --ui-primary-500: oklch(68% 0.105 62);   /* main brand */
+  --ui-primary-600: oklch(62% 0.10 60);    /* #b08840 */
+  --ui-primary-700: oklch(52% 0.09 58);
+  --ui-primary-800: oklch(40% 0.07 56);
+  --ui-primary-900: oklch(28% 0.05 55);
+  --ui-primary-950: oklch(18% 0.04 55);
+}
+
