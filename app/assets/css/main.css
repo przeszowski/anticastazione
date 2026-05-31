@@ -1,0 +1,22 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* ── Brand: L'Antica Stazione — złoty akcent ─────────────────────── */
+@theme {
+  --color-primary-50:  #fdf6ec;
+  --color-primary-100: #f8e9cc;
+  --color-primary-200: #f0d099;
+  --color-primary-300: #e6b566;
+  --color-primary-400: #d4a050;
+  --color-primary-500: #c59d5f;
+  --color-primary-600: #b08840;
+  --color-primary-700: #8a6830;
+  --color-primary-800: #614820;
+  --color-primary-900: #3d2e14;
+  --color-primary-950: #1e1709;
+
+  --font-family-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* DM Sans z Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap');

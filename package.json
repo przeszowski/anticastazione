@@ -1,0 +1,22 @@
+{
+  "name": "antica-procedury",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^3.0.2",
+    "nuxt": "^3.17.0"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "typescript": "^5.7.0",
+    "vue": "latest",
+    "vue-router": "latest"
+  }
+}
