@@ -37,8 +37,13 @@ const filtered = computed(() =>
 
 const periodColor: Record<string, any> = {
   'Rano': 'primary',
-  'Dzień': 'info',
-  'Wieczór': 'violet'
+  'Dzien': 'info',
+  'Wieczor': 'violet'
+}
+const periodLabel: Record<string, string> = {
+  'Rano': 'Rano',
+  'Dzien': 'Dzień',
+  'Wieczor': 'Wieczór'
 }
 
 const columns = [
@@ -112,7 +117,7 @@ async function toggleActive(row: any) {
           </UBadge>
         </template>
         <template #pora_dnia-cell="{ row }">
-          <UBadge :color="periodColor[row.original.pora_dnia]" variant="subtle" size="sm">{{ row.original.pora_dnia }}</UBadge>
+          <UBadge :color="periodColor[row.original.pora_dnia]" variant="subtle" size="sm">{{ periodLabel[row.original.pora_dnia] || row.original.pora_dnia }}</UBadge>
         </template>
         <template #norma_min-cell="{ row }">
           {{ row.original.norma_min }} min

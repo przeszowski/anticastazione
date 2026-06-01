@@ -26,7 +26,30 @@ export const useStanowiska = () => {
     loading.value = false
   }
 
-  return { stanowiska, loading, error, fetch }
+  async function create(payload: Database['public']['Tables']['stanowiska']['Insert']) {
+    const { data, error: err } = await db.from('stanowiska').insert(payload).select().single()
+    if (err) throw err
+    return data
+  }
+
+  async function update(id: string, payload: Database['public']['Tables']['stanowiska']['Update']) {
+    const { data, error: err } = await db.from('stanowiska').update(payload).eq('id', id).select().single()
+    if (err) throw err
+    return data
+  }
+
+  async function remove(id: string) {
+    const { error: err } = await db.from('stanowiska').delete().eq('id', id)
+    if (err) throw err
+  }
+
+  async function fetchOne(id: string) {
+    const { data, error: err } = await db.from('stanowiska').select('*').eq('id', id).single()
+    if (err) throw err
+    return data
+  }
+
+  return { stanowiska, loading, error, fetch, fetchOne, create, update, remove }
 }
 
 // Procedury
@@ -65,7 +88,17 @@ export const useProcedury = () => {
     if (err) throw err
   }
 
-  return { procedury, loading, error, fetch, create, update, remove }
+  async function fetchOne(id: string) {
+    const { data, error: err } = await db
+      .from('procedury')
+      .select('*, stanowiska(nazwa, dzial)')
+      .eq('id', id)
+      .single()
+    if (err) throw err
+    return data as any
+  }
+
+  return { procedury, loading, error, fetch, fetchOne, create, update, remove }
 }
 
 // Wykonania (raporty)

@@ -18,4 +18,8 @@ export default defineNuxtConfig({
     head: {
       title: "L'Antica Stazione — Procedury",
       meta: [
- 
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+      ]
+    }
+  }
+})
