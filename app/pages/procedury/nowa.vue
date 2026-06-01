@@ -12,7 +12,7 @@ const form = reactive({
   nazwa: '',
   opis: '',
   stanowisko_id: '',
-  pora_dnia: 'Rano' as 'Rano' | 'Dzień' | 'Wieczór',
+  pora_dnia: 'Rano' as 'Rano' | 'Dzien' | 'Wieczor',
   norma_min: 20,
   aktywna: true,
   kolejnosc: 1
@@ -25,8 +25,8 @@ const stationOptions = computed(() => [
 
 const poraDniaOptions = [
   { label: 'Rano', value: 'Rano' },
-  { label: 'Dzień', value: 'Dzień' },
-  { label: 'Wieczór', value: 'Wieczór' }
+  { label: 'Dzień', value: 'Dzien' },
+  { label: 'Wieczór', value: 'Wieczor' }
 ]
 
 async function save() {
@@ -79,9 +79,9 @@ async function save() {
           <label class="text-xs font-medium text-muted">Stanowisko</label>
           <USelect
             v-model="form.stanowisko_id"
-            :options="stationOptions"
-            option-attribute="label"
-            value-attribute="value"
+            :items="stationOptions"
+            value-key="value"
+            class="w-full"
           />
         </div>
 
@@ -90,9 +90,9 @@ async function save() {
             <label class="text-xs font-medium text-muted">Pora dnia</label>
             <USelect
               v-model="form.pora_dnia"
-              :options="poraDniaOptions"
-              option-attribute="label"
-              value-attribute="value"
+              :items="poraDniaOptions"
+              value-key="value"
+              class="w-full"
             />
           </div>
           <div class="flex flex-col gap-1.5">
@@ -107,7 +107,7 @@ async function save() {
         </div>
 
         <div class="flex items-center gap-2">
-          <UToggle v-model="form.aktywna" />
+          <USwitch v-model="form.aktywna" />
           <span class="text-sm">Procedura aktywna</span>
         </div>
       </div>

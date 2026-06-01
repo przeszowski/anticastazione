@@ -145,10 +145,10 @@ const stats = computed(() => {
         <UInput v-model="selectedDate" type="date" size="sm" icon="i-lucide-calendar" class="w-44" />
         <USelect
           v-model="filterStation"
-          :options="stationOptions"
-          option-attribute="label"
-          value-attribute="value"
+          :items="stationOptions"
+          value-key="value"
           size="sm"
+          class="w-48"
         />
         <span class="ml-auto text-xs text-muted">{{ filtered.length }} wykonań</span>
       </div>

@@ -111,10 +111,10 @@ async function doDelete() {
           <label class="text-xs font-medium text-muted">Dział *</label>
           <USelect
             v-model="form.dzial"
-            :options="dzialOptions"
-            option-attribute="label"
-            value-attribute="value"
+            :items="dzialOptions"
+            value-key="value"
             placeholder="Wybierz dział"
+            class="w-full"
           />
         </div>
 
@@ -140,7 +140,7 @@ async function doDelete() {
         </div>
 
         <div class="flex items-center gap-2">
-          <UToggle v-model="form.aktywne" />
+          <USwitch v-model="form.aktywne" />
           <span class="text-sm">Stanowisko aktywne</span>
         </div>
       </div>

@@ -1,28 +1,21 @@
 <script setup lang="ts">
 const route = useRoute()
+const { imieNazwisko, rola, can, logout, odswiezProfil, profil } = useAuth()
 
-const navItems = [
-  {
-    label: 'Procedury',
-    to: '/procedury',
-    icon: 'i-lucide-clipboard-list'
-  },
-  {
-    label: 'Stanowiska',
-    to: '/stanowiska',
-    icon: 'i-lucide-building-2'
-  },
-  {
-    label: 'Raporty',
-    to: '/raporty',
-    icon: 'i-lucide-bar-chart-2'
-  },
-  {
-    label: 'Widok mobilny',
-    to: '/mobile',
-    icon: 'i-lucide-smartphone'
-  }
-]
+// Załaduj profil użytkownika przy wejściu (jeśli jeszcze nie wczytany)
+onMounted(() => {
+  if (!profil.value) odswiezProfil()
+})
+
+// Pozycje menu z wymaganym uprawnieniem; jeśli brak — pozycja ukryta
+const navItems = computed(() => [
+  { label: 'Procedury', to: '/procedury', icon: 'i-lucide-clipboard-list', perm: 'procedury:read' },
+  { label: 'Stanowiska', to: '/stanowiska', icon: 'i-lucide-building-2', perm: 'stanowiska:read' },
+  { label: 'Raporty', to: '/raporty', icon: 'i-lucide-bar-chart-2', perm: 'raporty:read' },
+  { label: 'Widok mobilny', to: '/mobile', icon: 'i-lucide-smartphone', perm: 'wykonania:read' },
+  { label: 'Użytkownicy', to: '/uzytkownicy', icon: 'i-lucide-users', perm: 'users:read' },
+  { label: 'Role', to: '/role', icon: 'i-lucide-shield-check', perm: 'roles:read' }
+].filter(item => can(item.perm)))
 
 const isActive = (to: string) => route.path.startsWith(to)
 </script>
@@ -34,7 +27,7 @@ const isActive = (to: string) => route.path.startsWith(to)
   >
     <!-- Logo -->
     <div class="px-5 py-5 border-b border-muted">
-      <div class="text-xs font-semibold tracking-widest text-primary">
+      <div class="text-xs font-semibold tracking-widest" style="color: #c59d5f;">
         L'ANTICA STAZIONE
       </div>
       <div class="text-xs text-muted mt-0.5">Panel zarządzania</div>
@@ -57,9 +50,20 @@ const isActive = (to: string) => route.path.startsWith(to)
     </nav>
 
     <!-- Footer -->
-    <div class="px-5 py-3.5 border-t border-muted text-xs text-muted">
-      <div class="font-medium text-default">Anna Kowalska</div>
-      <div class="mt-0.5">Administrator</div>
+    <div class="px-3 py-3.5 border-t border-muted">
+      <div class="px-2 mb-2">
+        <div class="text-xs font-medium text-default truncate">{{ imieNazwisko || '—' }}</div>
+        <div class="text-xs text-muted mt-0.5">{{ rola || '—' }}</div>
+      </div>
+      <UButton
+        block
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        icon="i-lucide-log-out"
+        label="Wyloguj"
+        @click="logout"
+      />
     </div>
   </aside>
 </template>

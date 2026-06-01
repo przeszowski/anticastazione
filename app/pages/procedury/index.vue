@@ -22,8 +22,8 @@ const stationOptions = computed(() => [
 const periodOptions = [
   { label: 'Wszystkie pory', value: '' },
   { label: 'Rano', value: 'Rano' },
-  { label: 'Dzień', value: 'Dzień' },
-  { label: 'Wieczór', value: 'Wieczór' }
+  { label: 'Dzień', value: 'Dzien' },
+  { label: 'Wieczór', value: 'Wieczor' }
 ]
 
 const filtered = computed(() =>
@@ -89,8 +89,8 @@ async function toggleActive(row: any) {
       <!-- Filtry -->
       <div class="flex items-center gap-2 flex-wrap">
         <UInput v-model="search" placeholder="Szukaj procedury…" icon="i-lucide-search" size="sm" class="w-56" />
-        <USelect v-model="filterStation" :options="stationOptions" option-attribute="label" value-attribute="value" size="sm" />
-        <USelect v-model="filterPeriod" :options="periodOptions" option-attribute="label" value-attribute="value" size="sm" />
+        <USelect v-model="filterStation" :items="stationOptions" value-key="value" size="sm" class="w-48" />
+        <USelect v-model="filterPeriod" :items="periodOptions" value-key="value" size="sm" class="w-40" />
         <span class="ml-auto text-xs text-muted">
           {{ loading ? 'Ładowanie…' : `${filtered.length} procedur` }}
         </span>
@@ -108,8 +108,8 @@ async function toggleActive(row: any) {
         class="border border-muted rounded-xl overflow-hidden cursor-pointer"
       >
         <template #nazwa-cell="{ row }">
-          <div class="font-medium">{{ row.nazwa }}</div>
-          <div v-if="row.opis" class="text-xs text-muted mt-0.5 truncate max-w-xs">{{ row.opis }}</div>
+          <div class="font-medium">{{ row.original.nazwa }}</div>
+          <div v-if="row.original.opis" class="text-xs text-muted mt-0.5 truncate max-w-xs">{{ row.original.opis }}</div>
         </template>
         <template #stanowiska-cell="{ row }">
           <UBadge color="primary" variant="subtle" size="sm">
@@ -155,7 +155,7 @@ async function toggleActive(row: any) {
           <div class="grid grid-cols-2 gap-3 text-sm">
             <div>
               <div class="text-muted text-xs mb-1">Pora dnia</div>
-              <UBadge :color="periodColor[selected.pora_dnia]" variant="subtle">{{ selected.pora_dnia }}</UBadge>
+              <UBadge :color="periodColor[selected.pora_dnia]" variant="subtle">{{ periodLabel[selected.pora_dnia] || selected.pora_dnia }}</UBadge>
             </div>
             <div>
               <div class="text-muted text-xs mb-1">Norma czasu</div>

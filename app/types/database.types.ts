@@ -3,6 +3,56 @@ export type Json = string | number | boolean | null | { [key: string]: Json } | 
 export interface Database {
   public: {
     Tables: {
+      roles: {
+        Row: {
+          id: string
+          nazwa: string
+          opis: string | null
+          permissions: string[]
+          systemowa: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          nazwa: string
+          opis?: string | null
+          permissions?: string[]
+          systemowa?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['roles']['Insert']>
+      }
+      profiles: {
+        Row: {
+          id: string
+          imie: string | null
+          nazwisko: string | null
+          email: string | null
+          telefon: string | null
+          email_zweryfikowany: boolean
+          aktywny: boolean
+          role_id: string | null
+          stanowisko_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          imie?: string | null
+          nazwisko?: string | null
+          email?: string | null
+          telefon?: string | null
+          email_zweryfikowany?: boolean
+          aktywny?: boolean
+          role_id?: string | null
+          stanowisko_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['profiles']['Insert']>
+      }
       stanowiska: {
         Row: {
           id: string
@@ -36,7 +86,7 @@ export interface Database {
           nazwa: string
           opis: string | null
           stanowisko_id: string | null
-          pora_dnia: 'Rano' | 'Dzień' | 'Wieczór'
+          pora_dnia: 'Rano' | 'Dzien' | 'Wieczor'
           norma_min: number
           aktywna: boolean
           kolejnosc: number
@@ -48,7 +98,7 @@ export interface Database {
           nazwa: string
           opis?: string | null
           stanowisko_id?: string | null
-          pora_dnia: 'Rano' | 'Dzień' | 'Wieczór'
+          pora_dnia: 'Rano' | 'Dzien' | 'Wieczor'
           norma_min?: number
           aktywna?: boolean
           kolejnosc?: number
