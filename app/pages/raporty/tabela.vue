@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import type { WykonanieWithRelations } from '~/composables/useSupabase'
+import {
+  badgePoryDnia,
+  formatPoraDnia,
+  raportTabs,
+  statusWykonaniaBadge,
+  statusWykonaniaLabel
+} from '~/utils/procedureMeta'
+
 definePageMeta({ layout: 'default' })
 
 const { wykonania, loading, error, fetchDzien } = useWykonania()
@@ -12,47 +21,16 @@ onMounted(async () => {
   await fetchDzien(selectedDate.value)
 })
 
-watch(selectedDate, (val) => fetchDzien(val))
+watch([selectedDate, filterStation], ([date, station]) => fetchDzien(date, station || undefined))
 
 const stationOptions = computed(() => [
   { label: 'Wszystkie stanowiska', value: '' },
   ...stanowiska.value.map(s => ({ label: s.nazwa, value: s.id }))
 ])
 
-const filtered = computed(() =>
-  wykonania.value.filter(w =>
-    !filterStation.value || w.stanowisko_id === filterStation.value
-  )
-)
+const filtered = computed(() => wykonania.value)
 
-const tabs = [
-  { label: 'Przegląd dzienny', to: '/raporty' },
-  { label: 'Tabela zbiorcza', to: '/raporty/tabela' }
-]
-
-const statusColor: Record<string, any> = {
-  do_zrobienia: 'neutral',
-  w_trakcie: 'primary',
-  wykonane: 'success',
-  odrzucone: 'error'
-}
-
-const statusLabel: Record<string, string> = {
-  do_zrobienia: 'Do zrobienia',
-  w_trakcie: 'W trakcie',
-  wykonane: 'Wykonane',
-  odrzucone: 'Odrzucone'
-}
-
-const poraBadge: Record<string, any> = {
-  Rano: 'primary',
-  Dzien: 'info',
-  Wieczor: 'violet'
-}
-
-const poraLabel: Record<string, string> = { Rano: 'Rano', Dzien: 'Dzień', Wieczor: 'Wieczór' }
-
-function odchylenie(w: any): string {
+function odchylenie(w: WykonanieWithRelations): string {
   if (!w.czas_start || !w.czas_koniec) return '—'
   const start = new Date(w.czas_start)
   const koniec = new Date(w.czas_koniec)
@@ -62,7 +40,7 @@ function odchylenie(w: any): string {
   return diff > 0 ? `+${diff} min` : `${diff} min`
 }
 
-function odchylenieClass(w: any): string {
+function odchylenieClass(w: WykonanieWithRelations): string {
   if (!w.czas_start || !w.czas_koniec) return 'text-muted'
   const start = new Date(w.czas_start)
   const koniec = new Date(w.czas_koniec)
@@ -73,23 +51,12 @@ function odchylenieClass(w: any): string {
   return 'text-error font-medium'
 }
 
-function czasTrwania(w: any): string {
+function czasTrwania(w: WykonanieWithRelations): string {
   if (!w.czas_start || !w.czas_koniec) return '—'
   const start = new Date(w.czas_start)
   const koniec = new Date(w.czas_koniec)
   return Math.round((koniec.getTime() - start.getTime()) / 60000) + ' min'
 }
-
-const columns = [
-  { accessorKey: 'procedury', header: 'Procedura' },
-  { accessorKey: 'stanowiska', header: 'Stanowisko' },
-  { accessorKey: 'pora_dnia', header: 'Pora' },
-  { accessorKey: 'status', header: 'Status' },
-  { accessorKey: 'czas_start', header: 'Start' },
-  { accessorKey: 'czas_trwania', header: 'Czas' },
-  { accessorKey: 'odchylenie', header: 'Odchylenie' },
-  { accessorKey: 'uwagi', header: 'Uwagi' }
-]
 
 // Statystyki podsumowujące
 const stats = computed(() => {
@@ -131,7 +98,7 @@ const stats = computed(() => {
       <!-- Sub-tabs -->
       <div class="flex border-b border-muted gap-4">
         <NuxtLink
-          v-for="tab in tabs"
+          v-for="tab in raportTabs"
           :key="tab.to"
           :to="tab.to"
           class="pb-2.5 text-sm font-medium border-b-2 -mb-px transition-colors"
@@ -220,13 +187,13 @@ const stats = computed(() => {
               <td class="px-4 py-2.5 font-medium">{{ w.procedury?.nazwa ?? '—' }}</td>
               <td class="px-4 py-2.5 text-muted">{{ w.stanowiska?.nazwa ?? '—' }}</td>
               <td class="px-4 py-2.5">
-                <UBadge :color="poraBadge[w.procedury?.pora_dnia ?? ''] ?? 'neutral'" variant="subtle" size="sm">
-                  {{ poraLabel[w.procedury?.pora_dnia ?? ''] ?? w.procedury?.pora_dnia ?? '—' }}
+                <UBadge :color="badgePoryDnia(w.procedury?.pora_dnia)" variant="subtle" size="sm">
+                  {{ formatPoraDnia(w.procedury?.pora_dnia) }}
                 </UBadge>
               </td>
               <td class="px-4 py-2.5">
-                <UBadge :color="statusColor[w.status]" variant="subtle" size="sm">
-                  {{ statusLabel[w.status] ?? w.status }}
+                <UBadge :color="statusWykonaniaBadge[w.status]" variant="subtle" size="sm">
+                  {{ statusWykonaniaLabel[w.status] }}
                 </UBadge>
               </td>
               <td class="px-4 py-2.5 text-muted text-xs">

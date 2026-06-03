@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { dzialOptions } from '~/utils/procedureMeta'
+
 definePageMeta({ layout: 'default' })
 
 const { create } = useStanowiska()
@@ -14,14 +16,6 @@ const form = reactive({
   aktywne: true,
   kolejnosc: 1
 })
-
-const dzialOptions = [
-  { label: 'Kuchnia', value: 'Kuchnia' },
-  { label: 'Bar', value: 'Bar' },
-  { label: 'Sala', value: 'Sala' },
-  { label: 'Zmywak', value: 'Zmywak' },
-  { label: 'Recepcja', value: 'Recepcja' }
-]
 
 async function save() {
   if (!form.nazwa.trim() || !form.dzial) {

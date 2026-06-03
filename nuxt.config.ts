@@ -36,6 +36,29 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: ['cookie']
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return
+            if (id.includes('@supabase')) return 'vendor-supabase'
+            if (
+              id.includes('@nuxt/ui')
+              || id.includes('reka-ui')
+              || id.includes('vaul-vue')
+              || id.includes('@floating-ui')
+              || id.includes('@vueuse')
+              || id.includes('@iconify')
+              || id.includes('@nuxt/icon')
+              || id.includes('\\vue')
+              || id.includes('/vue')
+              || id.includes('@vue/')
+            ) return 'vendor-ui'
+            return
+          }
+        }
+      }
     }
   },
 

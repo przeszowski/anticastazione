@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { poraDniaOptions } from '~/utils/procedureMeta'
+
 definePageMeta({ layout: 'default' })
 
 const { create } = useProcedury()
@@ -22,12 +24,6 @@ const stationOptions = computed(() => [
   { label: 'Bez stanowiska', value: '' },
   ...stanowiska.value.map(s => ({ label: s.nazwa, value: s.id }))
 ])
-
-const poraDniaOptions = [
-  { label: 'Rano', value: 'Rano' },
-  { label: 'Dzień', value: 'Dzien' },
-  { label: 'Wieczór', value: 'Wieczor' }
-]
 
 async function save() {
   if (!form.nazwa.trim()) {

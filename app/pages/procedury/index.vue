@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { badgePoryDnia, formatPoraDnia, poraDniaOptions } from '~/utils/procedureMeta'
+
 definePageMeta({ layout: 'default' })
 
 const { procedury, loading, error, fetch } = useProcedury()
@@ -20,12 +22,7 @@ const stationOptions = computed(() => [
   ...stanowiska.value.map(s => ({ label: s.nazwa, value: s.id }))
 ])
 
-const periodOptions = [
-  { label: 'Wszystkie pory', value: '' },
-  { label: 'Rano', value: 'Rano' },
-  { label: 'Dzień', value: 'Dzien' },
-  { label: 'Wieczór', value: 'Wieczor' }
-]
+const periodOptions = [{ label: 'Wszystkie pory', value: '' }, ...poraDniaOptions]
 
 const filtered = computed(() =>
   procedury.value.filter(p => {
@@ -35,17 +32,6 @@ const filtered = computed(() =>
     return matchSearch && matchStation && matchPeriod
   })
 )
-
-const periodColor: Record<string, any> = {
-  'Rano': 'primary',
-  'Dzien': 'info',
-  'Wieczor': 'violet'
-}
-const periodLabel: Record<string, string> = {
-  'Rano': 'Rano',
-  'Dzien': 'Dzień',
-  'Wieczor': 'Wieczór'
-}
 
 const columns = [
   { accessorKey: 'nazwa', header: 'Procedura' },
@@ -121,7 +107,7 @@ async function toggleActive(row: any) {
           </UBadge>
         </template>
         <template #pora_dnia-cell="{ row }">
-          <UBadge :color="periodColor[row.original.pora_dnia]" variant="subtle" size="sm">{{ periodLabel[row.original.pora_dnia] || row.original.pora_dnia }}</UBadge>
+          <UBadge :color="badgePoryDnia(row.original.pora_dnia)" variant="subtle" size="sm">{{ formatPoraDnia(row.original.pora_dnia) }}</UBadge>
         </template>
         <template #norma_min-cell="{ row }">
           {{ row.original.norma_min }} min
@@ -159,7 +145,7 @@ async function toggleActive(row: any) {
           <div class="grid grid-cols-2 gap-3 text-sm">
             <div>
               <div class="text-muted text-xs mb-1">Pora dnia</div>
-              <UBadge :color="periodColor[selected.pora_dnia]" variant="subtle">{{ periodLabel[selected.pora_dnia] || selected.pora_dnia }}</UBadge>
+              <UBadge :color="badgePoryDnia(selected.pora_dnia)" variant="subtle">{{ formatPoraDnia(selected.pora_dnia) }}</UBadge>
             </div>
             <div>
               <div class="text-muted text-xs mb-1">Norma czasu</div>

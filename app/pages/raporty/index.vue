@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import type { StatusWykonania } from '~/types/database.types'
 import type { WykonanieWithRelations } from '~/composables/useSupabase'
+import {
+  badgePoryDnia,
+  formatPoraDnia,
+  raportTabs,
+  statusWykonaniaGroupClass,
+  statusWykonaniaLabel
+} from '~/utils/procedureMeta'
 
 definePageMeta({ layout: 'default' })
 
@@ -9,28 +16,6 @@ const { stanowiska, fetch: fetchStanowiska } = useStanowiska()
 
 const selectedDate = ref(new Date().toISOString().slice(0, 10))
 const filterStation = ref('')
-
-const tabs = [
-  { label: 'Przegląd dzienny', to: '/raporty' },
-  { label: 'Tabela zbiorcza', to: '/raporty/tabela' }
-]
-
-const statusLabel: Record<StatusWykonania, string> = {
-  do_zrobienia: 'Do zrobienia',
-  w_trakcie: 'W trakcie',
-  wykonane: 'Wykonane',
-  odrzucone: 'Odrzucone'
-}
-
-const statusColor: Record<StatusWykonania, string> = {
-  do_zrobienia: 'text-muted border-muted bg-elevated',
-  w_trakcie: 'text-info border-info/30 bg-info/5',
-  wykonane: 'text-success border-success/30 bg-success/5',
-  odrzucone: 'text-error border-error/30 bg-error/5'
-}
-
-const periodLabel: Record<string, string> = { Rano: 'Rano', Dzien: 'Dzień', Wieczor: 'Wieczór' }
-const periodBadge: Record<string, any> = { Rano: 'primary', Dzien: 'info', Wieczor: 'violet' }
 
 onMounted(async () => {
   await fetchStanowiska()
@@ -63,7 +48,7 @@ const groups = computed(() =>
   (['w_trakcie', 'do_zrobienia', 'wykonane', 'odrzucone'] as StatusWykonania[])
     .map(status => ({
       status,
-      label: statusLabel[status],
+      label: statusWykonaniaLabel[status],
       items: filtered.value.filter(w => w.status === status)
     }))
     .filter(group => group.items.length > 0)
@@ -106,7 +91,7 @@ function startLabel(w: WykonanieWithRelations) {
     <div class="p-5 flex flex-col gap-4">
       <div class="flex border-b border-muted gap-4">
         <NuxtLink
-          v-for="tab in tabs"
+          v-for="tab in raportTabs"
           :key="tab.to"
           :to="tab.to"
           class="pb-2.5 text-sm font-medium border-b-2 -mb-px transition-colors"
@@ -173,7 +158,7 @@ function startLabel(w: WykonanieWithRelations) {
         <div v-for="group in groups" :key="group.status">
           <div
             class="flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-semibold uppercase tracking-wide mb-2"
-            :class="statusColor[group.status]"
+            :class="statusWykonaniaGroupClass[group.status]"
           >
             {{ group.label }}
             <span class="font-normal normal-case tracking-normal ml-1">({{ group.items.length }})</span>
@@ -188,8 +173,8 @@ function startLabel(w: WykonanieWithRelations) {
               <div class="text-sm font-medium truncate">{{ item.procedury?.nazwa ?? '—' }}</div>
               <div class="text-xs text-muted mt-0.5">{{ item.stanowiska?.nazwa ?? '—' }}</div>
             </div>
-            <UBadge :color="periodBadge[item.procedury?.pora_dnia ?? ''] ?? 'neutral'" variant="subtle" size="sm">
-              {{ periodLabel[item.procedury?.pora_dnia ?? ''] ?? item.procedury?.pora_dnia ?? '—' }}
+            <UBadge :color="badgePoryDnia(item.procedury?.pora_dnia)" variant="subtle" size="sm">
+              {{ formatPoraDnia(item.procedury?.pora_dnia) }}
             </UBadge>
             <div class="text-xs text-muted w-12 text-right">{{ startLabel(item) }}</div>
             <div class="text-xs w-16 text-right">{{ czasLabel(item) }}</div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { StatusWykonania } from '~/types/database.types'
+import { formatPoraDnia } from '~/utils/procedureMeta'
 
 definePageMeta({ layout: 'mobile', middleware: 'mobile-auth' })
 
@@ -43,12 +44,6 @@ const procentPostepu = computed(() => {
   const all = zadania.value.length
   return all ? Math.round((wykonane.value.length / all) * 100) : 0
 })
-
-const periodLabel: Record<string, string> = { Rano: 'Rano', Dzien: 'Dzień', Wieczor: 'Wieczór' }
-
-function labelPoryDnia(pora?: string) {
-  return pora ? (periodLabel[pora] ?? pora) : '—'
-}
 
 async function zmienStatus(id: string, status: StatusWykonania) {
   aktualizowane.value = id
@@ -110,7 +105,7 @@ async function zmienStatus(id: string, status: StatusWykonania) {
         <div v-for="z in wTrakcie" :key="z.id" class="border border-muted rounded-2xl p-4">
           <div class="font-medium">{{ z.procedury?.nazwa }}</div>
           <div class="flex items-center gap-2 mt-1 text-xs text-muted">
-            <UBadge color="primary" variant="subtle" size="sm">{{ labelPoryDnia(z.procedury?.pora_dnia) }}</UBadge>
+            <UBadge color="primary" variant="subtle" size="sm">{{ formatPoraDnia(z.procedury?.pora_dnia) }}</UBadge>
             <span>norma: {{ z.procedury?.norma_min }} min</span>
           </div>
           <UButton block color="primary" class="mt-3 justify-center" :loading="aktualizowane === z.id" icon="i-lucide-check" @click="zmienStatus(z.id, 'wykonane')">Zakończ</UButton>
@@ -123,7 +118,7 @@ async function zmienStatus(id: string, status: StatusWykonania) {
         <div v-for="z in doZrobienia" :key="z.id" class="border border-muted rounded-2xl p-4">
           <div class="font-medium">{{ z.procedury?.nazwa }}</div>
           <div class="flex items-center gap-2 mt-1 text-xs text-muted">
-            <UBadge color="neutral" variant="subtle" size="sm">{{ labelPoryDnia(z.procedury?.pora_dnia) }}</UBadge>
+            <UBadge color="neutral" variant="subtle" size="sm">{{ formatPoraDnia(z.procedury?.pora_dnia) }}</UBadge>
             <span>norma: {{ z.procedury?.norma_min }} min</span>
           </div>
           <UButton block color="neutral" variant="outline" class="mt-3 justify-center" :loading="aktualizowane === z.id" icon="i-lucide-play" @click="zmienStatus(z.id, 'w_trakcie')">Rozpocznij</UButton>
