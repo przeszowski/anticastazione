@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { poraDniaOptions } from '~/utils/procedureMeta'
+import { NO_STATION_VALUE, poraDniaOptions } from '~/utils/procedureMeta'
 
 definePageMeta({ layout: 'default' })
 
@@ -13,7 +13,7 @@ onMounted(fetchStanowiska)
 const form = reactive({
   nazwa: '',
   opis: '',
-  stanowisko_id: '',
+  stanowisko_id: NO_STATION_VALUE,
   pora_dnia: 'Rano' as 'Rano' | 'Dzien' | 'Wieczor',
   norma_min: 20,
   aktywna: true,
@@ -21,7 +21,7 @@ const form = reactive({
 })
 
 const stationOptions = computed(() => [
-  { label: 'Bez stanowiska', value: '' },
+  { label: 'Bez stanowiska', value: NO_STATION_VALUE },
   ...stanowiska.value.map(s => ({ label: s.nazwa, value: s.id }))
 ])
 
@@ -35,7 +35,7 @@ async function save() {
     await create({
       nazwa: form.nazwa.trim(),
       opis: form.opis.trim() || null,
-      stanowisko_id: form.stanowisko_id || null,
+      stanowisko_id: form.stanowisko_id === NO_STATION_VALUE ? null : form.stanowisko_id,
       pora_dnia: form.pora_dnia,
       norma_min: form.norma_min,
       aktywna: form.aktywna,

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NO_STATION_VALUE } from '~/utils/procedureMeta'
+
 definePageMeta({ layout: 'default' })
 
 const { roles, fetch: fetchRoles } = useRoles()
@@ -17,12 +19,12 @@ const form = reactive({
   telefon: '',
   haslo: '',
   rola: 'PRACOWNIK',
-  stanowisko_id: ''
+  stanowisko_id: NO_STATION_VALUE
 })
 
 const roleOptions = computed(() => roles.value.map(r => ({ label: r.nazwa, value: r.nazwa })))
 const stationOptions = computed(() => [
-  { label: 'Bez stanowiska', value: '' },
+  { label: 'Bez stanowiska', value: NO_STATION_VALUE },
   ...stanowiska.value.map(s => ({ label: s.nazwa, value: s.id }))
 ])
 
@@ -42,7 +44,7 @@ async function save() {
         telefon: form.telefon.trim() || null,
         haslo: form.haslo,
         rola: form.rola,
-        stanowisko_id: form.stanowisko_id || null
+        stanowisko_id: form.stanowisko_id === NO_STATION_VALUE ? null : form.stanowisko_id
       }
     })
     toast.add({ title: 'Użytkownik utworzony', color: 'success' })

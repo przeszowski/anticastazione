@@ -2,6 +2,7 @@
 import type { StatusWykonania } from '~/types/database.types'
 import type { WykonanieWithRelations } from '~/composables/useSupabase'
 import {
+  ALL_SELECT_VALUE,
   badgePoryDnia,
   formatPoraDnia,
   raportTabs,
@@ -15,7 +16,7 @@ const { wykonania, loading, error, fetchDzien } = useWykonania()
 const { stanowiska, fetch: fetchStanowiska } = useStanowiska()
 
 const selectedDate = ref(new Date().toISOString().slice(0, 10))
-const filterStation = ref('')
+const filterStation = ref(ALL_SELECT_VALUE)
 
 onMounted(async () => {
   await fetchStanowiska()
@@ -23,11 +24,11 @@ onMounted(async () => {
 })
 
 watch([selectedDate, filterStation], async ([date, station]) => {
-  await fetchDzien(date, station || undefined)
+  await fetchDzien(date, station === ALL_SELECT_VALUE ? undefined : station)
 })
 
 const stationOptions = computed(() => [
-  { label: 'Wszystkie stanowiska', value: '' },
+  { label: 'Wszystkie stanowiska', value: ALL_SELECT_VALUE },
   ...stanowiska.value.map(s => ({ label: s.nazwa, value: s.id }))
 ])
 

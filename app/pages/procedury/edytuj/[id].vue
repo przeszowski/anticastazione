@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { poraDniaOptions } from '~/utils/procedureMeta'
+import { NO_STATION_VALUE, poraDniaOptions } from '~/utils/procedureMeta'
 
 definePageMeta({ layout: 'default' })
 
@@ -20,7 +20,7 @@ const canDelete = computed(() => can('procedury:delete'))
 const form = reactive({
   nazwa: '',
   opis: '',
-  stanowisko_id: '',
+  stanowisko_id: NO_STATION_VALUE,
   pora_dnia: 'Rano' as 'Rano' | 'Dzien' | 'Wieczor',
   norma_min: 20,
   aktywna: true,
@@ -28,7 +28,7 @@ const form = reactive({
 })
 
 const stationOptions = computed(() => [
-  { label: 'Bez stanowiska', value: '' },
+  { label: 'Bez stanowiska', value: NO_STATION_VALUE },
   ...stanowiska.value.map(s => ({ label: s.nazwa, value: s.id }))
 ])
 
@@ -38,7 +38,7 @@ onMounted(async () => {
     const data = await fetchOne(id)
     form.nazwa = data.nazwa
     form.opis = data.opis ?? ''
-    form.stanowisko_id = data.stanowisko_id ?? ''
+    form.stanowisko_id = data.stanowisko_id ?? NO_STATION_VALUE
     form.pora_dnia = data.pora_dnia
     form.norma_min = data.norma_min
     form.aktywna = data.aktywna
@@ -61,7 +61,7 @@ async function save() {
     await update(id, {
       nazwa: form.nazwa.trim(),
       opis: form.opis.trim() || null,
-      stanowisko_id: form.stanowisko_id || null,
+      stanowisko_id: form.stanowisko_id === NO_STATION_VALUE ? null : form.stanowisko_id,
       pora_dnia: form.pora_dnia,
       norma_min: form.norma_min,
       aktywna: form.aktywna,

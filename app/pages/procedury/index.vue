@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { badgePoryDnia, formatPoraDnia, poraDniaOptions } from '~/utils/procedureMeta'
+import { ALL_SELECT_VALUE, badgePoryDnia, formatPoraDnia, poraDniaOptions } from '~/utils/procedureMeta'
 
 definePageMeta({ layout: 'default' })
 
@@ -9,8 +9,8 @@ const { can } = useAuth()
 const toast = useToast()
 
 const search = ref('')
-const filterStation = ref('')
-const filterPeriod = ref('')
+const filterStation = ref(ALL_SELECT_VALUE)
+const filterPeriod = ref(ALL_SELECT_VALUE)
 
 // Pobierz dane przy montowaniu
 onMounted(async () => {
@@ -18,17 +18,17 @@ onMounted(async () => {
 })
 
 const stationOptions = computed(() => [
-  { label: 'Wszystkie stanowiska', value: '' },
+  { label: 'Wszystkie stanowiska', value: ALL_SELECT_VALUE },
   ...stanowiska.value.map(s => ({ label: s.nazwa, value: s.id }))
 ])
 
-const periodOptions = [{ label: 'Wszystkie pory', value: '' }, ...poraDniaOptions]
+const periodOptions = [{ label: 'Wszystkie pory', value: ALL_SELECT_VALUE }, ...poraDniaOptions]
 
 const filtered = computed(() =>
   procedury.value.filter(p => {
     const matchSearch = p.nazwa.toLowerCase().includes(search.value.toLowerCase())
-    const matchStation = !filterStation.value || p.stanowisko_id === filterStation.value
-    const matchPeriod = !filterPeriod.value || p.pora_dnia === filterPeriod.value
+    const matchStation = filterStation.value === ALL_SELECT_VALUE || p.stanowisko_id === filterStation.value
+    const matchPeriod = filterPeriod.value === ALL_SELECT_VALUE || p.pora_dnia === filterPeriod.value
     return matchSearch && matchStation && matchPeriod
   })
 )

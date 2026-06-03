@@ -2,6 +2,9 @@ import type { PoraDnia, StatusWykonania } from '~/types/database.types'
 
 export type UiColor = 'error' | 'primary' | 'info' | 'neutral' | 'success' | 'secondary' | 'warning'
 
+export const ALL_SELECT_VALUE = '__all__'
+export const NO_STATION_VALUE = '__none__'
+
 export const raportTabs = [
   { label: 'Przegląd dzienny', to: '/raporty' },
   { label: 'Tabela zbiorcza', to: '/raporty/tabela' }
