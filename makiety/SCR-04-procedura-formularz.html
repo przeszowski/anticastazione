@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>L'Antica — Nowa procedura</title>
+<style>
+:root{--brand:#c59d5f;--brand-h:#b08840;--brand-l:#fdf6ec;--t:#111827;--t2:#6b7280;--t3:#9ca3af;--b:#e5e7eb;--bg:#f9fafb;--ok:#16a34a;--ok-bg:#f0fdf4;--warn:#d97706;--warn-bg:#fffbeb;--err:#dc2626;--err-bg:#fef2f2;--inf:#2563eb;--inf-bg:#eff6ff;--sid:220px;--th:52px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#fff;color:var(--t);}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:var(--sid);background:#fff;border-right:1px solid var(--b);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:20;overflow-y:auto;}
+.main{margin-left:var(--sid);flex:1;display:flex;flex-direction:column;}
+.sb-logo{padding:20px 20px 14px;border-bottom:1px solid var(--b);}
+.sb-logo-name{font-size:13px;font-weight:600;color:var(--brand);letter-spacing:.04em;}
+.sb-logo-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+.sb-nav{padding:12px 10px;flex:1;}
+.si{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;text-decoration:none;margin-bottom:2px;transition:background .12s,color .12s;}
+
+
+.si svg{flex-shrink:0;}
+.sb-footer{padding:14px 20px;border-top:1px solid var(--b);font-size:12px;color:var(--t3);}
+.topbar{height:var(--th);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 20px;gap:8px;background:#fff;position:sticky;top:0;z-index:10;}
+.content{padding:20px;flex:1;}
+
+ 
+ 
+.tb-title{font-size:14px;font-weight:600;color:var(--t);}
+.tb-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;white-space:nowrap;}
+.btn-brand{background:var(--brand);color:#fff;} .btn-brand:hover{background:var(--brand-h);}
+.btn-sec{background:#fff;color:var(--t);border:1px solid var(--b);} .btn-sec:hover{background:var(--bg);}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.bdg{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;}
+.bdg-g{background:var(--ok-bg);color:var(--ok);}
+/* SO */
+.so-ov{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40;}
+.so{position:fixed;top:0;right:0;bottom:0;width:480px;background:#fff;z-index:50;display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.1);}
+.so-hd{padding:16px 20px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;}
+.so-t{font-size:16px;font-weight:600;color:var(--t);}
+.so-st{font-size:13px;color:var(--t2);margin-top:2px;}
+.so-x{width:28px;height:28px;border:none;background:transparent;color:var(--t2);cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.so-x:hover{background:var(--bg);}
+.so-bd{padding:20px;overflow-y:auto;flex:1;}
+.so-ft{padding:14px 20px;border-top:1px solid var(--b);display:flex;gap:8px;}
+.fg{margin-bottom:16px;}
+.fl{display:block;font-size:13px;font-weight:600;color:var(--t);margin-bottom:5px;}
+.fl-req::after{content:" *";color:var(--err);}
+.finp,.fsel-f,.fta{width:100%;padding:8px 12px;border:1px solid var(--b);border-radius:8px;font-size:13.5px;color:var(--t);background:#fff;outline:none;font-family:inherit;}
+.finp:focus,.fsel-f:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-l);}
+.fta{min-height:90px;resize:vertical;}
+.fta:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-l);}
+.fhint{font-size:12px;color:var(--t3);margin-top:3px;}
+.so-sec-t{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--b);}
+
+/* ─── Recurrence picker ──────────────────────────────────────── */
+.rec-btn{width:100%;padding:8px 12px;border:1px solid var(--b);border-radius:8px;font-size:13.5px;color:var(--t);background:#fff;outline:none;font-family:inherit;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;transition:border-color .15s,box-shadow .15s;}
+.rec-btn:hover{border-color:var(--brand);}
+.rec-btn:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-l);}
+.rec-btn svg{flex-shrink:0;color:var(--t3);}
+/* modal overlay */
+.rec-ov{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:flex;align-items:center;justify-content:center;}
+.rec-ov.hidden{display:none;}
+/* modal card */
+.rec-dlg{background:#fff;border-radius:14px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;}
+.rec-dlg-hd{padding:18px 20px 14px;border-bottom:1px solid var(--b);}
+.rec-dlg-t{font-size:15px;font-weight:600;color:var(--t);}
+.rec-dlg-bd{padding:20px;}
+.rec-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.rec-row:last-child{margin-bottom:0;}
+.rec-lbl{font-size:13px;font-weight:600;color:var(--t);min-width:110px;flex-shrink:0;}
+.rec-num{width:62px;padding:7px 10px;border:1px solid var(--b);border-radius:8px;font-size:14px;font-weight:600;color:var(--t);text-align:center;font-family:inherit;outline:none;}
+.rec-num:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-l);}
+.rec-unit{padding:7px 10px;border:1px solid var(--b);border-radius:8px;font-size:13.5px;color:var(--t);background:#fff;outline:none;font-family:inherit;cursor:pointer;flex:1;}
+.rec-unit:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-l);}
+/* day chips */
+.day-chips{display:flex;gap:5px;flex-wrap:wrap;}
+.day-chip{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--b);font-size:12px;font-weight:600;color:var(--t2);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.day-chip:hover{border-color:var(--brand);color:var(--brand-h);}
+.day-chip.on{background:var(--brand);border-color:var(--brand);color:#fff;}
+/* ends radio */
+.rec-radio-grp{display:flex;flex-direction:column;gap:10px;flex:1;}
+.rec-radio-opt{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px;color:var(--t);}
+.rec-radio-opt input[type=radio]{width:15px;height:15px;accent-color:var(--brand);cursor:pointer;}
+.rec-date-inp{padding:6px 10px;border:1px solid var(--b);border-radius:7px;font-size:13px;color:var(--t);font-family:inherit;outline:none;margin-left:4px;}
+.rec-date-inp:focus{border-color:var(--brand);}
+.rec-occ-inp{width:52px;padding:6px 10px;border:1px solid var(--b);border-radius:7px;font-size:13px;color:var(--t);text-align:center;font-family:inherit;outline:none;margin-left:4px;margin-right:4px;}
+.rec-occ-inp:focus{border-color:var(--brand);}
+.rec-dlg-ft{padding:14px 20px;border-top:1px solid var(--b);display:flex;gap:8px;justify-content:flex-end;}
+
+/* Tło tabeli */
+table{width:100%;border-collapse:collapse;}
+thead th{padding:10px 12px;text-align:left;font-size:13px;font-weight:600;color:var(--t);border-bottom:1px solid var(--b);}
+tbody tr{border-bottom:1px solid var(--b);}
+td{padding:11px 12px;font-size:13.5px;color:var(--t);}
+.td2{color:var(--t2);font-size:12px;margin-top:2px;}
+.bdg-brand{background:var(--brand-l);color:var(--brand-h);}
+.bdg-b{background:var(--inf-bg);color:var(--inf);}
+.bdg-purple{background:#f5f3ff;color:#7c3aed;}
+.bdg-gr{background:#f3f4f6;color:#6b7280;}
+</style>
+</head>
+<body>
+<div class="layout">
+    <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-name">L'ANTICA STAZIONE</div>
+      <div class="sb-logo-sub">Panel zarządzania</div>
+    </div>
+    <nav class="sb-nav">
+    
+    <a class="si active" href="SCR-02-procedury-lista.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/></svg>
+      Procedury
+    </a>
+    <a class="si"  href="SCR-05-stanowiska-lista.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+      Stanowiska
+    </a>
+    <a class="si" href="SCR-07-odpowiedzi-dzien.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+      Raporty
+    </a>
+    </nav>
+    <div class="sb-footer">Prototyp v0.1</div>
+  </aside>
+
+
+  <!-- MAIN (przyciemniony) -->
+  <div class="main" style="opacity:.4;pointer-events:none;">
+    <div class="topbar">
+      <div class="tb-title">Procedury</div>
+      <div class="tb-r"><button class="btn btn-brand" onclick="window.location='SCR-02-procedury-lista.html'">+ Nowa procedura</button></div>
+    </div>
+    <div class="content">
+      <table><thead><tr><th style="width:32px;"></th><th>Nazwa procedury</th><th>Stanowisko</th><th>Pora dnia</th><th>Śr. czas</th><th>Częstotliwość</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <tr><td></td><td><div style="font-weight:600">Mycie pieca</div></td><td>Kuchnia</td><td><span class="bdg bdg-brand">Rano</span></td><td>12 min</td><td>Codziennie</td><td><span class="bdg bdg-g">Aktywna</span></td><td></td></tr>
+        <tr><td></td><td><div style="font-weight:600">Wyrabianie ciasta</div></td><td>Kuchnia</td><td><span class="bdg bdg-brand">Rano</span></td><td>15 min</td><td>Codziennie</td><td><span class="bdg bdg-g">Aktywna</span></td><td></td></tr>
+        <tr><td></td><td><div style="font-weight:600">Sprawdzenie temperatur</div></td><td>Kuchnia</td><td><span class="bdg bdg-b">W ciągu dnia</span></td><td>5 min</td><td>2× dziennie</td><td><span class="bdg bdg-g">Aktywna</span></td><td></td></tr>
+        <tr><td></td><td><div style="font-weight:600">Dezynfekcja blatów</div></td><td>Kuchnia</td><td><span class="bdg bdg-purple">Zamknięcie</span></td><td>10 min</td><td>Codziennie</td><td><span class="bdg bdg-g">Aktywna</span></td><td></td></tr>
+      </tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY -->
+<div class="so-ov"></div>
+
+<!-- SLIDEOVER FORMULARZ -->
+<div class="so">
+  <div class="so-hd">
+    <div>
+      <div class="so-t">Nowa procedura</div>
+      <div class="so-st">Wypełnij pola i zapisz</div>
+    </div>
+    <button class="so-x" onclick="window.location='SCR-02-procedury-lista.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="so-bd">
+    <div style="margin-bottom:20px;">
+      <div class="so-sec-t">Dane podstawowe</div>
+      <div class="fg">
+        <label class="fl fl-req">Nazwa procedury</label>
+        <input class="finp" type="text" value="Mycie pieca" placeholder="np. Mycie pieca">
+      </div>
+      <div class="fg">
+        <label class="fl">Opis / Instrukcja wykonania</label>
+        <textarea class="fta" placeholder="Opisz kroki do wykonania…">Wyczyść piec z resztek poprzedniego dnia. Użyj szczotki drucianej, następnie wytrzyj wilgotną ściereczką. Sprawdź elementy grzewcze pod kątem uszkodzeń.</textarea>
+        <div class="fhint">Instrukcja widoczna dla pracownika podczas wykonywania procedury</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div class="so-sec-t">Przypisanie i harmonogram</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="fg">
+          <label class="fl fl-req">Stanowisko</label>
+          <select class="fsel-f">
+            <option>— wybierz —</option>
+            <option selected>Kuchnia</option>
+            <option>Pizza</option>
+            <option>Sala</option>
+            <option>Dostawa</option>
+            <option>Zarządzanie</option>
+            <option>Inne</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="fl fl-req">Pora dnia</label>
+          <select class="fsel-f">
+            <option>— wybierz —</option>
+            <option selected>Rano</option>
+            <option>W ciągu dnia</option>
+            <option>Zamknięcie</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="fl fl-req">Śr. czas wykonania</label>
+          <input class="finp" type="text" value="12 min" placeholder="np. 15 min">
+          <div class="fhint">Przybliżony czas trwania</div>
+        </div>
+        <div class="fg">
+          <label class="fl fl-req">Częstotliwość</label>
+          <button type="button" class="rec-btn" id="recBtn" onclick="recOpen()">
+            <span id="recLabel">Co tydzień w: piątek</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+          </button>
+          <div class="fhint">Jak często procedura ma się powtarzać</div>
+        </div>
+
+<!-- ═══════════════ RECURRENCE MODAL ═══════════════ -->
+<!-- Simple dropdown panel (shown for non-custom options) -->
+<div id="recDropOv" class="rec-ov hidden" onclick="if(event.target===this)recClose()">
+  <div class="rec-dlg" style="width:320px;">
+    <div class="rec-dlg-bd" style="padding:8px 0">
+      <div id="recOpts"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom recurrence dialog -->
+<div id="recCustomOv" class="rec-ov hidden" onclick="if(event.target===this)recCustomCancel()">
+  <div class="rec-dlg">
+    <div class="rec-dlg-hd">
+      <div class="rec-dlg-t">Powtarzanie niestandardowe</div>
+    </div>
+    <div class="rec-dlg-bd">
+      <!-- Powtarzaj co: [n] [unit] -->
+      <div class="rec-row">
+        <div class="rec-lbl">Powtarzaj co:</div>
+        <input id="recN" type="number" class="rec-num" value="1" min="1" max="99" oninput="recUpdateDayVis()">
+        <select id="recUnit" class="rec-unit" onchange="recUpdateDayVis()">
+          <option value="dzien">dzień</option>
+          <option value="tydzien" selected>tydzień</option>
+          <option value="miesiac">miesiąc</option>
+          <option value="rok">rok</option>
+        </select>
+      </div>
+      <!-- Powtarzaj w: day chips (only for weeks) -->
+      <div class="rec-row" id="recDayRow">
+        <div class="rec-lbl">Powtarzaj w:</div>
+        <div class="day-chips">
+          <button type="button" class="day-chip" data-d="1">P</button>
+          <button type="button" class="day-chip" data-d="2">W</button>
+          <button type="button" class="day-chip" data-d="3">Ś</button>
+          <button type="button" class="day-chip" data-d="4">C</button>
+          <button type="button" class="day-chip on" data-d="5">P</button>
+          <button type="button" class="day-chip" data-d="6">S</button>
+          <button type="button" class="day-chip" data-d="0">N</button>
+        </div>
+      </div>
+      <!-- Kończy się -->
+      <div class="rec-row" style="align-items:flex-start">
+        <div class="rec-lbl" style="padding-top:3px">Kończy się:</div>
+        <div class="rec-radio-grp">
+          <label class="rec-radio-opt">
+            <input type="radio" name="recEnd" value="never" checked> Nigdy
+          </label>
+          <label class="rec-radio-opt">
+            <input type="radio" name="recEnd" value="date" onchange="recEndChange(this)"> W dniu
+            <input type="date" class="rec-date-inp" id="recEndDate" value="2025-12-31" onclick="document.querySelector('[value=date]').checked=true" onchange="document.querySelector('[value=date]').checked=true">
+          </label>
+          <label class="rec-radio-opt">
+            <input type="radio" name="recEnd" value="occ" onchange="recEndChange(this)"> Po
+            <input type="number" class="rec-occ-inp" id="recOcc" value="10" min="1" onclick="document.querySelector('[value=occ]').checked=true" oninput="document.querySelector('[value=occ]').checked=true"> wystąpieniach
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="rec-dlg-ft">
+      <button type="button" class="btn btn-sec" onclick="recCustomCancel()">Anuluj</button>
+      <button type="button" class="btn btn-brand" onclick="recCustomSave()">Gotowe</button>
+    </div>
+  </div>
+</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="so-sec-t">Status</div>
+      <div class="fg">
+        <label class="fl">Status procedury</label>
+        <select class="fsel-f">
+          <option selected>Aktywna</option>
+          <option>Nieaktywna</option>
+        </select>
+        <div class="fhint">Nieaktywne procedury nie pojawiają się na liście zadań pracowników</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="so-ft">
+    <button class="btn btn-sec" style="flex:1;justify-content:center;" onclick="window.location='SCR-02-procedury-lista.html'">Anuluj</button>
+    <button class="btn btn-brand" style="flex:1;justify-content:center;" onclick="window.location='SCR-02-procedury-lista.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+      Zapisz procedurę
+    </button>
+  </div>
+</div>
+
+<script>
+// ── Recurrence state ──────────────────────────────────────────────────────────
+const REC_OPTIONS = [
+  { id:'none',    label:'Nie powtarza się' },
+  { id:'daily',   label:'Codziennie' },
+  { id:'weekly',  label:'Co tydzień w: piątek' },
+  { id:'monthly', label:'Co miesiąc w: 1. piątek' },
+  { id:'yearly',  label:'Co rok w dniu: 1. maja' },
+  { id:'weekdays',label:'W dni powszednie (pon – pt)' },
+  { id:'custom',  label:'Niestandardowe…' },
+];
+let recCurrent = 'weekly';
+
+// ── Build simple dropdown ─────────────────────────────────────────────────────
+function recOpen() {
+  const el = document.getElementById('recOpts');
+  el.innerHTML = '';
+  REC_OPTIONS.forEach(opt => {
+    const div = document.createElement('div');
+    div.style.cssText = 'padding:10px 18px;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .1s;';
+    div.onmouseenter = () => div.style.background = 'var(--bg)';
+    div.onmouseleave = () => div.style.background = '';
+    // checkmark for current
+    const chk = document.createElement('span');
+    chk.style.cssText = 'width:16px;color:var(--brand);font-size:14px;flex-shrink:0;';
+    chk.textContent = recCurrent === opt.id ? '✓' : '';
+    div.appendChild(chk);
+    div.appendChild(document.createTextNode(opt.label));
+    div.onclick = () => recSelect(opt.id, opt.label);
+    el.appendChild(div);
+  });
+  document.getElementById('recDropOv').classList.remove('hidden');
+}
+
+function recClose() {
+  document.getElementById('recDropOv').classList.add('hidden');
+}
+
+function recSelect(id, label) {
+  recClose();
+  if (id === 'custom') {
+    recCurrent = 'custom';
+    document.getElementById('recCustomOv').classList.remove('hidden');
+    recUpdateDayVis();
+    return;
+  }
+  recCurrent = id;
+  document.getElementById('recLabel').textContent = label;
+}
+
+// ── Day chips toggle ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.day-chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('on'));
+  });
+});
+
+// ── Show/hide day row based on unit ──────────────────────────────────────────
+function recUpdateDayVis() {
+  const unit = document.getElementById('recUnit').value;
+  document.getElementById('recDayRow').style.display = unit === 'tydzien' ? 'flex' : 'none';
+}
+
+// ── Custom dialog actions ────────────────────────────────────────────────────
+function recCustomCancel() {
+  document.getElementById('recCustomOv').classList.add('hidden');
+  if (recCurrent === 'custom') {
+    recCurrent = 'weekly';
+    document.getElementById('recLabel').textContent = 'Co tydzień w: piątek';
+  }
+}
+
+function recCustomSave() {
+  document.getElementById('recCustomOv').classList.add('hidden');
+  // Build label from selections
+  const n    = document.getElementById('recN').value;
+  const unit = document.getElementById('recUnit');
+  const unitNames = { dzien:'dzień', tydzien:'tydzień', miesiac:'miesiąc', rok:'rok' };
+  const unitPlural = { dzien:'dni', tydzien:'tygodni', miesiac:'miesięcy', rok:'lat' };
+  const days  = ['N','P','W','Ś','C','P','S'];
+  const selDays = [...document.querySelectorAll('.day-chip.on')].map(c => days[+c.dataset.d]).join(', ');
+  const endRadio = document.querySelector('[name=recEnd]:checked').value;
+  const endStr = endRadio === 'never' ? '' : endRadio === 'date' ? ', do ' + document.getElementById('recEndDate').value : ', ' + document.getElementById('recOcc').value + '×';
+
+  let label;
+  if (n == 1) {
+    label = 'Co ' + unitNames[unit.value];
+  } else {
+    label = 'Co ' + n + ' ' + unitPlural[unit.value];
+  }
+  if (unit.value === 'tydzien' && selDays) label += ' (' + selDays + ')';
+  label += endStr;
+
+  document.getElementById('recLabel').textContent = label;
+  recCurrent = 'custom';
+}
+</script>
+</body>
+</html>

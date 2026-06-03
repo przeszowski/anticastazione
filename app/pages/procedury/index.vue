@@ -3,6 +3,7 @@ definePageMeta({ layout: 'default' })
 
 const { procedury, loading, error, fetch } = useProcedury()
 const { stanowiska, fetch: fetchStanowiska } = useStanowiska()
+const { can } = useAuth()
 const toast = useToast()
 
 const search = ref('')
@@ -54,6 +55,8 @@ const columns = [
   { accessorKey: 'aktywna', header: 'Status' },
   { id: 'actions', header: '' }
 ]
+const canCreate = computed(() => can('procedury:create'))
+const canUpdate = computed(() => can('procedury:update'))
 
 // Slideover szczegółów
 const slideoverOpen = ref(false)
@@ -65,6 +68,7 @@ function openDetails(row: any) {
 }
 
 async function toggleActive(row: any) {
+  if (!canUpdate.value) return
   const { update } = useProcedury()
   try {
     await update(row.id, { aktywna: !row.aktywna })
@@ -80,7 +84,7 @@ async function toggleActive(row: any) {
   <div class="flex flex-col flex-1">
     <div class="h-[52px] border-b border-muted flex items-center px-5 gap-3 bg-default sticky top-0 z-10">
       <span class="text-sm font-semibold flex-1">Procedury</span>
-      <UButton color="primary" size="sm" icon="i-lucide-plus" @click="navigateTo('/procedury/nowa')">
+      <UButton v-if="canCreate" color="primary" size="sm" icon="i-lucide-plus" @click="navigateTo('/procedury/nowa')">
         Nowa procedura
       </UButton>
     </div>
@@ -128,7 +132,7 @@ async function toggleActive(row: any) {
           </UBadge>
         </template>
         <template #actions-cell="{ row }">
-          <div class="flex justify-end gap-1">
+          <div v-if="canUpdate" class="flex justify-end gap-1">
             <UButton color="neutral" variant="ghost" icon="i-lucide-pencil" size="xs"
               @click.stop="navigateTo('/procedury/edytuj/' + row.original.id)" />
             <UButton color="neutral" variant="ghost"

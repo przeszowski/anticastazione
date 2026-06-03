@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Godziny pracy — L'Antica</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{
+  --brand:#c59d5f;--brand-h:#b08840;--brand-l:#fdf6ec;
+  --t:#111827;--t2:#6b7280;--t3:#9ca3af;
+  --b:#e5e7eb;--bg:#f9fafb;
+  --ok:#16a34a;--ok-bg:#f0fdf4;
+  --warn:#d97706;--warn-bg:#fffbeb;
+  --err:#dc2626;--err-bg:#fef2f2;
+  --inf:#2563eb;--inf-bg:#eff6ff;
+  --sw:52px;--th:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#fff;color:var(--t);}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:var(--sw);background:#fff;border-right:1px solid var(--b);display:flex;flex-direction:column;align-items:center;padding:8px 0;position:fixed;top:0;left:0;bottom:0;z-index:20;}
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;}
+.topbar{height:var(--th);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 20px;gap:8px;background:#fff;position:sticky;top:0;z-index:10;}
+.content{padding:20px;flex:1;}
+.si{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--t2);cursor:pointer;margin:2px 0;}
+.si:hover{background:var(--bg);color:var(--t);}
+.si.active{background:var(--brand-l);color:var(--brand);}
+.sdiv{width:32px;height:1px;background:var(--b);margin:6px 0;}
+.sbot{margin-top:auto;}
+.tb-title{font-size:14px;font-weight:600;color:var(--t);}
+.tb-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;white-space:nowrap;}
+.btn-brand{background:var(--brand);color:#fff;}
+.btn-brand:hover{background:var(--brand-h);}
+.btn-sec{background:#fff;color:var(--t);border:1px solid var(--b);}
+.btn-sec:hover{background:var(--bg);}
+.btn-ghost{background:transparent;color:var(--t2);}
+.btn-ghost:hover{background:var(--bg);color:var(--t);}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.bdg{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;}
+/* Grid schedule styles */
+.week-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.week-label{font-size:14px;font-weight:600;color:var(--t);min-width:200px;text-align:center;}
+.grid-wrap{border:1px solid var(--b);border-radius:10px;overflow:hidden;}
+.grid-table{width:100%;border-collapse:collapse;}
+.grid-table th{padding:10px 8px;font-size:12px;font-weight:600;color:var(--t2);border-bottom:1px solid var(--b);text-align:center;background:var(--bg);}
+.grid-table th.sta-col{text-align:left;padding-left:16px;min-width:160px;background:var(--bg);}
+.grid-table td{border-bottom:1px solid var(--b);border-right:1px solid #f3f4f6;vertical-align:middle;padding:8px 6px;}
+.grid-table td.sta-cell{padding:10px 16px;font-size:13.5px;font-weight:600;}
+.grid-table tr:last-child td{border-bottom:none;}
+.shift{border-radius:6px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer;display:block;margin:2px 0;white-space:nowrap;}
+.shift-morning{background:#fdf6ec;color:#b08840;border:1px solid #f0e0c0;}
+.shift-day{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;}
+.shift-evening{background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe;}
+.shift-closed{background:#f9fafb;color:#9ca3af;border:1px solid #e5e7eb;}
+.add-shift{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:transparent;border:1px dashed var(--b);color:var(--t3);cursor:pointer;font-size:14px;margin:2px auto;}
+.add-shift:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-l);}
+.day-today{background:#fffbeb;}
+.legend-wrap{display:flex;gap:16px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);}
+.leg-dot{width:10px;height:10px;border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="si" style="margin-bottom:4px" title="Dashboard">
+      <span style="font-size:11px;font-weight:600;color:var(--brand)">L'A</span>
+    </div>
+    <div class="sdiv"></div>
+    
+    <div class="si" onclick="location.href='SCR-02-procedury-lista.html'" title="Procedury">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/></svg>
+    </div>
+    <div class="si" onclick="location.href='SCR-05-stanowiska-lista.html'" title="Stanowiska">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+    </div>
+    <div class="si active" title="Godziny pracy">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+    </div>
+    <div class="si" onclick="location.href='SCR-07-odpowiedzi-dzien.html'" title="Odpowiedzi">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+    </div>
+    <div class="sbot">
+      <div class="si" title="Ustawienia">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+      </div>
+      <div class="si" style="background:var(--brand);color:#fff;font-size:10px;font-weight:600;cursor:pointer;" title="Marta Kowalska">MK</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+      <span class="tb-title">Godziny pracy stanowisk</span>
+      <div class="tb-r">
+
+        <button class="btn btn-brand">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Dodaj zmianę
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Week navigation -->
+      <div class="week-nav">
+        <button class="btn btn-sec btn-sm" style="gap:4px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+          Poprzedni
+        </button>
+        <div class="week-label">28 kwi – 4 maj 2025 · Tydzień 18</div>
+        <button class="btn btn-sec btn-sm" style="gap:4px">
+          Następny
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-sm" style="margin-left:8px">Dziś</button>
+        <div style="margin-left:auto">
+          <select style="padding:6px 10px;border:1px solid var(--b);border-radius:8px;font-size:13px;color:var(--t);background:#fff;outline:none;font-family:inherit;cursor:pointer">
+            <option>Wszystkie stanowiska</option>
+            <option>Kuchnia</option>
+            <option>Bar</option>
+            <option>Sala</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-wrap">
+        <div class="leg"><div class="leg-dot" style="background:#fdf6ec;border:1px solid #f0e0c0"></div> Rano (06:00–12:00)</div>
+        <div class="leg"><div class="leg-dot" style="background:#eff6ff;border:1px solid #bfdbfe"></div> W ciągu dnia (12:00–18:00)</div>
+        <div class="leg"><div class="leg-dot" style="background:#f5f3ff;border:1px solid #ddd6fe"></div> Zamknięcie (18:00–02:00)</div>
+        <div class="leg"><div class="leg-dot" style="background:#f9fafb;border:1px solid #e5e7eb"></div> Zamknięte</div>
+      </div>
+
+      <!-- Grid -->
+      <div class="grid-wrap">
+        <table class="grid-table">
+          <thead>
+            <tr>
+              <th class="sta-col">Stanowisko</th>
+              <th>Pon<br><span style="font-size:11px;font-weight:400;color:var(--t3)">28.04</span></th>
+              <th>Wt<br><span style="font-size:11px;font-weight:400;color:var(--t3)">29.04</span></th>
+              <th class="day-today" style="color:var(--brand)">Śr<br><span style="font-size:11px;font-weight:400">30.04</span></th>
+              <th>Czw<br><span style="font-size:11px;font-weight:400;color:var(--t3)">01.05</span></th>
+              <th>Pt<br><span style="font-size:11px;font-weight:400;color:var(--t3)">02.05</span></th>
+              <th>Sob<br><span style="font-size:11px;font-weight:400;color:var(--t3)">03.05</span></th>
+              <th>Nd<br><span style="font-size:11px;font-weight:400;color:var(--t3)">04.05</span></th>
+              <th style="min-width:70px">Razem<br><span style="font-size:11px;font-weight:400;color:var(--t3)">tydzień</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Kuchnia główna -->
+            <tr>
+              <td class="sta-cell">
+                <div style="font-weight:600;font-size:13.5px">Kuchnia główna</div>
+                <div style="font-size:11px;color:var(--t3);margin-top:1px">Kuchnia</div>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">06:00–12:00</span>
+                <span class="shift shift-day">12:00–18:00</span>
+                <span class="shift shift-evening">18:00–23:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">06:00–12:00</span>
+                <span class="shift shift-day">12:00–18:00</span>
+                <span class="shift shift-evening">18:00–23:00</span>
+              </td>
+              <td class="day-today" style="text-align:center">
+                <span class="shift shift-morning">06:00–12:00</span>
+                <span class="shift shift-day">12:00–18:00</span>
+                <span class="shift shift-evening">18:00–23:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-closed">Zamknięte</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">06:00–12:00</span>
+                <span class="shift shift-day">12:00–18:00</span>
+                <span class="shift shift-evening">18:00–23:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">06:00–14:00</span>
+                <span class="shift shift-evening">14:00–23:30</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">08:00–14:00</span>
+                <span class="shift shift-evening">14:00–22:00</span>
+              </td>
+              <td style="text-align:center;font-size:13px;font-weight:600;color:var(--t)">
+                102h
+                <div style="font-size:11px;font-weight:400;color:var(--t3)">6 dni</div>
+              </td>
+            </tr>
+            <!-- Bar główny -->
+            <tr>
+              <td class="sta-cell">
+                <div style="font-weight:600;font-size:13.5px">Bar główny</div>
+                <div style="font-size:11px;color:var(--t3);margin-top:1px">Bar</div>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-day">14:00–18:00</span>
+                <span class="shift shift-evening">18:00–02:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-day">14:00–18:00</span>
+                <span class="shift shift-evening">18:00–02:00</span>
+              </td>
+              <td class="day-today" style="text-align:center">
+                <span class="shift shift-day">14:00–18:00</span>
+                <span class="shift shift-evening">18:00–02:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-closed">Zamknięte</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-day">14:00–18:00</span>
+                <span class="shift shift-evening">18:00–02:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-day">12:00–18:00</span>
+                <span class="shift shift-evening">18:00–03:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-day">12:00–18:00</span>
+                <span class="shift shift-evening">18:00–02:00</span>
+              </td>
+              <td style="text-align:center;font-size:13px;font-weight:600;color:var(--t)">
+                78h
+                <div style="font-size:11px;font-weight:400;color:var(--t3)">6 dni</div>
+              </td>
+            </tr>
+            <!-- Sala -->
+            <tr>
+              <td class="sta-cell">
+                <div style="font-weight:600;font-size:13.5px">Sala restauracyjna</div>
+                <div style="font-size:11px;color:var(--t3);margin-top:1px">Sala</div>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">11:00–15:00</span>
+                <span class="shift shift-day">15:00–18:00</span>
+                <span class="shift shift-evening">18:00–23:30</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">11:00–15:00</span>
+                <span class="shift shift-day">15:00–18:00</span>
+                <span class="shift shift-evening">18:00–23:30</span>
+              </td>
+              <td class="day-today" style="text-align:center">
+                <span class="shift shift-morning">11:00–15:00</span>
+                <span class="shift shift-day">15:00–18:00</span>
+                <span class="shift shift-evening">18:00–23:30</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-closed">Zamknięte</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">11:00–15:00</span>
+                <span class="shift shift-day">15:00–18:00</span>
+                <span class="shift shift-evening">18:00–23:30</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">11:00–15:00</span>
+                <span class="shift shift-evening">15:00–23:30</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">11:00–15:00</span>
+                <span class="shift shift-evening">15:00–22:00</span>
+              </td>
+              <td style="text-align:center;font-size:13px;font-weight:600;color:var(--t)">
+                94h
+                <div style="font-size:11px;font-weight:400;color:var(--t3)">6 dni</div>
+              </td>
+            </tr>
+            <!-- Recepcja -->
+            <tr>
+              <td class="sta-cell">
+                <div style="font-weight:600;font-size:13.5px">Recepcja</div>
+                <div style="font-size:11px;color:var(--t3);margin-top:1px">Obsługa gości</div>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">10:00–14:00</span>
+                <span class="shift shift-day">14:00–18:00</span>
+                <span class="shift shift-evening">18:00–22:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">10:00–14:00</span>
+                <span class="shift shift-day">14:00–18:00</span>
+                <span class="shift shift-evening">18:00–22:00</span>
+              </td>
+              <td class="day-today" style="text-align:center">
+                <span class="shift shift-morning">10:00–14:00</span>
+                <span class="shift shift-day">14:00–18:00</span>
+                <span class="shift shift-evening">18:00–22:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">10:00–14:00</span>
+                <span class="shift shift-day">14:00–18:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-morning">10:00–14:00</span>
+                <span class="shift shift-day">14:00–18:00</span>
+                <span class="shift shift-evening">18:00–22:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-day">12:00–18:00</span>
+                <span class="shift shift-evening">18:00–22:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-day">12:00–18:00</span>
+                <span class="shift shift-evening">18:00–22:00</span>
+              </td>
+              <td style="text-align:center;font-size:13px;font-weight:600;color:var(--t)">
+                76h
+                <div style="font-size:11px;font-weight:400;color:var(--t3)">7 dni</div>
+              </td>
+            </tr>
+            <!-- Sommelier -->
+            <tr>
+              <td class="sta-cell">
+                <div style="font-weight:600;font-size:13.5px">Sommelier</div>
+                <div style="font-size:11px;color:var(--t3);margin-top:1px">Bar</div>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-evening">17:00–23:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-evening">17:00–23:00</span>
+              </td>
+              <td class="day-today" style="text-align:center">
+                <span class="shift shift-closed">Wolne</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-closed">Zamknięte</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-evening">17:00–23:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-day">14:00–18:00</span>
+                <span class="shift shift-evening">18:00–01:00</span>
+              </td>
+              <td style="text-align:center">
+                <span class="shift shift-day">14:00–18:00</span>
+                <span class="shift shift-evening">18:00–23:00</span>
+              </td>
+              <td style="text-align:center;font-size:13px;font-weight:600;color:var(--t)">
+                44h
+                <div style="font-size:11px;font-weight:400;color:var(--t3)">5 dni</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Summary cards -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px">
+        <div style="background:#fff;border:1px solid var(--b);border-radius:10px;padding:14px">
+          <div style="font-size:12px;color:var(--t2);margin-bottom:6px">Łączne godziny / tydzień</div>
+          <div style="font-size:22px;font-weight:600;color:var(--t)">394h</div>
+          <div style="font-size:12px;color:var(--ok);margin-top:2px">+12h vs. poprzedni tydzień</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--b);border-radius:10px;padding:14px">
+          <div style="font-size:12px;color:var(--t2);margin-bottom:6px">Aktywne stanowiska</div>
+          <div style="font-size:22px;font-weight:600;color:var(--t)">5</div>
+          <div style="font-size:12px;color:var(--t3);margin-top:2px">z 12 łącznie</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--b);border-radius:10px;padding:14px">
+          <div style="font-size:12px;color:var(--t2);margin-bottom:6px">Dni z pełną obsadą</div>
+          <div style="font-size:22px;font-weight:600;color:var(--t)">5<span style="font-size:14px;font-weight:600;color:var(--t3)">/7</span></div>
+          <div style="font-size:12px;color:var(--warn);margin-top:2px">Czwartek — dzień wolny</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--b);border-radius:10px;padding:14px">
+          <div style="font-size:12px;color:var(--t2);margin-bottom:6px">Avg godzin / stanowisko</div>
+          <div style="font-size:22px;font-weight:600;color:var(--t)">78,8h</div>
+          <div style="font-size:12px;color:var(--t3);margin-top:2px">w tym tygodniu</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

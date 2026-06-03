@@ -4,12 +4,15 @@ definePageMeta({ layout: 'default' })
 const route = useRoute()
 const id = route.params.id as string
 const { fetchOne, update, remove } = useStanowiska()
+const { can } = useAuth()
 const toast = useToast()
 
 const loading = ref(true)
 const saving = ref(false)
 const deleting = ref(false)
 const confirmDelete = ref(false)
+const canUpdate = computed(() => can('stanowiska:update'))
+const canDelete = computed(() => can('stanowiska:delete'))
 
 const form = reactive({
   nazwa: '',
@@ -92,8 +95,8 @@ async function doDelete() {
     <div class="h-[52px] border-b border-muted flex items-center px-5 gap-3 bg-default sticky top-0 z-10">
       <UButton color="neutral" variant="ghost" icon="i-lucide-arrow-left" size="sm" @click="navigateTo('/stanowiska')" />
       <span class="text-sm font-semibold flex-1">Edycja stanowiska</span>
-      <UButton v-if="!loading" color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" @click="confirmDelete = true" />
-      <UButton v-if="!loading" color="primary" size="sm" :loading="saving" @click="save">Zapisz</UButton>
+      <UButton v-if="!loading && canDelete" color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" @click="confirmDelete = true" />
+      <UButton v-if="!loading && canUpdate" color="primary" size="sm" :loading="saving" @click="save">Zapisz</UButton>
     </div>
 
     <div v-if="loading" class="p-5 flex justify-center">

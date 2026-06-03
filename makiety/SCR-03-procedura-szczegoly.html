@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>L'Antica — Szczegóły procedury</title>
+<style>
+:root{--brand:#c59d5f;--brand-h:#b08840;--brand-l:#fdf6ec;--t:#111827;--t2:#6b7280;--t3:#9ca3af;--b:#e5e7eb;--bg:#f9fafb;--ok:#16a34a;--ok-bg:#f0fdf4;--warn:#d97706;--warn-bg:#fffbeb;--err:#dc2626;--err-bg:#fef2f2;--inf:#2563eb;--inf-bg:#eff6ff;--sid:220px;--th:52px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#fff;color:var(--t);}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:var(--sid);background:#fff;border-right:1px solid var(--b);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:20;overflow-y:auto;}
+.main{margin-left:var(--sid);flex:1;display:flex;flex-direction:column;}
+.sb-logo{padding:20px 20px 14px;border-bottom:1px solid var(--b);}
+.sb-logo-name{font-size:13px;font-weight:600;color:var(--brand);letter-spacing:.04em;}
+.sb-logo-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+.sb-nav{padding:12px 10px;flex:1;}
+.si{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;text-decoration:none;margin-bottom:2px;transition:background .12s,color .12s;}
+
+
+.si svg{flex-shrink:0;}
+.sb-footer{padding:14px 20px;border-top:1px solid var(--b);font-size:12px;color:var(--t3);}
+.topbar{height:var(--th);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 20px;gap:8px;background:#fff;position:sticky;top:0;z-index:10;}
+.content{padding:20px;flex:1;}
+
+
+
+
+
+.tb-title{font-size:14px;font-weight:600;color:var(--t);}
+.tb-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;white-space:nowrap;}
+.btn-brand{background:var(--brand);color:#fff;} .btn-brand:hover{background:var(--brand-h);}
+.btn-sec{background:#fff;color:var(--t);border:1px solid var(--b);} .btn-sec:hover{background:var(--bg);}
+.btn-danger{background:#fff;color:var(--err);border:1px solid var(--b);}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.tbar{display:flex;justify-content:flex-end;margin-bottom:4px;}
+.btn-col{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border:1px solid var(--b);border-radius:8px;font-size:13px;color:var(--t2);background:#fff;cursor:pointer;}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:10px 12px;text-align:left;font-size:13px;font-weight:600;color:var(--t);border-bottom:1px solid var(--b);}
+.frow th{padding:6px 12px;border-bottom:2px solid var(--b);background:#fff;}
+.fi-w{position:relative;}
+.fi{width:100%;padding:5px 8px 5px 26px;border:1px solid var(--b);border-radius:6px;font-size:12px;color:var(--t);background:#fff;outline:none;font-family:inherit;}
+.fi-ic{position:absolute;left:7px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none;}
+.fsel{padding:5px 8px;border:1px solid var(--b);border-radius:6px;font-size:12px;color:var(--t);background:#fff;outline:none;font-family:inherit;cursor:pointer;width:100%;}
+tbody tr{border-bottom:1px solid var(--b);}
+tbody tr:last-child{border-bottom:none;}
+td{padding:11px 12px;font-size:13.5px;color:var(--t);}
+.td2{color:var(--t2);font-size:12px;margin-top:2px;}
+.td-act{text-align:right;width:40px;}
+.btn-d{width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:var(--t2);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-left:auto;}
+.bdg{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;}
+.bdg-g{background:var(--ok-bg);color:var(--ok);} .bdg-y{background:var(--warn-bg);color:var(--warn);}
+.bdg-r{background:var(--err-bg);color:var(--err);} .bdg-b{background:var(--inf-bg);color:var(--inf);}
+.bdg-gr{background:#f3f4f6;color:#6b7280;} .bdg-brand{background:var(--brand-l);color:var(--brand-h);}
+.bdg-purple{background:#f5f3ff;color:#7c3aed;}
+/* Slideover */
+.so-ov{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40;}
+.so{position:fixed;top:0;right:0;bottom:0;width:460px;background:#fff;z-index:50;display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.1);}
+.so-hd{padding:16px 20px;border-bottom:1px solid var(--b);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.so-t{font-size:16px;font-weight:600;color:var(--t);}
+.so-st{font-size:13px;color:var(--t2);margin-top:3px;display:flex;align-items:center;gap:8px;}
+.so-acts{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.so-x{width:28px;height:28px;border:none;background:transparent;color:var(--t2);cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.so-x:hover{background:var(--bg);}
+.so-bd{padding:20px;overflow-y:auto;flex:1;}
+.so-sec{margin-bottom:22px;}
+.so-sec-t{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--b);}
+.so-gr{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.so-f{display:flex;flex-direction:column;gap:3px;}
+.so-l{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;}
+.so-v{font-size:13.5px;color:var(--t);}
+.so-ft{padding:14px 20px;border-top:1px solid var(--b);display:flex;gap:8px;}
+.tl-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--b);font-size:13px;}
+.tl-item:last-child{border-bottom:none;}
+.tl-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);flex-shrink:0;margin-top:4px;}
+.tl-time{font-size:11px;color:var(--t3);margin-top:2px;}
+</style>
+</head>
+<body>
+<div class="layout">
+    <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-name">L'ANTICA STAZIONE</div>
+      <div class="sb-logo-sub">Panel zarządzania</div>
+    </div>
+    <nav class="sb-nav">
+    
+    <a class="si active" href="SCR-02-procedury-lista.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/></svg>
+      Procedury
+    </a>
+    <a class="si"  href="SCR-05-stanowiska-lista.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+      Stanowiska
+    </a>
+    <a class="si" href="SCR-07-odpowiedzi-dzien.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+      Raporty
+    </a>
+    </nav>
+    <div class="sb-footer">Prototyp v0.1</div>
+  </aside>
+
+
+  <!-- MAIN (przyciemniony) -->
+  <div class="main" style="opacity:.4;pointer-events:none;">
+    <div class="topbar">
+      <div class="tb-title">Procedury</div>
+      <div class="tb-r">
+        
+        <button class="btn btn-brand" onclick="window.location='SCR-04-procedura-formularz.html'">+ Nowa procedura</button>
+      </div>
+    </div>
+    <div class="content">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:32px;"><input type="checkbox"></th>
+            <th>Nazwa procedury</th><th>Stanowisko</th><th>Pora dnia</th><th>Śr. czas</th><th>Częstotliwość</th><th>Status</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:var(--brand-l);"><td style="padding:11px 8px 11px 12px;"></td><td><div style="font-weight:600">Mycie pieca</div><div class="td2">Wyczyść piec z resztek…</div></td><td>Kuchnia</td><td><span class="bdg bdg-brand">Rano</span></td><td>12 min</td><td>Codziennie</td><td><span class="bdg bdg-g">Aktywna</span></td><td></td></tr>
+          <tr><td style="padding:11px 8px 11px 12px;"></td><td><div style="font-weight:600">Wyrabianie ciasta</div><div class="td2">Wymieszaj mąkę…</div></td><td>Kuchnia</td><td><span class="bdg bdg-brand">Rano</span></td><td>15 min</td><td>Codziennie</td><td><span class="bdg bdg-g">Aktywna</span></td><td></td></tr>
+          <tr><td style="padding:11px 8px 11px 12px;"></td><td><div style="font-weight:600">Przygotowanie sosu</div><div class="td2">Sos pomidorowy…</div></td><td>Pizza</td><td><span class="bdg bdg-brand">Rano</span></td><td>20 min</td><td>Codziennie</td><td><span class="bdg bdg-g">Aktywna</span></td><td></td></tr>
+          <tr><td style="padding:11px 8px 11px 12px;"></td><td><div style="font-weight:600">Sprawdzenie temperatur</div></td><td>Kuchnia</td><td><span class="bdg bdg-b">W ciągu dnia</span></td><td>5 min</td><td>2× dziennie</td><td><span class="bdg bdg-g">Aktywna</span></td><td></td></tr>
+          <tr><td style="padding:11px 8px 11px 12px;"></td><td><div style="font-weight:600">Dezynfekcja blatów</div></td><td>Kuchnia</td><td><span class="bdg bdg-purple">Zamknięcie</span></td><td>10 min</td><td>Codziennie</td><td><span class="bdg bdg-g">Aktywna</span></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY -->
+<div class="so-ov"></div>
+
+<!-- SLIDEOVER -->
+<div class="so">
+  <div class="so-hd">
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <div class="so-t">Mycie pieca</div>
+        <span class="bdg bdg-g">Aktywna</span>
+      </div>
+      <div class="so-st">
+        <span class="bdg bdg-brand" style="font-size:11px;">Rano</span>
+        <span>Kuchnia</span>
+        <span style="color:var(--t3);">·</span>
+        <span>Codziennie</span>
+      </div>
+    </div>
+    <div class="so-acts">
+      <button class="btn btn-sec btn-sm" onclick="window.location='SCR-04-procedura-formularz.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>
+        Edytuj
+      </button>
+      <button class="btn btn-sec btn-sm" style="color:var(--err);">Archiwizuj</button>
+      <button class="so-x" onclick="window.location='SCR-02-procedury-lista.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="so-bd">
+    <!-- Podstawowe informacje -->
+    <div class="so-sec">
+      <div class="so-sec-t">Podstawowe informacje</div>
+      <div class="so-gr">
+        <div class="so-f"><div class="so-l">Stanowisko</div><div class="so-v">Kuchnia</div></div>
+        <div class="so-f"><div class="so-l">Pora dnia</div><div class="so-v"><span class="bdg bdg-brand">Rano</span></div></div>
+        <div class="so-f"><div class="so-l">Śr. czas wykonania</div><div class="so-v" style="font-weight:600;">12 min</div></div>
+        <div class="so-f"><div class="so-l">Częstotliwość</div><div class="so-v">Codziennie</div></div>
+        <div class="so-f"><div class="so-l">Status</div><div class="so-v"><span class="bdg bdg-g">Aktywna</span></div></div>
+        <div class="so-f"><div class="so-l">Dodano</div><div class="so-v">12.03.2025</div></div>
+      </div>
+    </div>
+
+    <!-- Opis -->
+    <div class="so-sec">
+      <div class="so-sec-t">Instrukcja wykonania</div>
+      <div style="font-size:13.5px;color:var(--t);line-height:1.7;">
+        Wyczyść piec z resztek poprzedniego dnia. Użyj szczotki drucianej, następnie wytrzyj wilgotną ściereczką. Sprawdź elementy grzewcze pod kątem uszkodzeń. Po czyszczeniu ustaw temperaturę roboczą na 280°C i pozostaw do nagrzania przez minimum 15 minut przed pierwszym użyciem.
+      </div>
+    </div>
+
+    <!-- Historia wykonań -->
+    <div class="so-sec">
+      <div class="so-sec-t">Ostatnie wykonania</div>
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--ok);"></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:13px;font-weight:600;">Kuchnia</div>
+            <span class="bdg bdg-g" style="font-size:11px;">Wykonane</span>
+          </div>
+          <div class="tl-time">Dziś, 07:42 · czas wykonania: <strong>11 min</strong></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--ok);"></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:13px;font-weight:600;">Kuchnia</div>
+            <span class="bdg bdg-g" style="font-size:11px;">Wykonane</span>
+          </div>
+          <div class="tl-time">Wtorek, 07:55 · czas wykonania: <strong>13 min</strong></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--err);"></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:13px;font-weight:600;">Kuchnia</div>
+            <span class="bdg bdg-r" style="font-size:11px;">Odrzucone</span>
+          </div>
+          <div class="tl-time">Poniedziałek · Powód: Uszkodzony sprzęt</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--ok);"></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:13px;font-weight:600;">Kuchnia</div>
+            <span class="bdg bdg-g" style="font-size:11px;">Wykonane</span>
+          </div>
+          <div class="tl-time">Niedziela, 08:10 · czas wykonania: <strong>10 min</strong></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--ok);"></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:13px;font-weight:600;">Kuchnia</div>
+            <span class="bdg bdg-g" style="font-size:11px;">Wykonane</span>
+          </div>
+          <div class="tl-time">Sobota, 07:38 · czas wykonania: <strong>14 min</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="so-ft">
+    <button class="btn btn-brand" style="flex:1;justify-content:center;" onclick="window.location='SCR-07-odpowiedzi-dzien.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+      Zobacz odpowiedzi
+    </button>
+    <button class="btn btn-sec" style="flex:1;justify-content:center;" onclick="window.location='SCR-02-procedury-lista.html'">Zamknij</button>
+  </div>
+</div>
+</body>
+</html>

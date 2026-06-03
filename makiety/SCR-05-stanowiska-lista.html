@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Stanowiska — L'Antica</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{
+  --brand:#c59d5f;--brand-h:#b08840;--brand-l:#fdf6ec;
+  --t:#111827;--t2:#6b7280;--t3:#9ca3af;
+  --b:#e5e7eb;--bg:#f9fafb;
+  --ok:#16a34a;--ok-bg:#f0fdf4;
+  --warn:#d97706;--warn-bg:#fffbeb;
+  --err:#dc2626;--err-bg:#fef2f2;
+  --inf:#2563eb;--inf-bg:#eff6ff;
+    --sid:220px;--th:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#fff;color:var(--t);}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:var(--sid);background:#fff;border-right:1px solid var(--b);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:20;overflow-y:auto;}
+.sb-logo{padding:20px 20px 14px;border-bottom:1px solid var(--b);}
+.sb-logo-name{font-size:13px;font-weight:600;color:var(--brand);letter-spacing:.04em;}
+.sb-logo-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+.sb-nav{padding:12px 10px;flex:1;}
+.si{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;text-decoration:none;margin-bottom:2px;transition:background .12s,color .12s;}
+.si:hover{background:var(--bg);color:var(--t);}
+.si.active{background:var(--brand-l);color:var(--brand-h);}
+.si svg{flex-shrink:0;}
+.sb-footer{padding:14px 20px;border-top:1px solid var(--b);font-size:12px;color:var(--t3);}
+.main{margin-left:var(--sid);flex:1;display:flex;flex-direction:column;}
+.topbar{height:var(--th);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 20px;gap:8px;background:#fff;position:sticky;top:0;z-index:10;}
+.content{padding:20px;flex:1;}
+
+.tb-title{font-size:14px;font-weight:600;color:var(--t);}
+.tb-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;white-space:nowrap;}
+.btn-brand{background:var(--brand);color:#fff;}
+.btn-brand:hover{background:var(--brand-h);}
+.btn-sec{background:#fff;color:var(--t);border:1px solid var(--b);}
+.btn-sec:hover{background:var(--bg);}
+.btn-ghost{background:transparent;color:var(--t2);}
+.btn-ghost:hover{background:var(--bg);color:var(--t);}
+.btn-danger{background:#fff;color:var(--err);border:1px solid var(--b);}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.tbar{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;}
+.tbar-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:10px 12px;text-align:left;font-size:13px;font-weight:600;color:var(--t);border-bottom:1px solid var(--b);white-space:nowrap;}
+.th-i{display:flex;align-items:center;gap:4px;}
+.th-s{color:var(--t3);flex-shrink:0;}
+.frow th{padding:6px 12px;border-bottom:1px solid var(--b);background:#fff;}
+.fi-w{position:relative;}
+.fi{width:100%;padding:5px 8px 5px 26px;border:1px solid var(--b);border-radius:6px;font-size:12px;color:var(--t);background:#fff;outline:none;font-family:inherit;}
+.fi:focus{border-color:var(--brand);}
+.fi-ic{position:absolute;left:7px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none;}
+.fsel{padding:5px 8px;border:1px solid var(--b);border-radius:6px;font-size:12px;color:var(--t);background:#fff;outline:none;font-family:inherit;cursor:pointer;}
+tbody tr{border-bottom:1px solid var(--b);cursor:pointer;}
+tbody tr:hover{background:var(--bg);}
+tbody tr:last-child{border-bottom:none;}
+td{padding:11px 12px;font-size:13.5px;color:var(--t);}
+.td2{color:var(--t2);font-size:12px;margin-top:2px;}
+.td-act{text-align:right;width:40px;position:relative;}
+.btn-d{width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:var(--t2);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-left:auto;}
+.btn-d:hover{background:var(--bg);color:var(--t);}
+.dd{position:absolute;right:0;top:32px;background:#fff;border:1px solid var(--b);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);padding:4px;min-width:160px;z-index:30;display:none;}
+.dd.open{display:block;}
+.ddi{display:flex;align-items:center;gap:8px;padding:8px 10px;font-size:13px;color:var(--t);border-radius:6px;cursor:pointer;}
+.ddi:hover{background:var(--bg);}
+.ddi-danger{color:var(--err);}
+.ddiv{height:1px;background:var(--b);margin:4px 0;}
+.bdg{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;}
+.bdg-g{background:var(--ok-bg);color:var(--ok);}
+.bdg-y{background:var(--warn-bg);color:var(--warn);}
+.bdg-r{background:var(--err-bg);color:var(--err);}
+.bdg-gr{background:#f3f4f6;color:#6b7280;}
+.bdg-brand{background:var(--brand-l);color:var(--brand-h);}
+.pgn{display:flex;align-items:center;justify-content:space-between;padding:12px 0;font-size:13px;color:var(--t2);margin-top:4px;}
+.pgp{display:flex;gap:4px;}
+.pgb{width:28px;height:28px;border:1px solid var(--b);border-radius:6px;background:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);}
+.pgb.on{background:var(--brand);color:#fff;border-color:var(--brand);}
+.sta-ico{width:32px;height:32px;border-radius:8px;background:var(--brand-l);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+</style>
+</head>
+<body>
+<div class="layout">
+    <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-name">L'ANTICA STAZIONE</div>
+      <div class="sb-logo-sub">Panel zarządzania</div>
+    </div>
+    <nav class="sb-nav">
+    
+    <a class="si" href="SCR-02-procedury-lista.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/></svg>
+      Procedury
+    </a>
+    <a class="si active"  href="SCR-05-stanowiska-lista.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+      Stanowiska
+    </a>
+    <a class="si" href="SCR-07-odpowiedzi-dzien.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+      Raporty
+    </a>
+    </nav>
+    <div class="sb-footer">Prototyp v0.1</div>
+  </aside>
+
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+      <span class="tb-title">Stanowiska</span>
+      <div class="tb-r">
+        <button class="btn btn-brand" onclick="location.href='SCR-05b-stanowisko-formularz.html'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Nowe stanowisko
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <!-- Tbar -->
+      <div class="tbar">
+        <div class="fi-w" style="width:280px">
+          <svg class="fi-ic" xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+          <input class="fi" placeholder="Szukaj stanowiska…" value="">
+        </div>
+        <select class="fsel">
+          <option>Wszystkie działy</option>
+          <option>Kuchnia</option>
+          <option>Bar</option>
+          <option>Sala</option>
+          <option>Recepcja</option>
+        </select>
+        <select class="fsel">
+          <option>Wszystkie statusy</option>
+          <option>Aktywne</option>
+          <option>Archiwalne</option>
+        </select>
+        <div class="tbar-r" style="font-size:13px;color:var(--t2)">12 stanowisk</div>
+      </div>
+
+      <!-- TABLE -->
+      <div style="border:1px solid var(--b);border-radius:10px;overflow:hidden;">
+        <table>
+          <thead>
+            <tr>
+              <th><div class="th-i">Stanowisko <svg class="th-s" xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"/></svg></div></th>
+              <th><div class="th-i">Dział</div></th>
+              <th><div class="th-i">Procedury <svg class="th-s" xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"/></svg></div></th>
+              <th><div class="th-i">Godziny otwarcia</div></th>
+              <th><div class="th-i">Status</div></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- ROW 1 -->
+            <tr onclick="location.href='SCR-06-stanowisko-szczegoly.html'">
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="sta-ico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#c59d5f" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 13.5v-1.5M9 13.5v-1.5M3 19.5v-1.5m18 1.5v-1.5M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600">Kuchnia</div>
+                    <div class="td2">Chef de cuisine i cały zespół kuchni</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="bdg bdg-brand">Kuchnia</span></td>
+              <td>
+                <div style="font-weight:600">14</div>
+                <div class="td2">8 aktywnych</div>
+              </td>
+              <td style="color:var(--t2);font-size:13px">06:00 – 23:00</td>
+              <td><span class="bdg bdg-g">Aktywne</span></td>
+              <td class="td-act" onclick="event.stopPropagation()">
+                <button class="btn-d" onclick="toggleDD(this)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg>
+                </button>
+                <div class="dd">
+                  <div class="ddi" onclick="location.href='SCR-05b-stanowisko-formularz.html'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>
+                    Edytuj
+                  </div>
+                  <div class="ddi">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"/></svg>
+                    Duplikuj
+                  </div>
+                  <div class="ddiv"></div>
+                  <div class="ddi ddi-danger">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
+                    Archiwizuj
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <!-- ROW 2 -->
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="sta-ico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#c59d5f" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21a48.25 48.25 0 0 1-8.135-.687c-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600">Bar</div>
+                    <div class="td2">Barmani i sommelier</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="bdg bdg-b" style="background:#eff6ff;color:#2563eb">Bar</span></td>
+              <td>
+                <div style="font-weight:600">10</div>
+                <div class="td2">7 aktywnych</div>
+              </td>
+              <td style="color:var(--t2);font-size:13px">14:00 – 02:00</td>
+              <td><span class="bdg bdg-g">Aktywne</span></td>
+              <td class="td-act" onclick="event.stopPropagation()">
+                <button class="btn-d" onclick="toggleDD(this)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg>
+                </button>
+                <div class="dd">
+                  <div class="ddi"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>Edytuj</div>
+                  <div class="ddi"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"/></svg>Duplikuj</div>
+                  <div class="ddiv"></div>
+                  <div class="ddi ddi-danger"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>Archiwizuj</div>
+                </div>
+              </td>
+            </tr>
+            <!-- ROW 3 -->
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="sta-ico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#c59d5f" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600">Sala</div>
+                    <div class="td2">Kelnerzy i obsługa sali</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="bdg" style="background:#f3f4f6;color:#374151">Sala</span></td>
+              <td>
+                <div style="font-weight:600">18</div>
+                <div class="td2">12 aktywnych</div>
+              </td>
+              <td style="color:var(--t2);font-size:13px">11:00 – 23:30</td>
+              <td><span class="bdg bdg-g">Aktywne</span></td>
+              <td class="td-act" onclick="event.stopPropagation()">
+                <button class="btn-d" onclick="toggleDD(this)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg>
+                </button>
+                <div class="dd">
+                  <div class="ddi"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>Edytuj</div>
+                  <div class="ddi"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"/></svg>Duplikuj</div>
+                  <div class="ddiv"></div>
+                  <div class="ddi ddi-danger"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>Archiwizuj</div>
+                </div>
+              </td>
+            </tr>
+            <!-- ROW 4 -->
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="sta-ico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#c59d5f" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 0 .375 5.909 2.999 2.999 0 0 0 .375-5.909V6.375c0-.621.504-1.125 1.125-1.125h14.25c.621 0 1.125.504 1.125 1.125v3.026a2.999 2.999 0 0 0 .375 5.909 2.999 2.999 0 0 0 .375-5.909V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600">Recepcja</div>
+                    <div class="td2">Przyjęcia i rezerwacje</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="bdg" style="background:#f5f3ff;color:#7c3aed">Obsługa gości</span></td>
+              <td>
+                <div style="font-weight:600">8</div>
+                <div class="td2">5 aktywnych</div>
+              </td>
+              <td style="color:var(--t2);font-size:13px">10:00 – 22:00</td>
+              <td><span class="bdg bdg-g">Aktywne</span></td>
+              <td class="td-act" onclick="event.stopPropagation()">
+                <button class="btn-d" onclick="toggleDD(this)"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg></button>
+                <div class="dd">
+                  <div class="ddi"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>Edytuj</div>
+                  <div class="ddi"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"/></svg>Duplikuj</div>
+                  <div class="ddiv"></div>
+                  <div class="ddi ddi-danger"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>Archiwizuj</div>
+                </div>
+              </td>
+            </tr>
+            <!-- ROW 5 -->
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="sta-ico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#c59d5f" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600">Sommelier</div>
+                    <div class="td2">Dobór win i obsługa winiarni</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="bdg" style="background:#eff6ff;color:#2563eb">Bar</span></td>
+              <td>
+                <div style="font-weight:600">6</div>
+                <div class="td2">4 aktywnych</div>
+              </td>
+              <td style="color:var(--t2);font-size:13px">14:00 – 23:00</td>
+              <td><span class="bdg bdg-g">Aktywne</span></td>
+              <td class="td-act" onclick="event.stopPropagation()">
+                <button class="btn-d" onclick="toggleDD(this)"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg></button>
+                <div class="dd">
+                  <div class="ddi"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>Edytuj</div>
+                  <div class="ddi"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"/></svg>Duplikuj</div>
+                  <div class="ddiv"></div>
+                  <div class="ddi ddi-danger"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>Archiwizuj</div>
+                </div>
+              </td>
+            </tr>
+            <!-- ROW 6 - archiwalne -->
+            <tr style="opacity:.6">
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="sta-ico" style="background:#f3f4f6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600">Bufet śniadaniowy</div>
+                    <div class="td2">Zlikwidowany — 2024</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="bdg" style="background:#f3f4f6;color:#374151">Sala</span></td>
+              <td><div style="font-weight:600">3</div><div class="td2">0 aktywnych</div></td>
+              <td style="color:var(--t2);font-size:13px">—</td>
+              <td><span class="bdg bdg-gr">Archiwalne</span></td>
+              <td class="td-act" onclick="event.stopPropagation()">
+                <button class="btn-d" onclick="toggleDD(this)"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg></button>
+                <div class="dd">
+                  <div class="ddi"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>Edytuj</div>
+                  <div class="ddi" style="color:var(--ok)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Przywróć</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="pgn">
+        <span>Wyświetlono 1–6 z 12 stanowisk</span>
+        <div class="pgp">
+          <div class="pgb"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg></div>
+          <div class="pgb on">1</div>
+          <div class="pgb">2</div>
+          <div class="pgb"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleDD(btn){
+  document.querySelectorAll('.dd.open').forEach(d=>{if(d!==btn.nextElementSibling)d.classList.remove('open');});
+  btn.nextElementSibling.classList.toggle('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.td-act')) document.querySelectorAll('.dd.open').forEach(d=>d.classList.remove('open'));
+});
+</script>
+</body>
+</html>

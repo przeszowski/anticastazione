@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Nowe stanowisko — L'Antica</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{
+  --brand:#c59d5f;--brand-h:#b08840;--brand-l:#fdf6ec;
+  --t:#111827;--t2:#6b7280;--t3:#9ca3af;
+  --b:#e5e7eb;--bg:#f9fafb;
+  --ok:#16a34a;--ok-bg:#f0fdf4;
+  --err:#dc2626;--err-bg:#fef2f2;
+  --sid:220px;--th:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#fff;color:var(--t);}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:var(--sid);background:#fff;border-right:1px solid var(--b);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:20;overflow-y:auto;}
+.sb-logo{padding:20px 20px 14px;border-bottom:1px solid var(--b);}
+.sb-logo-name{font-size:13px;font-weight:600;color:var(--brand);letter-spacing:.04em;}
+.sb-logo-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+.sb-nav{padding:12px 10px;flex:1;}
+.si{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;text-decoration:none;margin-bottom:2px;transition:background .12s,color .12s;}
+.si:hover{background:var(--bg);color:var(--t);}
+.si.active{background:var(--brand-l);color:var(--brand-h);}
+.si svg{flex-shrink:0;}
+.sb-footer{padding:14px 20px;border-top:1px solid var(--b);font-size:12px;color:var(--t3);}
+.main{margin-left:var(--sid);flex:1;display:flex;flex-direction:column;}
+.topbar{height:var(--th);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 20px;gap:8px;background:#fff;position:sticky;top:0;z-index:10;}
+.content{padding:24px;flex:1;max-width:720px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;white-space:nowrap;}
+.btn-brand{background:var(--brand);color:#fff;}
+.btn-brand:hover{background:var(--brand-h);}
+.btn-sec{background:#fff;color:var(--t);border:1px solid var(--b);}
+.btn-sec:hover{background:var(--bg);}
+.btn-sm{padding:5px 10px;font-size:12px;}
+/* breadcrumb */
+.bc{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--t2);}
+.bc a{color:var(--t2);text-decoration:none;}
+.bc a:hover{color:var(--t);}
+.bc-sep{color:var(--t3);}
+.bc-cur{color:var(--t);font-weight:500;}
+/* form */
+.card{background:#fff;border:1px solid var(--b);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.card-hdr{padding:14px 20px;border-bottom:1px solid var(--b);font-size:13px;font-weight:600;color:var(--t);}
+.form-body{padding:20px;display:flex;flex-direction:column;gap:16px;}
+.form-row{display:flex;flex-direction:column;gap:5px;}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+label{font-size:13px;font-weight:500;color:var(--t);}
+.lbl-sub{font-size:12px;font-weight:400;color:var(--t3);margin-left:4px;}
+.inp{width:100%;padding:8px 10px;border:1px solid var(--b);border-radius:8px;font-size:13.5px;color:var(--t);background:#fff;outline:none;font-family:inherit;}
+.inp:focus{border-color:var(--brand);box-shadow:0 0 0 3px #fdf6ec;}
+.sel{width:100%;padding:8px 10px;border:1px solid var(--b);border-radius:8px;font-size:13.5px;color:var(--t);background:#fff;outline:none;font-family:inherit;cursor:pointer;}
+.sel:focus{border-color:var(--brand);}
+textarea.inp{resize:vertical;min-height:80px;}
+/* procedure checklist */
+.proc-check{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--b);border-radius:8px;cursor:pointer;margin-bottom:6px;}
+.proc-check:hover{background:var(--bg);}
+.proc-check input[type=checkbox]{width:15px;height:15px;accent-color:var(--brand);cursor:pointer;}
+.proc-check-name{flex:1;font-size:13.5px;color:var(--t);}
+.proc-bdg{font-size:11px;font-weight:500;padding:1px 7px;border-radius:20px;}
+.bdg-rano{background:var(--brand-l);color:var(--brand-h);}
+.bdg-dzien{background:#eff6ff;color:#2563eb;}
+.bdg-wiecz{background:#f5f3ff;color:#7c3aed;}
+/* bottom bar */
+.form-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--b);padding:14px 24px;display:flex;justify-content:flex-end;gap:10px;}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-name">L'ANTICA STAZIONE</div>
+      <div class="sb-logo-sub">Panel zarządzania</div>
+    </div>
+    <div class="sb-nav">
+      <a class="si" href="SCR-02-procedury-lista.html">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 0 2-2h2a2 2 0 0 0 2 2"/></svg>
+        Procedury
+      </a>
+      <a class="si active" href="SCR-05-stanowiska-lista.html">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+        Stanowiska
+      </a>
+      <a class="si" href="SCR-07-odpowiedzi-dzien.html">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+        Raporty
+      </a>
+      <a class="si" href="SCR-10-16-mobile.html">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 9 1.5 1.5L15 12"/></svg>
+        Widok mobilny
+      </a>
+    </div>
+    <div class="sb-footer">
+      <div style="font-weight:500;color:var(--t)">Anna Kowalska</div>
+      <div style="margin-top:2px">Administrator</div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="bc">
+        <a href="SCR-05-stanowiska-lista.html">Stanowiska</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-cur">Nowe stanowisko</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- Podstawowe dane -->
+      <div class="card">
+        <div class="card-hdr">Podstawowe dane</div>
+        <div class="form-body">
+          <div class="form-row">
+            <label>Nazwa stanowiska</label>
+            <input class="inp" type="text" placeholder="np. Kuchnia, Bar, Sala…">
+          </div>
+          <div class="form-row">
+            <label>Dział</label>
+            <select class="sel">
+              <option value="">Wybierz dział…</option>
+              <option>Kuchnia</option>
+              <option>Bar</option>
+              <option>Sala</option>
+              <option>Obsługa gości</option>
+              <option>Zarządzanie</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Opis <span class="lbl-sub">(opcjonalnie)</span></label>
+            <textarea class="inp" placeholder="Krótki opis stanowiska i jego zadań…"></textarea>
+          </div>
+          <div class="form-row-2">
+            <div class="form-row">
+              <label>Godziny otwarcia — od</label>
+              <input class="inp" type="time" value="06:00">
+            </div>
+            <div class="form-row">
+              <label>Godziny otwarcia — do</label>
+              <input class="inp" type="time" value="23:00">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Status</label>
+            <select class="sel">
+              <option value="active">Aktywne</option>
+              <option value="inactive">Nieaktywne</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Przypisane procedury -->
+      <div class="card">
+        <div class="card-hdr">Przypisane procedury <span style="font-size:12px;font-weight:400;color:var(--t3)">— wybierz które procedury obowiązują na tym stanowisku</span></div>
+        <div class="form-body">
+          <label class="proc-check">
+            <input type="checkbox" checked>
+            <span class="proc-check-name">Otwieranie kuchni — przygotowanie stanowiska</span>
+            <span class="proc-bdg bdg-rano">Rano</span>
+          </label>
+          <label class="proc-check">
+            <input type="checkbox" checked>
+            <span class="proc-check-name">Kontrola temperatur urządzeń chłodniczych</span>
+            <span class="proc-bdg bdg-rano">Rano</span>
+          </label>
+          <label class="proc-check">
+            <input type="checkbox">
+            <span class="proc-check-name">Przygotowanie mise en place na lunch</span>
+            <span class="proc-bdg bdg-rano">Rano</span>
+          </label>
+          <label class="proc-check">
+            <input type="checkbox" checked>
+            <span class="proc-check-name">Dezynfekcja powierzchni roboczych</span>
+            <span class="proc-bdg bdg-dzien">Dzień</span>
+          </label>
+          <label class="proc-check">
+            <input type="checkbox">
+            <span class="proc-check-name">Uzupełnienie stanów magazynowych</span>
+            <span class="proc-bdg bdg-dzien">Dzień</span>
+          </label>
+          <label class="proc-check">
+            <input type="checkbox" checked>
+            <span class="proc-check-name">Porządkowanie i mycie urządzeń kuchennych</span>
+            <span class="proc-bdg bdg-wiecz">Wieczór</span>
+          </label>
+          <label class="proc-check">
+            <input type="checkbox">
+            <span class="proc-check-name">Zamknięcie kuchni — checklist końcowy</span>
+            <span class="proc-bdg bdg-wiecz">Wieczór</span>
+          </label>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+
+    <div class="form-footer">
+      <button class="btn btn-sec" onclick="location.href='SCR-05-stanowiska-lista.html'">Anuluj</button>
+      <button class="btn btn-brand" onclick="location.href='SCR-06-stanowisko-szczegoly.html'">Zapisz stanowisko</button>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+</body>
+</html>

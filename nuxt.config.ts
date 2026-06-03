@@ -4,9 +4,15 @@ export default defineNuxtConfig({
     compatibilityVersion: 4
   },
   compatibilityDate: '2025-01-01',
-  devtools: { enabled: true },
+  // DevTools wyłączone — w dev dokłada zauważalny narzut.
+  devtools: { enabled: false },
 
   modules: ['@nuxt/ui', '@nuxtjs/supabase'],
+
+  // Ikony lokalnie (pakiet @iconify-json/lucide) — bez pobierania z sieci przy renderze.
+  icon: {
+    serverBundle: 'local'
+  },
 
   supabase: {
     // URL i klucz publiczny (publishable) — bezpiecznie trzymać w configu,
@@ -18,11 +24,20 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
-      exclude: ['/login', '/confirm']
+      // /m to osobna aplikacja mobilna z własnym logowaniem i ochroną (middleware mobile-auth)
+      exclude: ['/login', '/confirm', '/m', '/m/login']
     }
   },
 
   css: ['~/assets/css/main.css'],
+
+  // Wymusza prebundling pakietu "cookie" przez Vite — naprawia błąd
+  // "@supabase/ssr ... does not provide an export named 'parse'" w trybie dev.
+  vite: {
+    optimizeDeps: {
+      include: ['cookie']
+    }
+  },
 
   app: {
     head: {

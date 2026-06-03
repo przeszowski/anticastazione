@@ -1,0 +1,37 @@
+{
+  "project": "L'Antica — Moduł Procedur",
+  "folder": "L'ANTICA",
+  "brand_color": "#c59d5f",
+  "font": "ui-sans-serif",
+  "client_website": "https://antica.netlify.app/",
+  "created": "2026-04-29",
+  "updated": "2026-04-29",
+  "phase": 2,
+  "current_screen": "SCR-01",
+  "components_used": {
+    "DASHBOARD":        ["SCR-01"],
+    "TABLE-LIST":       ["SCR-02", "SCR-05", "SCR-09"],
+    "SLIDEOVER-DETAIL": ["SCR-03", "SCR-08"],
+    "SLIDEOVER-FORM":   ["SCR-04"],
+    "CUSTOM":           ["SCR-06", "SCR-07"],
+    "MOBILE":           ["SCR-10", "SCR-11", "SCR-12", "SCR-13", "SCR-14", "SCR-15", "SCR-16"]
+  },
+  "screens": [
+    {"code":"SCR-01","name":"Dashboard procedur","file":"SCR-01-dashboard.html","component":"DASHBOARD","status":"coded","notes":""},
+    {"code":"SCR-02","name":"Procedury — Lista","file":"SCR-02-procedury-lista.html","component":"TABLE-LIST","status":"pending","notes":""},
+    {"code":"SCR-03","name":"Procedura — Szczegóły","file":"SCR-03-procedura-szczegoly.html","component":"SLIDEOVER-DETAIL","status":"pending","notes":""},
+    {"code":"SCR-04","name":"Procedura — Tworzenie/Edycja","file":"SCR-04-procedura-formularz.html","component":"SLIDEOVER-FORM","status":"pending","notes":""},
+    {"code":"SCR-05","name":"Stanowiska","file":"SCR-05-stanowiska.html","component":"TABLE-LIST","status":"pending","notes":""},
+    {"code":"SCR-06","name":"Godziny pracy","file":"SCR-06-godziny-pracy.html","component":"CUSTOM","status":"pending","notes":""},
+    {"code":"SCR-07","name":"Odpowiedzi — Przegląd dzienny","file":"SCR-07-odpowiedzi-dzien.html","component":"CUSTOM","status":"pending","notes":""},
+    {"code":"SCR-08","name":"Odpowiedzi — Szczegóły pracownika","file":"SCR-08-odpowiedzi-pracownik.html","component":"SLIDEOVER-DETAIL","status":"pending","notes":""},
+    {"code":"SCR-09","name":"Odpowiedzi — Tabela zbiorcza","file":"SCR-09-odpowiedzi-tabela.html","component":"TABLE-LIST","status":"pending","notes":""},
+    {"code":"SCR-10","name":"Mobile — Logowanie + wybór stanowiska","file":"SCR-10-16-mobile.html","component":"MOBILE","status":"coded","notes":"Wszystkie ekrany mobile w jednym pliku"},
+    {"code":"SCR-11","name":"Mobile — Lista zadań na dziś","file":"SCR-10-16-mobile.html","component":"MOBILE","status":"coded","notes":""},
+    {"code":"SCR-12","name":"Mobile — Szczegóły procedury (swipe)","file":"SCR-10-16-mobile.html","component":"MOBILE","status":"coded","notes":"swipe gesture"},
+    {"code":"SCR-13","name":"Mobile — Powód odrzucenia","file":"SCR-10-16-mobile.html","component":"MOBILE","status":"coded","notes":""},
+    {"code":"SCR-14","name":"Mobile — Nowa procedura/zadanie","file":"SCR-10-16-mobile.html","component":"MOBILE","status":"coded","notes":"formularz: nazwa, opis, stanowisko, pora, avgTime, freq"},
+    {"code":"SCR-15","name":"Mobile — Widok stanowiska (kierownik)","file":"SCR-10-16-mobile.html","component":"MOBILE","status":"coded","notes":"karty stanowisk z progress bar i statystykami"},
+    {"code":"SCR-16","name":"Mobile — Szczegóły pracownika (kierownik)","file":"SCR-10-16-mobile.html","component":"MOBILE","status":"coded","notes":"read-only lista procedur z elapsed time, period separators"}
+  ]
+}

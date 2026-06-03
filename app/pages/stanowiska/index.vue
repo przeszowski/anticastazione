@@ -2,8 +2,10 @@
 definePageMeta({ layout: 'default' })
 
 const { stanowiska, loading, error, fetch } = useStanowiska()
+const { can } = useAuth()
 
 onMounted(fetch)
+const canCreate = computed(() => can('stanowiska:create'))
 
 const columns = [
   { accessorKey: 'nazwa', header: 'Stanowisko' },
@@ -18,7 +20,7 @@ const columns = [
   <div class="flex flex-col flex-1">
     <div class="h-[52px] border-b border-muted flex items-center px-5 gap-3 bg-default sticky top-0 z-10">
       <span class="text-sm font-semibold flex-1">Stanowiska</span>
-      <UButton color="primary" size="sm" icon="i-lucide-plus" @click="navigateTo('/stanowiska/nowe')">
+      <UButton v-if="canCreate" color="primary" size="sm" icon="i-lucide-plus" @click="navigateTo('/stanowiska/nowe')">
         Nowe stanowisko
       </UButton>
     </div>

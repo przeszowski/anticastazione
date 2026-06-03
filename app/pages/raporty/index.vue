@@ -1,85 +1,109 @@
 <script setup lang="ts">
+import type { StatusWykonania } from '~/types/database.types'
+import type { WykonanieWithRelations } from '~/composables/useSupabase'
+
 definePageMeta({ layout: 'default' })
 
-// Mock data — zastąpić API
-const today = new Date().toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })
+const { wykonania, loading, error, fetchDzien } = useWykonania()
+const { stanowiska, fetch: fetchStanowiska } = useStanowiska()
 
-const kpi = [
-  { label: 'Procedur dziś', value: '24', sub: '3 w trakcie', color: 'text-default' },
-  { label: 'Realizacja', value: '87%', sub: '+3% vs norma', color: 'text-primary' },
-  { label: 'Odchylenie od normy', value: '+14m', sub: '(1g 50m / 2g 4m)', color: 'text-warning' },
-  { label: 'Aktywnych stanowisk', value: '4', sub: 'z 5 ogółem', color: 'text-default' }
-]
+const selectedDate = ref(new Date().toISOString().slice(0, 10))
+const filterStation = ref('')
 
 const tabs = [
   { label: 'Przegląd dzienny', to: '/raporty' },
   { label: 'Tabela zbiorcza', to: '/raporty/tabela' }
 ]
 
-const groups = [
-  {
-    label: 'W trakcie',
-    status: 'running',
-    items: [
-      { name: 'Dezynfekcja powierzchni roboczych', station: 'Kuchnia', period: 'Dzień', time: '14:22', duration: '23 min', norm: '20 min', status: 'over' },
-      { name: 'Przygotowanie mise en place', station: 'Bar', period: 'Dzień', time: '14:35', duration: '18 min', norm: '25 min', status: 'ok' }
-    ]
-  },
-  {
-    label: 'Do zrobienia',
-    status: 'todo',
-    items: [
-      { name: 'Porządkowanie strefy zmywaka', station: 'Kuchnia', period: 'Wieczór', time: '22:00', duration: null, norm: '15 min', status: 'pending' },
-      { name: 'Zamknięcie baru', station: 'Bar', period: 'Wieczór', time: '23:00', duration: null, norm: '30 min', status: 'pending' }
-    ]
-  },
-  {
-    label: 'Wykonane',
-    status: 'done',
-    items: [
-      { name: 'Otwieranie kuchni', station: 'Kuchnia', period: 'Rano', time: '06:15', duration: '28 min', norm: '25 min', status: 'over' },
-      { name: 'Kontrola temperatur', station: 'Kuchnia', period: 'Rano', time: '07:00', duration: '12 min', norm: '15 min', status: 'fast' },
-      { name: 'Przygotowanie sali', station: 'Sala', period: 'Rano', time: '08:00', duration: '35 min', norm: '30 min', status: 'over' }
-    ]
-  }
-]
-
-const periodBadge: Record<string, { color: string }> = {
-  Rano: { color: 'primary' },
-  Dzień: { color: 'info' },
-  Wieczór: { color: 'violet' }
+const statusLabel: Record<StatusWykonania, string> = {
+  do_zrobienia: 'Do zrobienia',
+  w_trakcie: 'W trakcie',
+  wykonane: 'Wykonane',
+  odrzucone: 'Odrzucone'
 }
 
-const statusColor: Record<string, string> = {
-  fast: 'text-info font-semibold',
-  ok: 'text-success font-semibold',
-  over: 'text-warning font-semibold',
-  pending: 'text-muted'
+const statusColor: Record<StatusWykonania, string> = {
+  do_zrobienia: 'text-muted border-muted bg-elevated',
+  w_trakcie: 'text-info border-info/30 bg-info/5',
+  wykonane: 'text-success border-success/30 bg-success/5',
+  odrzucone: 'text-error border-error/30 bg-error/5'
 }
 
-const groupColor: Record<string, string> = {
-  running: 'text-info border-info/30 bg-info/5',
-  todo: 'text-muted border-muted bg-elevated',
-  done: 'text-success border-success/30 bg-success/5'
+const periodLabel: Record<string, string> = { Rano: 'Rano', Dzien: 'Dzień', Wieczor: 'Wieczór' }
+const periodBadge: Record<string, any> = { Rano: 'primary', Dzien: 'info', Wieczor: 'violet' }
+
+onMounted(async () => {
+  await fetchStanowiska()
+  await fetchDzien(selectedDate.value)
+})
+
+watch([selectedDate, filterStation], async ([date, station]) => {
+  await fetchDzien(date, station || undefined)
+})
+
+const stationOptions = computed(() => [
+  { label: 'Wszystkie stanowiska', value: '' },
+  ...stanowiska.value.map(s => ({ label: s.nazwa, value: s.id }))
+])
+
+const filtered = computed(() => wykonania.value)
+
+const stats = computed(() => {
+  const total = filtered.value.length
+  const done = filtered.value.filter(w => w.status === 'wykonane').length
+  const running = filtered.value.filter(w => w.status === 'w_trakcie').length
+  const todo = filtered.value.filter(w => w.status === 'do_zrobienia').length
+  const percent = total ? Math.round((done / total) * 100) : 0
+  const time = filtered.value.reduce((sum, w) => sum + (w.czas_min ?? czasMin(w) ?? 0), 0)
+  const norm = filtered.value.reduce((sum, w) => sum + (w.procedury?.norma_min ?? 0), 0)
+  return { total, done, running, todo, percent, time, norm, diff: time - norm }
+})
+
+const groups = computed(() =>
+  (['w_trakcie', 'do_zrobienia', 'wykonane', 'odrzucone'] as StatusWykonania[])
+    .map(status => ({
+      status,
+      label: statusLabel[status],
+      items: filtered.value.filter(w => w.status === status)
+    }))
+    .filter(group => group.items.length > 0)
+)
+
+const dateLabel = computed(() =>
+  new Date(selectedDate.value + 'T00:00:00').toLocaleDateString('pl-PL', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long'
+  })
+)
+
+function czasMin(w: WykonanieWithRelations) {
+  if (!w.czas_start || !w.czas_koniec) return null
+  const start = new Date(w.czas_start).getTime()
+  const end = new Date(w.czas_koniec).getTime()
+  return Math.max(0, Math.round((end - start) / 60000))
 }
 
-// Progress bar
-const progressDone = 14
-const progressRunning = 3
-const progressTodo = 7
-const progressTotal = progressDone + progressRunning + progressTodo
+function czasLabel(w: WykonanieWithRelations) {
+  const minutes = w.czas_min ?? czasMin(w)
+  return minutes == null ? '—' : `${minutes} min`
+}
+
+function startLabel(w: WykonanieWithRelations) {
+  return w.czas_start
+    ? new Date(w.czas_start).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
+    : '—'
+}
 </script>
 
 <template>
   <div class="flex flex-col flex-1">
-    <!-- Topbar -->
     <div class="h-[52px] border-b border-muted flex items-center px-5 gap-2 bg-default sticky top-0 z-10">
       <UIcon name="i-lucide-bar-chart-2" class="w-4 h-4 text-muted" />
       <span class="text-sm font-semibold">Raporty</span>
     </div>
 
     <div class="p-5 flex flex-col gap-4">
-      <!-- Sub-tabs -->
       <div class="flex border-b border-muted gap-4">
         <NuxtLink
           v-for="tab in tabs"
@@ -94,80 +118,83 @@ const progressTotal = progressDone + progressRunning + progressTodo
         </NuxtLink>
       </div>
 
-      <!-- Date + filters -->
       <div class="flex items-center gap-3 flex-wrap">
-        <UButton color="neutral" variant="outline" size="sm" icon="i-lucide-calendar" trailing-icon="i-lucide-chevron-down">
-          Dziś — {{ today }}
-        </UButton>
-        <UButton color="neutral" variant="outline" size="sm" icon="i-lucide-building-2" trailing-icon="i-lucide-chevron-down">
-          Wszystkie stanowiska
-        </UButton>
+        <UInput v-model="selectedDate" type="date" size="sm" icon="i-lucide-calendar" class="w-44" />
+        <USelect v-model="filterStation" :items="stationOptions" value-key="value" size="sm" class="w-52" />
+        <span class="ml-auto text-xs text-muted capitalize">{{ dateLabel }}</span>
       </div>
 
-      <!-- KPI tiles -->
       <div class="grid grid-cols-4 gap-3">
-        <div
-          v-for="k in kpi"
-          :key="k.label"
-          class="bg-elevated border border-muted rounded-xl p-4"
-        >
-          <div class="text-xs text-muted mb-1">{{ k.label }}</div>
-          <div class="text-2xl font-semibold" :class="k.color">{{ k.value }}</div>
-          <div class="text-xs text-muted mt-0.5">{{ k.sub }}</div>
+        <div class="bg-elevated border border-muted rounded-xl p-4">
+          <div class="text-xs text-muted mb-1">Procedur dziś</div>
+          <div class="text-2xl font-semibold">{{ stats.total }}</div>
+          <div class="text-xs text-muted mt-0.5">{{ stats.running }} w trakcie</div>
+        </div>
+        <div class="bg-elevated border border-muted rounded-xl p-4">
+          <div class="text-xs text-muted mb-1">Realizacja</div>
+          <div class="text-2xl font-semibold text-primary">{{ stats.percent }}%</div>
+          <div class="text-xs text-muted mt-0.5">{{ stats.done }} wykonane</div>
+        </div>
+        <div class="bg-elevated border border-muted rounded-xl p-4">
+          <div class="text-xs text-muted mb-1">Odchylenie od normy</div>
+          <div class="text-2xl font-semibold" :class="stats.diff <= 0 ? 'text-success' : 'text-warning'">
+            {{ stats.diff > 0 ? '+' : '' }}{{ stats.diff }}m
+          </div>
+          <div class="text-xs text-muted mt-0.5">{{ stats.time }}m / {{ stats.norm }}m</div>
+        </div>
+        <div class="bg-elevated border border-muted rounded-xl p-4">
+          <div class="text-xs text-muted mb-1">Do zrobienia</div>
+          <div class="text-2xl font-semibold">{{ stats.todo }}</div>
+          <div class="text-xs text-muted mt-0.5">pozostałe zadania</div>
         </div>
       </div>
 
-      <!-- Progress bar -->
       <div class="bg-elevated border border-muted rounded-xl p-4">
         <div class="flex items-center justify-between mb-2">
           <span class="text-sm font-medium">Postęp dnia</span>
-          <span class="text-xs text-muted">{{ progressDone }}/{{ progressTotal }} procedur</span>
+          <span class="text-xs text-muted">{{ stats.done }}/{{ stats.total }} procedur</span>
         </div>
-        <div class="h-2.5 rounded-full bg-muted/30 overflow-hidden flex">
-          <div
-            class="bg-success transition-all"
-            :style="`width: ${(progressDone / progressTotal) * 100}%`"
-          />
-          <div
-            class="bg-primary transition-all"
-            :style="`width: ${(progressRunning / progressTotal) * 100}%`"
-          />
-        </div>
-        <div class="flex gap-4 mt-2 text-xs text-muted">
-          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-success inline-block" />Wykonane ({{ progressDone }})</span>
-          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary inline-block" />W trakcie ({{ progressRunning }})</span>
-          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-muted/50 inline-block" />Do zrobienia ({{ progressTodo }})</span>
+        <div class="h-2.5 rounded-full bg-muted/30 overflow-hidden">
+          <div class="h-full bg-success transition-all" :style="{ width: stats.percent + '%' }" />
         </div>
       </div>
 
-      <!-- Procedure groups -->
-      <div v-for="group in groups" :key="group.label">
-        <div
-          class="flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-semibold uppercase tracking-wide mb-2"
-          :class="groupColor[group.status]"
-        >
-          {{ group.label }}
-          <span class="font-normal normal-case tracking-normal ml-1">({{ group.items.length }})</span>
-        </div>
+      <UAlert v-if="error" color="error" icon="i-lucide-alert-circle" :description="error" />
 
-        <div
-          v-for="item in group.items"
-          :key="item.name"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-muted bg-default mb-1.5 cursor-pointer hover:bg-elevated transition-colors"
-          @click="navigateTo('/raporty/' + item.name)"
-        >
-          <div class="flex-1 min-w-0">
-            <div class="text-sm font-medium truncate">{{ item.name }}</div>
-            <div class="text-xs text-muted mt-0.5">{{ item.station }}</div>
+      <div v-if="loading" class="p-8 flex justify-center">
+        <UIcon name="i-lucide-loader-circle" class="w-5 h-5 text-muted animate-spin" />
+      </div>
+
+      <div v-else-if="filtered.length === 0" class="p-8 text-center text-sm text-muted border border-muted rounded-xl">
+        Brak danych dla wybranego dnia.
+      </div>
+
+      <div v-else class="flex flex-col gap-4">
+        <div v-for="group in groups" :key="group.status">
+          <div
+            class="flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-semibold uppercase tracking-wide mb-2"
+            :class="statusColor[group.status]"
+          >
+            {{ group.label }}
+            <span class="font-normal normal-case tracking-normal ml-1">({{ group.items.length }})</span>
           </div>
-          <UBadge :color="periodBadge[item.period]?.color as any || 'neutral'" variant="subtle" size="sm">
-            {{ item.period }}
-          </UBadge>
-          <div class="text-xs text-muted w-12 text-right">{{ item.time }}</div>
-          <div class="text-xs w-16 text-right" :class="statusColor[item.status]">
-            {{ item.duration ?? '—' }}
+
+          <div
+            v-for="item in group.items"
+            :key="item.id"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-muted bg-default mb-1.5 hover:bg-elevated transition-colors"
+          >
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium truncate">{{ item.procedury?.nazwa ?? '—' }}</div>
+              <div class="text-xs text-muted mt-0.5">{{ item.stanowiska?.nazwa ?? '—' }}</div>
+            </div>
+            <UBadge :color="periodBadge[item.procedury?.pora_dnia ?? ''] ?? 'neutral'" variant="subtle" size="sm">
+              {{ periodLabel[item.procedury?.pora_dnia ?? ''] ?? item.procedury?.pora_dnia ?? '—' }}
+            </UBadge>
+            <div class="text-xs text-muted w-12 text-right">{{ startLabel(item) }}</div>
+            <div class="text-xs w-16 text-right">{{ czasLabel(item) }}</div>
+            <div class="text-xs text-muted w-14 text-right">n: {{ item.procedury?.norma_min ?? '—' }}m</div>
           </div>
-          <div class="text-xs text-muted w-14 text-right">n: {{ item.norm }}</div>
         </div>
       </div>
     </div>

@@ -3,9 +3,11 @@ definePageMeta({ layout: false })
 
 const { login } = useAuth()
 const user = useSupabaseUser()
+const toast = useToast()
 
 const email = ref('')
 const haslo = ref('')
+const pokazHaslo = ref(false)
 const ladowanie = ref(false)
 const blad = ref<string | null>(null)
 
@@ -16,6 +18,10 @@ watchEffect(() => {
 
 async function zaloguj() {
   blad.value = null
+  if (!email.value || !haslo.value) {
+    blad.value = 'Podaj email i hasło.'
+    return
+  }
   ladowanie.value = true
   try {
     await login(email.value, haslo.value)
@@ -28,48 +34,88 @@ async function zaloguj() {
     ladowanie.value = false
   }
 }
+
+function przypomnienieHasla() {
+  toast.add({
+    title: 'Reset hasła',
+    description: 'Skontaktuj się z administratorem, aby zresetować hasło.',
+    color: 'info'
+  })
+}
 </script>
 
 <template>
   <div class="min-h-screen flex items-center justify-center bg-elevated px-4">
-    <div class="w-full max-w-sm">
-      <!-- Logo -->
-      <div class="text-center mb-8">
-        <div class="text-lg font-semibold tracking-[0.2em]" style="color: #c59d5f;">
+    <div class="w-full max-w-md">
+      <!-- Logo nad kartą -->
+      <div class="text-center mb-6">
+        <div class="text-lg font-semibold tracking-[0.25em]" style="color: #c59d5f;">
           L'ANTICA STAZIONE
         </div>
         <div class="text-sm text-muted mt-1">Panel zarządzania — Procedury</div>
       </div>
 
       <!-- Karta logowania -->
-      <UCard>
-        <form class="flex flex-col gap-4" @submit.prevent="zaloguj">
-          <h1 class="text-base font-medium text-default">Zaloguj się</h1>
+      <div class="bg-default border border-muted rounded-2xl shadow-sm p-8">
+        <!-- Ikona + nagłówek -->
+        <div class="flex flex-col items-center text-center mb-7">
+          <div class="w-12 h-12 rounded-full bg-elevated flex items-center justify-center mb-3">
+            <UIcon name="i-lucide-user" class="w-6 h-6 text-muted" />
+          </div>
+          <h1 class="text-xl font-bold text-default">Witaj ponownie!</h1>
+          <p class="text-sm text-muted mt-1">
+            Nie masz konta? Skontaktuj się z administratorem.
+          </p>
+        </div>
 
-          <UFormField label="Email">
+        <form class="flex flex-col gap-5" @submit.prevent="zaloguj">
+          <!-- Email -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-sm font-medium text-default">
+              Email <span style="color: #c59d5f;">*</span>
+            </label>
             <UInput
               v-model="email"
               type="email"
-              placeholder="adres@email.pl"
+              placeholder="Wprowadź email…"
               autocomplete="email"
               size="lg"
               class="w-full"
-              required
             />
-          </UFormField>
+          </div>
 
-          <UFormField label="Hasło">
+          <!-- Hasło -->
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-medium text-default">
+                Hasło <span style="color: #c59d5f;">*</span>
+              </label>
+              <button
+                type="button"
+                class="text-sm hover:underline"
+                style="color: #c59d5f;"
+                @click="przypomnienieHasla"
+              >
+                Zapomniałeś hasła?
+              </button>
+            </div>
             <UInput
               v-model="haslo"
-              type="password"
-              placeholder="••••••••"
+              :type="pokazHaslo ? 'text' : 'password'"
+              placeholder="Wprowadź hasło…"
               autocomplete="current-password"
               size="lg"
               class="w-full"
-              required
-            />
-          </UFormField>
+            >
+              <template #trailing>
+                <button type="button" class="text-muted hover:text-default" @click="pokazHaslo = !pokazHaslo">
+                  <UIcon :name="pokazHaslo ? 'i-lucide-eye-off' : 'i-lucide-eye'" class="w-4 h-4" />
+                </button>
+              </template>
+            </UInput>
+          </div>
 
+          <!-- Błąd -->
           <UAlert
             v-if="blad"
             color="error"
@@ -78,6 +124,7 @@ async function zaloguj() {
             icon="i-lucide-alert-circle"
           />
 
+          <!-- Przycisk -->
           <UButton
             type="submit"
             size="lg"
@@ -86,11 +133,7 @@ async function zaloguj() {
             label="Zaloguj się"
           />
         </form>
-      </UCard>
-
-      <p class="text-center text-xs text-muted mt-6">
-        Nie masz konta? Skontaktuj się z administratorem.
-      </p>
+      </div>
     </div>
   </div>
 </template>

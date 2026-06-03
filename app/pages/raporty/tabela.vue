@@ -46,9 +46,11 @@ const statusLabel: Record<string, string> = {
 
 const poraBadge: Record<string, any> = {
   Rano: 'primary',
-  'Dzień': 'info',
-  Wieczór: 'violet'
+  Dzien: 'info',
+  Wieczor: 'violet'
 }
+
+const poraLabel: Record<string, string> = { Rano: 'Rano', Dzien: 'Dzień', Wieczor: 'Wieczór' }
 
 function odchylenie(w: any): string {
   if (!w.czas_start || !w.czas_koniec) return '—'
@@ -100,6 +102,7 @@ const stats = computed(() => {
   const czasy = filtered.value
     .filter(w => w.czas_start && w.czas_koniec)
     .map(w => {
+      if (!w.czas_start || !w.czas_koniec) return 0
       const start = new Date(w.czas_start)
       const koniec = new Date(w.czas_koniec)
       return Math.round((koniec.getTime() - start.getTime()) / 60000)
@@ -217,8 +220,8 @@ const stats = computed(() => {
               <td class="px-4 py-2.5 font-medium">{{ w.procedury?.nazwa ?? '—' }}</td>
               <td class="px-4 py-2.5 text-muted">{{ w.stanowiska?.nazwa ?? '—' }}</td>
               <td class="px-4 py-2.5">
-                <UBadge :color="poraBadge[w.procedury?.pora_dnia] ?? 'neutral'" variant="subtle" size="sm">
-                  {{ w.procedury?.pora_dnia ?? '—' }}
+                <UBadge :color="poraBadge[w.procedury?.pora_dnia ?? ''] ?? 'neutral'" variant="subtle" size="sm">
+                  {{ poraLabel[w.procedury?.pora_dnia ?? ''] ?? w.procedury?.pora_dnia ?? '—' }}
                 </UBadge>
               </td>
               <td class="px-4 py-2.5">

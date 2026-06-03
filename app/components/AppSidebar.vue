@@ -12,7 +12,7 @@ const navItems = computed(() => [
   { label: 'Procedury', to: '/procedury', icon: 'i-lucide-clipboard-list', perm: 'procedury:read' },
   { label: 'Stanowiska', to: '/stanowiska', icon: 'i-lucide-building-2', perm: 'stanowiska:read' },
   { label: 'Raporty', to: '/raporty', icon: 'i-lucide-bar-chart-2', perm: 'raporty:read' },
-  { label: 'Widok mobilny', to: '/mobile', icon: 'i-lucide-smartphone', perm: 'wykonania:read' },
+  { label: 'Widok mobilny', to: '/m', icon: 'i-lucide-smartphone', perm: 'wykonania:read' },
   { label: 'Użytkownicy', to: '/uzytkownicy', icon: 'i-lucide-users', perm: 'users:read' },
   { label: 'Role', to: '/role', icon: 'i-lucide-shield-check', perm: 'roles:read' }
 ].filter(item => can(item.perm)))

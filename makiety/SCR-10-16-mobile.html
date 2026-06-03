@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>L'Antica — Widok Pracownika</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --brand:#c59d5f;--brand-h:#b08840;--brand-l:#fdf6ec;--brand-d:#7a5c28;
+  --ok:#16a34a;--ok-bg:#f0fdf4;--ok-light:#dcfce7;
+  --err:#dc2626;--err-bg:#fef2f2;
+  --warn:#d97706;--warn-bg:#fffbeb;
+  --run:#2563eb;--run-bg:#eff6ff;
+  --pause:#7c3aed;--pause-bg:#f5f3ff;
+  --t:#111827;--t2:#6b7280;--t3:#9ca3af;
+  --b:#e5e7eb;--bg:#f5f4f1;
+}
+body{
+  font-family:-apple-system,ui-sans-serif,system-ui,sans-serif;
+  background:#f5f0e8;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:24px 20px 64px;
+}
+
+/* ══ PHONE ══ */
+.phone{
+  width:390px;height:844px;background:var(--bg);border-radius:52px;overflow:hidden;
+  position:relative;flex-shrink:0;
+  box-shadow:
+    0 0 0 11px #f5f0e8,
+    0 0 0 13px #c9aa7a,
+    0 50px 100px rgba(0,0,0,.12),
+    0 20px 40px rgba(0,0,0,.07);
+}
+.notch{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:120px;height:36px;background:#e8d0a0;border-radius:0 0 24px 24px;z-index:200;
+}
+.status-bar{
+  position:absolute;top:0;left:0;right:0;height:50px;z-index:190;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 26px 8px;font-size:12px;font-weight:600;pointer-events:none;
+}
+.st-time{color:#111;font-size:14px;font-weight:500;letter-spacing:-.3px;}
+.st-icons{display:flex;gap:5px;align-items:center;color:#333;}
+.sb-light .st-time,.sb-light .st-icons{color:#111;}
+
+/* ══ SCREENS ══ */
+.screens{position:absolute;inset:0;overflow:hidden;}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;}
+.screen.active{display:flex;}
+.slide-in{animation:sIn .3s cubic-bezier(.32,.72,0,1) both;}
+.slide-back{animation:sBack .3s cubic-bezier(.32,.72,0,1) both;}
+@keyframes sIn{from{transform:translateX(100%);opacity:.8}to{transform:translateX(0);opacity:1}}
+@keyframes sBack{from{transform:translateX(-30%);opacity:.8}to{transform:translateX(0);opacity:1}}
+
+/* ══════════════════════════════
+   S1 — LOGIN
+══════════════════════════════ */
+#s-login{background:#ffffff;}
+.login-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 320px 280px at 20% 10%, rgba(197,157,95,.22) 0%, transparent 60%),
+    radial-gradient(ellipse 280px 320px at 85% 90%, rgba(197,157,95,.18) 0%, transparent 60%),
+    radial-gradient(ellipse 180px 180px at 60% 40%, rgba(255,248,220,.9) 0%, transparent 55%);
+  backdrop-filter:blur(0px);
+}
+.login-scroll{flex:1;display:flex;flex-direction:column;align-items:center;padding:64px 28px 36px;position:relative;z-index:1;overflow-y:auto;}
+.login-logo-wrap{margin-bottom:24px;}
+.logo-ring{
+  width:88px;height:88px;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.logo-ring svg{position:absolute;inset:0;}
+.logo-inner{font-family:serif;text-align:center;position:relative;z-index:1;}
+.login-brand{font-size:11px;font-weight:500;color:#b08840;letter-spacing:3px;margin-bottom:2px;}
+.login-name{font-size:24px;font-weight:600;color:#1a1008;margin-bottom:3px;letter-spacing:.5px;}
+.login-tagline{font-size:12px;color:var(--t2);letter-spacing:.5px;}
+.gold-line{width:32px;height:1.5px;background:var(--brand);border-radius:1px;margin:18px auto 28px;}
+.login-card{background:rgba(255,255,255,.85);border:1px solid rgba(197,157,95,.35);border-radius:20px;padding:24px;width:100%;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 40px rgba(197,157,95,.2),0 2px 12px rgba(0,0,0,.05);}
+.login-form-title{font-size:18px;font-weight:600;color:var(--t);margin-bottom:3px;}
+.login-form-sub{font-size:13px;color:var(--t2);margin-bottom:20px;}
+.m-inp{
+  width:100%;padding:13px 16px;border-radius:12px;
+  border:1.5px solid #e5e7eb;background:#fff;
+  color:var(--t);font-size:14px;outline:none;font-family:inherit;margin-bottom:10px;
+  transition:border-color .2s;
+}
+.m-inp::placeholder{color:var(--t3);}
+.m-inp:focus{border-color:var(--brand);background:#fff;}
+.login-submit{
+  width:100%;padding:14px;border-radius:12px;
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand-h) 100%);
+  color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;
+  font-family:inherit;letter-spacing:.06em;margin-top:4px;
+  box-shadow:0 4px 16px rgba(197,157,95,.3);transition:opacity .15s;
+}
+.login-submit:active{opacity:.85;}
+/* Stations */
+.stations-wrap{display:none;flex-direction:column;gap:8px;width:100%;}
+.stn-welcome{font-size:20px;font-weight:600;color:var(--t);margin-bottom:3px;}
+.stn-hint{font-size:13px;color:var(--t2);margin-bottom:18px;line-height:1.5;}
+.stn-btn{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;border-radius:14px;
+  background:rgba(255,255,255,.75);border:1.5px solid rgba(197,157,95,.25);
+  color:var(--t);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;
+  transition:all .15s;text-align:left;
+}
+.stn-btn:active,.stn-btn.on{
+  background:var(--brand-l);border-color:var(--brand);color:var(--brand-h);
+}
+.stn-ico{width:36px;height:36px;border-radius:10px;background:var(--brand-l);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ══════════════════════════════
+   S2 — TASK LIST
+══════════════════════════════ */
+#s-tasks{background:var(--bg);}
+
+/* Hero header */
+.task-hero{
+  flex-shrink:0;
+  background:linear-gradient(160deg,#fff 0%,#fdf6ec 60%,#f5e8cc 100%);
+  padding:54px 20px 20px;position:relative;overflow:hidden;
+}
+.task-hero::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 280px 180px at 90% 30%,rgba(197,157,95,.25) 0%,transparent 70%);
+}
+.th-top{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1;}
+.th-date{font-size:11px;color:var(--brand-h);letter-spacing:.5px;margin-bottom:3px;text-transform:uppercase;}
+.th-station{font-size:22px;font-weight:600;color:var(--t);letter-spacing:-.3px;}
+.th-icons{display:flex;gap:8px;}
+.th-ico-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.07);
+  border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);}
+/* Day strip */
+.day-strip{display:flex;gap:6px;margin-top:16px;overflow-x:auto;scrollbar-width:none;position:relative;z-index:1;}
+.day-strip::-webkit-scrollbar{display:none;}
+.day-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;
+  padding:8px 13px;border-radius:12px;cursor:pointer;border:none;font-family:inherit;
+  background:rgba(0,0,0,.06);transition:background .15s;}
+.day-chip.cur{background:var(--brand);}
+.day-chip:active{background:rgba(197,157,95,.2);}
+.dc-d{font-size:10px;font-weight:600;color:var(--t3);margin-bottom:2px;text-transform:uppercase;}
+.dc-n{font-size:16px;font-weight:600;color:var(--t);}
+.day-chip.cur .dc-d{color:rgba(255,255,255,.85);}
+.day-chip.cur .dc-n{color:#fff;}
+
+/* Progress strip */
+.prog-strip{
+  flex-shrink:0;background:#fff;
+  padding:14px 20px;border-bottom:1px solid var(--b);
+  display:flex;align-items:center;gap:16px;
+}
+.gauge{position:relative;width:72px;height:72px;flex-shrink:0;}
+.gauge svg{transform:rotate(-90deg);}
+.g-bg{fill:none;stroke:#f0ede6;stroke-width:7;}
+.g-fill{fill:none;stroke:var(--brand);stroke-width:7;stroke-linecap:round;
+  stroke-dasharray:208;stroke-dashoffset:125;transition:stroke-dashoffset 1s ease;}
+.g-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.g-pct{font-size:15px;font-weight:600;color:var(--t);}
+.g-sub{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;}
+.prog-details{flex:1;}
+.prog-title{font-size:13px;font-weight:500;color:var(--t);margin-bottom:6px;}
+.prog-chips{display:flex;gap:5px;flex-wrap:wrap;}
+.pc{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;}
+.pc-ok{background:var(--ok-bg);color:var(--ok);}
+.pc-run{background:var(--run-bg);color:var(--run);}
+.pc-err{background:var(--err-bg);color:var(--err);}
+
+/* Filter */
+.filter-bar{
+  flex-shrink:0;display:flex;gap:6px;padding:10px 16px;
+  background:#fff;border-bottom:1px solid var(--b);overflow-x:auto;scrollbar-width:none;
+}
+.filter-bar::-webkit-scrollbar{display:none;}
+.ftab{padding:5px 13px;border-radius:999px;font-size:12px;font-weight:600;
+  border:1.5px solid var(--b);background:#fff;color:var(--t2);cursor:pointer;
+  white-space:nowrap;font-family:inherit;flex-shrink:0;transition:all .15s;}
+.ftab.on{background:var(--brand);color:#fff;border-color:var(--brand);}
+
+/* Task scroll */
+.task-scroll{flex:1;overflow-y:auto;padding:8px 14px 100px;}
+
+/* Section separator */
+.period-sep{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 2px 8px;
+}
+.period-line{flex:1;height:1px;background:var(--b);}
+.period-label{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.period-dot{width:6px;height:6px;border-radius:50%;}
+
+/* Task card wrapper */
+.sw-wrap{position:relative;margin-bottom:8px;height:74px;border-radius:16px;overflow:hidden;}
+.sw-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:3px;border-radius:16px;}
+/* right bg colors */
+.swbg-start{background:#fdf6ec;align-items:flex-start;padding-left:20px;}
+.swbg-finish{background:#f0fdf4;align-items:flex-start;padding-left:20px;}
+/* left bg colors */
+.swbg-pause{background:#f5f3ff;align-items:flex-end;padding-right:20px;}
+.swbg-reject{background:#fef2f2;align-items:flex-end;padding-right:20px;}
+.sw-card{
+  position:absolute;inset:0;background:#fff;border-radius:16px;
+  display:flex;align-items:center;gap:12px;padding:0 14px;
+  cursor:pointer;will-change:transform;user-select:none;touch-action:pan-y;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+  transition:box-shadow .2s;
+}
+/* Running state: gold left border */
+.sw-card.running{
+  border-left:3px solid var(--brand);
+  background:linear-gradient(90deg,rgba(197,157,95,.04) 0%,#fff 30%);
+}
+.sw-card.paused{
+  border-left:3px solid var(--pause);
+  background:linear-gradient(90deg,rgba(124,58,237,.04) 0%,#fff 30%);
+}
+.sw-card.done{background:#fafafa;}
+.sw-card.done .t-name{color:var(--t2);}
+.sw-card.done .t-av{opacity:.5;}
+
+/* Task avatar */
+.t-av{width:44px;height:44px;border-radius:13px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.av-food{background:#fef3c7;color:#92400e;}
+.av-clean{background:#dbeafe;color:#1e40af;}
+.av-check{background:#d1fae5;color:#065f46;}
+.av-warn{background:#fee2e2;color:#991b1b;}
+.av-doc{background:#f3f4f6;color:#374151;}
+/* Running pulse */
+.av-run{background:rgba(197,157,95,.15);color:var(--brand-h);animation:avPulse 2s ease-in-out infinite;}
+@keyframes avPulse{0%,100%{box-shadow:0 0 0 0 rgba(197,157,95,.3)}50%{box-shadow:0 0 0 6px rgba(197,157,95,0)}}
+
+/* Task info */
+.t-info{flex:1;min-width:0;}
+.t-name{font-size:14px;font-weight:600;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.t-sub{font-size:12px;color:var(--t2);margin-top:1px;}
+.t-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;min-width:72px;}
+
+/* Status badges */
+.t-badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;}
+.tb-pending{background:#f3f4f6;color:#6b7280;}
+.tb-running{background:var(--run-bg);color:var(--run);display:flex;align-items:center;gap:4px;}
+.tb-paused{background:var(--pause-bg);color:var(--pause);}
+.tb-done{background:var(--ok-bg);color:var(--ok);}
+.tb-overdue{background:var(--err-bg);color:var(--err);}
+
+/* Timer display on card */
+.t-timer{font-size:12px;font-weight:600;color:var(--brand);font-variant-numeric:tabular-nums;}
+
+/* Run dot animation */
+.run-dot{width:6px;height:6px;border-radius:50%;background:var(--run);animation:blink 1s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* FAB */
+.fab{
+  position:absolute;bottom:24px;right:18px;width:54px;height:54px;
+  border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand-h));
+  color:#fff;border:none;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:40;
+  box-shadow:0 6px 20px rgba(197,157,95,.5),0 2px 8px rgba(0,0,0,.15);
+  transition:transform .15s,box-shadow .15s;
+}
+.fab:active{transform:scale(.92);box-shadow:0 3px 10px rgba(197,157,95,.4);}
+
+/* Swipe instruction */
+.swipe-inst{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  padding:10px 0 2px;
+}
+.si-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t3);}
+.si-arr{font-size:14px;}
+
+/* ══════════════════════════════
+   S3 — PROCEDURE DETAIL
+══════════════════════════════ */
+#s-detail{background:var(--bg);}
+.hero{height:220px;position:relative;flex-shrink:0;overflow:hidden;}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;}
+.hero-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(253,246,236,.95) 0%,rgba(253,246,236,.3) 60%,transparent 100%);}
+.hero-back{
+  position:absolute;top:54px;left:14px;z-index:10;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.8);backdrop-filter:blur(8px);
+  border:1px solid var(--b);cursor:pointer;color:var(--t2);
+  display:flex;align-items:center;justify-content:center;
+}
+.hero-content{position:absolute;bottom:0;left:0;right:0;padding:16px 18px;z-index:5;}
+.hero-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;
+  background:var(--brand-l);backdrop-filter:blur(4px);
+  border:1px solid rgba(197,157,95,.4);font-size:11px;font-weight:600;color:var(--brand-h);margin-bottom:8px;}
+.hero-title{font-size:22px;font-weight:600;color:var(--t);line-height:1.2;}
+
+.detail-body{flex:1;overflow-y:auto;padding-bottom:100px;}
+.det-meta{background:#fff;padding:13px 18px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--b);}
+.dm-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;}
+.dmc-br{background:var(--brand-l);color:var(--brand-h);}
+.dmc-g{background:var(--ok-bg);color:var(--ok);}
+.det-info-row{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end;}
+.det-info-item{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:3px;}
+
+.det-block{background:#fff;margin:8px 0 0;padding:16px 18px;}
+.det-block-label{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.det-block-txt{font-size:14px;color:var(--t);line-height:1.7;}
+
+/* Status & swipe card in detail */
+.det-action-section{margin:8px 14px 0;}
+.das-label{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;padding:12px 0 8px;}
+/* The big swipeable card */
+.det-sw-wrap{position:relative;height:80px;border-radius:16px;overflow:hidden;margin-bottom:10px;}
+.det-sw-bg{position:absolute;inset:0;display:flex;align-items:center;border-radius:16px;}
+.det-sw-bg-r{background:var(--ok-bg);padding-left:24px;gap:10px;}
+.det-sw-bg-l{background:var(--err-bg);justify-content:flex-end;padding-right:24px;gap:10px;}
+.det-sw-bg-p{background:var(--pause-bg);justify-content:flex-end;padding-right:24px;gap:10px;}
+.det-sw-card{
+  position:absolute;inset:0;background:#fff;border-radius:16px;
+  display:flex;align-items:center;padding:0 18px;gap:14px;
+  will-change:transform;user-select:none;touch-action:pan-y;
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+}
+.det-sw-card.running{
+  background:linear-gradient(90deg,rgba(197,157,95,.06) 0%,#fff 40%);
+  border-left:3px solid var(--brand);
+}
+.det-sw-card.paused{
+  background:linear-gradient(90deg,rgba(124,58,237,.06) 0%,#fff 40%);
+  border-left:3px solid var(--pause);
+}
+.det-sw-status{display:flex;flex-direction:column;gap:3px;flex:1;}
+.det-sw-name{font-size:15px;font-weight:600;color:var(--t);}
+.det-sw-hint{font-size:12px;color:var(--t2);}
+.det-timer-big{font-size:22px;font-weight:600;color:var(--brand);font-variant-numeric:tabular-nums;flex-shrink:0;}
+.det-timer-big.paused{color:var(--pause);}
+
+/* Instruction arrows */
+.det-arrows{display:flex;align-items:center;justify-content:space-between;padding:0 4px 12px;}
+.arr-item{display:flex;align-items:center;gap:6px;font-size:12px;}
+.arr-reject{color:var(--err);}
+.arr-ok{color:var(--ok);}
+.arr-pause{color:var(--pause);}
+
+/* Action bar */
+.action-bar{
+  position:absolute;bottom:0;left:0;right:0;background:#fff;
+  border-top:1px solid var(--b);padding:12px 14px 28px;
+  display:flex;gap:8px;z-index:30;
+}
+.ab-ghost{flex:1;padding:13px;border-radius:12px;background:#fff;border:1.5px solid var(--b);
+  font-size:13px;font-weight:600;color:var(--t);cursor:pointer;font-family:inherit;}
+.ab-err{flex:1;padding:13px;border-radius:12px;background:var(--err-bg);border:none;
+  font-size:13px;font-weight:600;color:var(--err);cursor:pointer;font-family:inherit;}
+.ab-pause{flex:1;padding:13px;border-radius:12px;background:var(--pause-bg);border:none;
+  font-size:13px;font-weight:600;color:var(--pause);cursor:pointer;font-family:inherit;}
+.ab-brand{flex:2;padding:13px;border-radius:12px;
+  background:linear-gradient(135deg,var(--brand),var(--brand-h));color:#fff;border:none;
+  font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;
+  box-shadow:0 3px 12px rgba(197,157,95,.35);}
+.ab-brand:active{opacity:.9;}
+
+/* ══════════════════════════════
+   S4 — REJECT REASON
+══════════════════════════════ */
+#s-reject{background:var(--bg);}
+.rej-header{background:#fff;padding:52px 18px 16px;border-bottom:1px solid var(--b);flex-shrink:0;}
+.rej-hrow{display:flex;align-items:center;gap:12px;}
+.rej-back{width:36px;height:36px;border-radius:50%;background:var(--bg);border:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);flex-shrink:0;}
+.rej-htitle{font-size:17px;font-weight:600;color:var(--t);}
+.rej-hsub{font-size:12px;color:var(--t2);margin-top:1px;}
+.rej-scroll{flex:1;overflow-y:auto;padding:16px 16px 110px;}
+
+.rej-item-card{
+  background:#fff;border:1px solid var(--b);border-radius:16px;
+  padding:14px 16px;margin-bottom:18px;
+  display:flex;align-items:center;gap:12px;
+}
+.ric-ico{width:40px;height:40px;border-radius:12px;background:var(--err-bg);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ric-name{font-size:14px;font-weight:600;color:var(--t);}
+.ric-sub{font-size:12px;color:var(--t2);margin-top:2px;}
+
+.qr-section-label{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+.qr-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
+.qr-chip{padding:8px 14px;border-radius:999px;border:1.5px solid var(--b);background:#fff;
+  font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;font-family:inherit;transition:all .15s;}
+.qr-chip.on{background:var(--brand-l);border-color:var(--brand);color:var(--brand-h);}
+.qr-chip:active{transform:scale(.97);}
+
+.rej-textarea{
+  width:100%;min-height:100px;padding:12px 14px;
+  border:1.5px solid var(--b);border-radius:14px;font-size:14px;
+  color:var(--t);background:#fff;outline:none;font-family:inherit;resize:none;line-height:1.6;
+  margin-bottom:12px;
+}
+.rej-textarea:focus{border-color:var(--brand);}
+.photo-btn{
+  width:100%;padding:13px;border:1.5px dashed var(--b);border-radius:14px;
+  background:transparent;display:flex;align-items:center;justify-content:center;
+  gap:8px;font-size:13px;color:var(--t2);cursor:pointer;font-family:inherit;
+}
+
+/* ══════════════════════════════
+   S5 — NOWA PROCEDURA (formularz)
+══════════════════════════════ */
+#s-new{background:var(--bg);}
+.form-header{
+  background:#fff;padding:52px 18px 16px;border-bottom:1px solid var(--b);flex-shrink:0;
+  display:flex;align-items:center;gap:12px;
+}
+.form-htitle{font-size:17px;font-weight:600;color:var(--t);}
+.form-scroll{flex:1;overflow-y:auto;padding:16px 16px 110px;}
+.form-group{margin-bottom:18px;}
+.form-label{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;
+  letter-spacing:.07em;margin-bottom:8px;}
+.form-label span{color:var(--err);margin-left:2px;}
+.form-input{
+  width:100%;padding:13px 14px;border:1.5px solid var(--b);border-radius:14px;
+  font-size:14px;color:var(--t);background:#fff;outline:none;font-family:inherit;
+}
+.form-input:focus{border-color:var(--brand);}
+.form-textarea{
+  width:100%;min-height:80px;padding:13px 14px;border:1.5px solid var(--b);border-radius:14px;
+  font-size:14px;color:var(--t);background:#fff;outline:none;font-family:inherit;resize:none;line-height:1.6;
+}
+.form-textarea:focus{border-color:var(--brand);}
+.form-chips{display:flex;flex-wrap:wrap;gap:7px;}
+.form-chip{
+  padding:8px 14px;border-radius:999px;border:1.5px solid var(--b);background:#fff;
+  font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.form-chip.on{background:var(--brand-l);border-color:var(--brand);color:var(--brand-h);font-weight:600;}
+.form-chip:active{transform:scale(.97);}
+.form-row{display:flex;gap:10px;}
+.form-row .form-group{flex:1;}
+.form-hint{font-size:11px;color:var(--t3);margin-top:5px;}
+
+/* ══════════════════════════════
+   S6 — MANAGER: STANOWISKA
+══════════════════════════════ */
+#s-manager{background:var(--bg);}
+.mgr-hero{
+  background:linear-gradient(160deg,#fff 0%,#fdf6ec 55%,#f5e4b8 100%);
+  padding:52px 20px 22px;flex-shrink:0;
+}
+.mgr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.mgr-label{font-size:10px;font-weight:600;color:var(--brand-h);text-transform:uppercase;letter-spacing:.12em;}
+.mgr-title{font-size:26px;font-weight:600;color:var(--t);letter-spacing:-.5px;}
+.mgr-date{font-size:12px;color:var(--t2);margin-top:2px;}
+.mgr-logout{background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.08);border-radius:10px;
+  padding:8px 12px;color:var(--t2);font-size:12px;font-weight:600;
+  display:flex;align-items:center;gap:6px;cursor:pointer;font-family:inherit;}
+.mgr-summary{
+  display:flex;gap:10px;margin-top:16px;
+}
+.mgr-sum-item{
+  flex:1;background:rgba(255,255,255,.6);border-radius:12px;padding:10px 12px;text-align:center;
+}
+.mgr-sum-v{font-size:18px;font-weight:600;color:var(--t);}
+.mgr-sum-l{font-size:10px;color:var(--t2);margin-top:2px;font-weight:600;letter-spacing:.04em;}
+.mgr-scroll{flex:1;overflow-y:auto;padding:14px 14px 30px;}
+.stn-card{
+  background:#fff;border-radius:18px;padding:16px;margin-bottom:12px;
+  box-shadow:0 1px 6px rgba(0,0,0,.06);cursor:pointer;transition:transform .15s;
+}
+.stn-card:active{transform:scale(.99);}
+.stn-card-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.stn-card-ico{
+  width:44px;height:44px;border-radius:13px;background:var(--brand-l);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.stn-card-name{font-size:16px;font-weight:600;color:var(--t);}
+.stn-card-sub{font-size:12px;color:var(--t2);margin-top:1px;}
+.stn-prog-bar{height:6px;background:#f3f4f6;border-radius:999px;overflow:hidden;margin-bottom:10px;}
+.stn-prog-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--brand),var(--brand-h));transition:width .4s ease;}
+.stn-prog-fill.full{background:linear-gradient(90deg,#16a34a,#15803d);}
+.stn-stats{display:flex;gap:8px;}
+.stn-stat{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;}
+.stn-stat-dot{width:7px;height:7px;border-radius:50%;}
+.stn-card-arr{margin-left:auto;color:var(--t3);}
+
+/* ══════════════════════════════
+   S7 — MANAGER: SZCZEGÓŁY STANOWISKA
+══════════════════════════════ */
+#s-station{background:var(--bg);}
+.sta-header{
+  background:#fff;padding:52px 18px 16px;border-bottom:1px solid var(--b);flex-shrink:0;
+}
+.sta-hrow{display:flex;align-items:center;gap:12px;}
+.sta-back{width:36px;height:36px;border-radius:50%;background:var(--bg);border:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);flex-shrink:0;}
+.sta-htitle{font-size:17px;font-weight:600;color:var(--t);}
+.sta-prog-inline{margin-top:12px;display:flex;align-items:center;gap:10px;}
+.sta-pi-bar{flex:1;height:6px;background:#f3f4f6;border-radius:999px;overflow:hidden;}
+.sta-pi-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--brand),var(--brand-h));}
+.sta-pi-txt{font-size:12px;font-weight:600;color:var(--t2);white-space:nowrap;}
+.sta-scroll{flex:1;overflow-y:auto;padding:12px 14px 30px;}
+
+/* Read-only task row for manager */
+.ro-card{
+  background:#fff;border-radius:14px;padding:13px 14px;margin-bottom:8px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+.ro-av{width:40px;height:40px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;}
+.ro-info{flex:1;min-width:0;}
+.ro-name{font-size:13.5px;font-weight:600;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ro-sub{font-size:11px;color:var(--t2);margin-top:1px;}
+.ro-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.ro-elapsed{font-size:11px;font-weight:600;color:var(--t3);font-variant-numeric:tabular-nums;}
+.ro-done-time{font-size:10px;color:var(--t3);}
+
+/* ══ TOAST ══ */
+.m-toast{
+  position:absolute;top:58px;left:14px;right:14px;z-index:300;
+  background:#fff;border-radius:14px;padding:12px 14px;
+  box-shadow:0 8px 30px rgba(0,0,0,.15),0 2px 8px rgba(0,0,0,.08);
+  display:flex;align-items:center;gap:10px;
+  opacity:0;transform:translateY(-10px) scale(.97);
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);pointer-events:none;
+}
+.m-toast.show{opacity:1;transform:translateY(0) scale(1);}
+.toast-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.toast-t{font-size:13px;font-weight:600;color:var(--t);}
+.toast-s{font-size:11px;color:var(--t2);margin-top:1px;}
+
+/* ══ INFO BAR ══ */
+.info-bar{
+  position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+  color:var(--t2);
+  border:1px solid var(--b);box-shadow:0 4px 20px rgba(0,0,0,.12);font-size:11px;
+  padding:8px 20px;border-radius:999px;white-space:nowrap;
+  display:flex;align-items:center;gap:14px;
+  border:1px solid rgba(255,255,255,.08);
+}
+.k{background:rgba(0,0,0,.07);padding:2px 6px;border-radius:5px;font-size:10px;}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- PHONE -->
+<div class="phone" id="phone">
+  <div class="notch"></div>
+  <div class="status-bar" id="statusBar">
+    <span class="st-time" id="stTime">9:30</span>
+    <div class="st-icons">
+      <svg width="14" height="10" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx=".8"/><rect x="4.5" y="5" width="3" height="6" rx=".8"/><rect x="9" y="2.5" width="3" height="8.5" rx=".8"/><rect x="13" y="0" width="3" height="11" rx=".8" opacity=".3"/></svg>
+      <svg width="14" height="10" viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 5C4 2 7.2.5 10 .5S16 2 19 5"/><path d="M3.5 8c1.7-1.8 4-2.8 6.5-2.8s4.8 1 6.5 2.8"/><path d="M7 11.2C8 10.2 9 9.7 10 9.7s2 .5 3 1.5"/><circle cx="10" cy="13.5" r="1.3" fill="currentColor"/></svg>
+      <svg width="24" height="11" viewBox="0 0 26 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1.2"/><rect x="2" y="2" width="15" height="8" rx="1.5" fill="currentColor"/><path d="M23.5 4v4a2 2 0 000-4z" fill="currentColor" opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <div class="screens">
+
+    <!-- ════ S1: LOGIN ════ -->
+    <div class="screen active" id="s-login">
+      <div class="login-bg"></div>
+      <div class="login-scroll">
+        <!-- Logo -->
+        <div class="login-logo-wrap" style="margin-bottom:0">
+          <svg viewBox="0 0 270 108" width="220" height="88" xmlns="http://www.w3.org/2000/svg">
+            <!-- L'Antica -->
+            <text x="135" y="38"
+              text-anchor="middle"
+              textLength="138" lengthAdjust="spacingAndGlyphs"
+              font-family="'Playfair Display', Georgia, serif"
+              font-size="34" font-weight="400"
+              fill="#c59d5f">L&#x2019;Antica</text>
+            <!-- STAZIONE -->
+            <text x="135" y="82"
+              text-anchor="middle"
+              textLength="252" lengthAdjust="spacingAndGlyphs"
+              font-family="'Playfair Display', Georgia, serif"
+              font-size="42" font-weight="400"
+              fill="#c59d5f">STAZIONE</text>
+            <!-- Lines + CUCINA ITALIANA -->
+            <line x1="10" y1="99" x2="66" y2="99" stroke="#c59d5f" stroke-width="0.7" opacity="0.6"/>
+            <text x="135" y="103"
+              text-anchor="middle"
+              font-family="'Playfair Display', Georgia, serif"
+              font-size="8.5" font-weight="400"
+              fill="#b08840" letter-spacing="3.5" opacity="0.9">CUCINA ITALIANA</text>
+            <line x1="204" y1="99" x2="260" y2="99" stroke="#c59d5f" stroke-width="0.7" opacity="0.6"/>
+          </svg>
+        </div>
+
+        <div class="login-tagline" style="font-size:11px;letter-spacing:2px;color:var(--t3);margin-top:8px;margin-bottom:0">SYSTEM ZARZĄDZANIA PROCEDURAMI</div>
+        <div class="gold-line"></div>
+
+        <!-- Login form -->
+        <div class="login-card" id="loginForm">
+          <div class="login-form-title">Witaj z powrotem!</div>
+          <div class="login-form-sub">Zaloguj się, aby zobaczyć zadania</div>
+          <input class="m-inp" type="text" placeholder="Login" value="grzegorz.grzes">
+          <input class="m-inp" type="password" placeholder="PIN" value="••••">
+          <button class="login-submit" onclick="showStations()">ZALOGUJ SIĘ</button>
+          <button style="width:100%;background:none;border:none;font-size:12px;color:rgba(197,157,95,.7);
+            margin-top:10px;cursor:pointer;font-family:inherit;padding:4px;"
+            onclick="goManagerLogin()" style="color:var(--brand-h);">Logowanie kierownika →</button>
+        </div>
+
+        <!-- Stations -->
+        <div class="stations-wrap" id="stationsWrap">
+          <div class="stn-welcome">Cześć, Grzegorz!</div>
+          <div class="stn-hint">Zanim przystąpisz do zadań,<br>potwierdź swoje stanowisko pracy</div>
+          <button class="stn-btn" onclick="pickStation(this,'Kuchnia')">
+            <div class="stn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#c59d5f" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75-1.5.75a3.354 3.354 0 0 1-3 0 3.354 3.354 0 0 0-3 0 3.354 3.354 0 0 1-3 0 3.354 3.354 0 0 0-3 0 3.354 3.354 0 0 1-3 0L3 16.5m15-3.379a48.474 48.474 0 0 0-6-.371c-2.032 0-4.034.126-6 .371m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.254 1.837 2.458v1a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15.62v-1c0-1.204.768-2.298 1.837-2.458A48.659 48.659 0 0 1 12 13.13Z"/></svg></div>
+            KUCHNIA
+          </button>
+          <button class="stn-btn" onclick="pickStation(this,'Pizza')">
+            <div class="stn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#c59d5f" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/></svg></div>
+            PIZZA
+          </button>
+          <button class="stn-btn" onclick="pickStation(this,'Sala')">
+            <div class="stn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#c59d5f" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg></div>
+            SALA
+          </button>
+          <button class="stn-btn" onclick="pickStation(this,'Dostawa')">
+            <div class="stn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#c59d5f" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg></div>
+            DOSTAWA
+          </button>
+          <button class="stn-btn" onclick="pickStation(this,'Zarządzanie')">
+            <div class="stn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#c59d5f" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg></div>
+            ZARZĄDZANIE
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ S2: TASK LIST ════ -->
+    <div class="screen" id="s-tasks">
+      <!-- Hero header -->
+      <div class="task-hero">
+        <div class="th-top">
+          <div>
+            <div class="th-date" id="thDate">ŚRODA, 26 LUTY 2025</div>
+            <div class="th-station" id="thStation">Kuchnia</div>
+          </div>
+          <div class="th-icons">
+            <button class="th-ico-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="day-strip" id="dayStrip"></div>
+      </div>
+
+      <!-- Progress gauge -->
+      <div class="prog-strip">
+        <div class="gauge">
+          <svg width="72" height="72" viewBox="0 0 72 72">
+            <circle class="g-bg" cx="36" cy="36" r="30"/>
+            <circle class="g-fill" id="gaugeFill" cx="36" cy="36" r="30"/>
+          </svg>
+          <div class="g-inner">
+            <div class="g-pct" id="gaugePct">40%</div>
+            <div class="g-sub">wykon.</div>
+          </div>
+        </div>
+        <div class="prog-details">
+          <div class="prog-title" id="progTitle">4 z 10 wykonanych</div>
+          <div class="prog-chips">
+            <span class="pc pc-ok" id="chipDone">4 wykonane</span>
+            <span class="pc pc-run" id="chipRun">1 w toku</span>
+            <span class="pc pc-err" id="chipOver">2 zaległe</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter -->
+      <div class="filter-bar">
+        <button class="ftab" onclick="setFilter(this,'pending')">Do zrobienia</button>
+        <button class="ftab" onclick="setFilter(this,'active')">Aktywne</button>
+        <button class="ftab" onclick="setFilter(this,'done')">Ukończone</button>
+        <button class="ftab" onclick="setFilter(this,'overdue')">Zaległe</button>
+        <button class="ftab on" onclick="setFilter(this,'all')">Wszystkie</button>
+      </div>
+
+      <div class="task-scroll" id="taskScroll"></div>
+
+      <button class="fab" onclick="goTo('s-new')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+      </button>
+
+      <div class="m-toast" id="t2"><div class="toast-ico" id="ti2"></div><div><div class="toast-t" id="tt2"></div><div class="toast-s" id="ts2"></div></div></div>
+    </div>
+
+    <!-- ════ S3: DETAIL ════ -->
+    <div class="screen" id="s-detail">
+      <div class="hero">
+        <svg class="hero-img" viewBox="0 0 390 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="390" height="220" fill="#fdf6ec"/>
+          <ellipse cx="195" cy="110" rx="200" ry="130" fill="#f5ead6" opacity=".7"/>
+          <ellipse cx="80" cy="70" rx="100" ry="75" fill="#c59d5f" opacity=".12"/>
+          <ellipse cx="320" cy="160" rx="120" ry="90" fill="#b08840" opacity=".1"/>
+          <ellipse cx="195" cy="125" rx="130" ry="82" fill="#c59d5f" opacity=".15"/>
+          <circle cx="145" cy="90" r="3.5" fill="#b08840" opacity=".2"/>
+          <circle cx="230" cy="78" r="2.5" fill="#b08840" opacity=".15"/>
+          <ellipse cx="158" cy="128" rx="42" ry="27" fill="#d4a96a" opacity=".25" transform="rotate(-14 158 128)"/>
+          <ellipse cx="238" cy="118" rx="42" ry="27" fill="#d4a96a" opacity=".25" transform="rotate(9 238 118)"/>
+        </svg>
+        <div class="hero-grad"></div>
+        <button class="hero-back" onclick="goBack()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+        </button>
+        <div class="hero-content">
+          <div class="hero-badge" id="detBadge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+            <span id="detAvgTime">~8 min</span>
+          </div>
+          <div class="hero-title" id="detTitle">Wyrabianie ciasta</div>
+        </div>
+      </div>
+
+      <div class="detail-body">
+        <div class="det-meta">
+          <span class="dm-chip dmc-br" id="detStation">Kuchnia</span>
+          <span class="dm-chip dmc-g" id="detPeriodChip">Rano</span>
+          <div class="det-info-row">
+            <span class="det-info-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25"/></svg>
+              <span id="detFreq">Codziennie</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="det-block">
+          <div class="det-block-label">Opis procedury</div>
+          <div class="det-block-txt" id="detDesc">Opis procedury załaduje się tutaj.</div>
+        </div>
+
+        <!-- Swipeable card + timer -->
+        <div class="det-action-section">
+          <div class="das-label">Oznacz procedurę</div>
+          <div class="det-sw-wrap" id="detSwWrap">
+            <div class="det-sw-bg det-sw-bg-r">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+              <span style="font-size:12px;font-weight:600;color:var(--ok);" id="detSwHintR">Rozpocznij</span>
+            </div>
+            <div class="det-sw-bg det-sw-bg-l" id="detBgL">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#dc2626" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+              <span style="font-size:12px;font-weight:600;color:var(--err);" id="detSwHintL">Odrzuć</span>
+            </div>
+            <div class="det-sw-card" id="detSwCard">
+              <div class="det-sw-status">
+                <div class="det-sw-name" id="detSwName">Wyrabianie ciasta</div>
+                <div class="det-sw-hint" id="detSwHint">Przesuń w prawo, aby rozpocząć</div>
+              </div>
+              <div class="det-timer-big" id="detTimer" style="display:none;">00:00</div>
+            </div>
+          </div>
+          <div class="det-arrows" id="detArrows">
+            <div class="arr-item arr-reject">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
+              Odrzuć
+            </div>
+            <div style="font-size:11px;color:var(--t3);" id="arrowsLabel">Swipe aby oznaczyć</div>
+            <div class="arr-item arr-ok">
+              Rozpocznij
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar" id="detActionBar">
+        <button class="ab-ghost" onclick="goBack()">WRÓĆ</button>
+        <button class="ab-pause" id="detBtnPause" style="display:none" onclick="detPauseAction()">PAUZA</button>
+        <button class="ab-err" id="detBtnReject" onclick="openReject()">ODRZUĆ</button>
+        <button class="ab-brand" id="detBtnMain" onclick="detMainAction()">ROZPOCZNIJ</button>
+      </div>
+
+      <div class="m-toast" id="t3"><div class="toast-ico" id="ti3"></div><div><div class="toast-t" id="tt3"></div><div class="toast-s" id="ts3"></div></div></div>
+    </div>
+
+    <!-- ════ S4: REJECT ════ -->
+    <div class="screen" id="s-reject">
+      <div class="rej-header">
+        <div class="rej-hrow">
+          <button class="rej-back" onclick="goBack()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+          </button>
+          <div>
+            <div class="rej-htitle">Powód odrzucenia</div>
+            <div class="rej-hsub">Opisz dlaczego procedura nie została wykonana</div>
+          </div>
+        </div>
+      </div>
+      <div class="rej-scroll">
+        <div class="rej-item-card">
+          <div class="ric-ico">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#dc2626" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+          </div>
+          <div>
+            <div class="ric-name" id="rejName">Wyrabianie ciasta</div>
+            <div class="ric-sub" id="rejSub">Kuchnia · codziennie rano</div>
+          </div>
+        </div>
+
+        <div class="qr-section-label">Szybki powód</div>
+        <div class="qr-chips" id="qrChips">
+          <button class="qr-chip" onclick="pickR(this,'Brak składników')">Brak składników</button>
+          <button class="qr-chip" onclick="pickR(this,'Uszkodzony sprzęt')">Uszkodzony sprzęt</button>
+          <button class="qr-chip" onclick="pickR(this,'Zbyt mało czasu')">Zbyt mało czasu</button>
+          <button class="qr-chip" onclick="pickR(this,'Pilniejsze zadanie')">Pilniejsze zadanie</button>
+          <button class="qr-chip" onclick="pickR(this,'Wykona ktoś inny')">Wykona ktoś inny</button>
+          <button class="qr-chip" onclick="pickR(this,'Inne')">Inne</button>
+        </div>
+
+        <div class="qr-section-label">Opis (opcjonalnie)</div>
+        <textarea class="rej-textarea" id="rejNote" placeholder="Podaj szczegóły…"></textarea>
+        <button class="photo-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"/></svg>
+          Dodaj zdjęcie (opcjonalnie)
+        </button>
+      </div>
+      <div class="action-bar">
+        <button class="ab-ghost" onclick="goBack()">WRÓĆ</button>
+        <button class="ab-brand" onclick="submitReject()">ZAPISZ</button>
+      </div>
+      <div class="m-toast" id="t4"><div class="toast-ico" id="ti4"></div><div><div class="toast-t" id="tt4"></div><div class="toast-s" id="ts4"></div></div></div>
+    </div>
+
+    <!-- ════ S5: NOWA PROCEDURA ════ -->
+    <div class="screen" id="s-new">
+      <div class="form-header">
+        <button class="sta-back" onclick="goBack()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+        </button>
+        <div class="form-htitle">Nowa procedura</div>
+      </div>
+
+      <div class="form-scroll">
+
+        <!-- Nazwa -->
+        <div class="form-group">
+          <div class="form-label">Nazwa procedury<span>*</span></div>
+          <input class="form-input" type="text" placeholder="np. Mycie pieca" id="newName">
+        </div>
+
+        <!-- Opis -->
+        <div class="form-group">
+          <div class="form-label">Opis / instrukcja</div>
+          <textarea class="form-textarea" placeholder="Opisz kroki do wykonania…" id="newDesc"></textarea>
+        </div>
+
+        <!-- Stanowisko -->
+        <div class="form-group">
+          <div class="form-label">Stanowisko<span>*</span></div>
+          <div class="form-chips" id="chipStation">
+            <button class="form-chip" onclick="pickChip('chipStation',this,'Kuchnia')">Kuchnia</button>
+            <button class="form-chip" onclick="pickChip('chipStation',this,'Pizza')">Pizza</button>
+            <button class="form-chip" onclick="pickChip('chipStation',this,'Sala')">Sala</button>
+            <button class="form-chip" onclick="pickChip('chipStation',this,'Dostawa')">Dostawa</button>
+            <button class="form-chip" onclick="pickChip('chipStation',this,'Zarządzanie')">Zarządzanie</button>
+          </div>
+        </div>
+
+        <!-- Pora dnia -->
+        <div class="form-group">
+          <div class="form-label">Pora dnia<span>*</span></div>
+          <div class="form-chips" id="chipPeriod">
+            <button class="form-chip" onclick="pickChip('chipPeriod',this,'morning')">
+              <span style="width:6px;height:6px;border-radius:50%;background:#c59d5f;display:inline-block;margin-right:5px;vertical-align:middle;"></span>Rano
+            </button>
+            <button class="form-chip" onclick="pickChip('chipPeriod',this,'day')">
+              <span style="width:6px;height:6px;border-radius:50%;background:#2563eb;display:inline-block;margin-right:5px;vertical-align:middle;"></span>W ciągu dnia
+            </button>
+            <button class="form-chip" onclick="pickChip('chipPeriod',this,'closing')">
+              <span style="width:6px;height:6px;border-radius:50%;background:#7c3aed;display:inline-block;margin-right:5px;vertical-align:middle;"></span>Zamknięcie
+            </button>
+          </div>
+        </div>
+
+        <!-- Średni czas wykonania + częstotliwość -->
+        <div class="form-row">
+          <div class="form-group">
+            <div class="form-label">Śr. czas wykonania<span>*</span></div>
+            <input class="form-input" type="text" placeholder="np. 15 min" id="newAvgTime">
+            <div class="form-hint">Przybliżony czas</div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Częstotliwość<span>*</span></div>
+            <div class="form-chips" style="flex-direction:column;gap:6px;" id="chipFreq">
+              <button class="form-chip" style="text-align:left;" onclick="pickChip('chipFreq',this,'Codziennie')">Codziennie</button>
+              <button class="form-chip" style="text-align:left;" onclick="pickChip('chipFreq',this,'2× dziennie')">2× dziennie</button>
+              <button class="form-chip" style="text-align:left;" onclick="pickChip('chipFreq',this,'Co tydzień')">Co tydzień</button>
+              <button class="form-chip" style="text-align:left;" onclick="pickChip('chipFreq',this,'Inne')">Inne</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /form-scroll -->
+
+      <div class="action-bar">
+        <button class="ab-ghost" onclick="goBack()">ANULUJ</button>
+        <button class="ab-brand" onclick="saveNewTask()">ZAPISZ PROCEDURĘ</button>
+      </div>
+      <div class="m-toast" id="t5"><div class="toast-ico" id="ti5"></div><div><div class="toast-t" id="tt5"></div><div class="toast-s" id="ts5"></div></div></div>
+    </div>
+
+    <!-- ════ S6: MANAGER — STANOWISKA ════ -->
+    <div class="screen" id="s-manager">
+      <!-- Hero -->
+      <div class="mgr-hero">
+        <div class="mgr-top">
+          <div>
+            <div class="mgr-label">Panel kierownika</div>
+            <div class="mgr-title">Przegląd</div>
+            <div class="mgr-date" id="mgrDate">ŚRODA, 26 LUTY 2025</div>
+          </div>
+          <button class="mgr-logout" onclick="goTo('s-login')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/></svg>
+            Wyloguj
+          </button>
+        </div>
+        <div class="mgr-summary" id="mgrSummary">
+          <div class="mgr-sum-item"><div class="mgr-sum-v" id="mgrTotalDone">0</div><div class="mgr-sum-l">Wykonanych</div></div>
+          <div class="mgr-sum-item"><div class="mgr-sum-v" id="mgrTotalRun" style="color:#c59d5f;">0</div><div class="mgr-sum-l">W toku</div></div>
+          <div class="mgr-sum-item"><div class="mgr-sum-v" id="mgrTotalOver" style="color:#ef4444;">0</div><div class="mgr-sum-l">Zaległych</div></div>
+          <div class="mgr-sum-item"><div class="mgr-sum-v" id="mgrTotal">0</div><div class="mgr-sum-l">Łącznie</div></div>
+        </div>
+      </div>
+
+      <div class="mgr-scroll" id="mgrScroll"></div>
+
+      <div class="m-toast" id="t6"><div class="toast-ico" id="ti6"></div><div><div class="toast-t" id="tt6"></div><div class="toast-s" id="ts6"></div></div></div>
+    </div>
+
+    <!-- ════ S7: MANAGER — SZCZEGÓŁY STANOWISKA ════ -->
+    <div class="screen" id="s-station">
+      <div class="sta-header">
+        <div class="sta-hrow">
+          <button class="sta-back" onclick="goBack()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+          </button>
+          <div>
+            <div class="sta-htitle" id="staTitle">Kuchnia</div>
+          </div>
+        </div>
+        <div class="sta-prog-inline">
+          <div class="sta-pi-bar"><div class="sta-pi-fill" id="staProgFill" style="width:0%"></div></div>
+          <div class="sta-pi-txt" id="staProgTxt">0 / 0</div>
+        </div>
+      </div>
+
+      <div class="sta-scroll" id="staScroll"></div>
+    </div>
+
+  </div><!-- /screens -->
+</div><!-- /phone -->
+
+<div class="info-bar">
+  <span>L'Antica Mobile</span>
+  <span><span class="k">→</span> Start/Koniec</span>
+  <span><span class="k">←</span> Pauza / Odrzuć</span>
+  <span>Myszka + dotyk</span>
+</div>
+
+
+<script>
+/* ═══════════════════════════════════════
+   L'ANTICA MOBILE — COMPLETE INTERACTIVE PROTOTYPE
+   ═══════════════════════════════════════ */
+
+// ─── ICONS ───────────────────────────────
+const ICONS = {
+  food:  `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75-1.5.75a3.354 3.354 0 0 1-3 0 3.354 3.354 0 0 0-3 0 3.354 3.354 0 0 1-3 0 3.354 3.354 0 0 0-3 0 3.354 3.354 0 0 1-3 0L3 16.5m15-3.379a48.474 48.474 0 0 0-6-.371c-2.032 0-4.034.126-6 .371m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.254 1.837 2.458v1a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15.62v-1c0-1.204.768-2.298 1.837-2.458A48.659 48.659 0 0 1 12 13.13Z"/></svg>`,
+  clean: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21a48.25 48.25 0 0 1-8.135-.687c-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg>`,
+  check: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>`,
+  warn:  `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>`,
+  doc:   `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>`
+};
+
+// ─── TASKS DATA ───
+let TASKS = [
+  {id:1, name:'Mycie pieca',          desc:'Wyczyść piec z pozostałości i resztek po pracy. Użyj preparatu R-12 i szczotki drucianej.',          icon:'clean', period:'rano',    status:'pending', norm:12},
+  {id:2, name:'Wyrabianie ciasta',    desc:'Przygotuj ciasto wg receptury: mąka typ 00, drożdże, woda, oliwa z oliwek. Wyrabiaj przez 10 minut aż będzie elastyczne.', icon:'food', period:'rano', status:'running', norm:15, startedAt:Date.now()-4*60000},
+  {id:3, name:'Przygotowanie sosu',   desc:'Sos pomidorowy San Marzano wg receptury R-07. Gotuj na małym ogniu przez 20 minut.',                  icon:'food',  period:'rano',    status:'done',    norm:20, elapsed:18},
+  {id:4, name:'Sprawdzenie temp.',    desc:'Sprawdź temperatury wszystkich urządzeń chłodniczych (maks. +4°C) i pieców (min. 220°C).',            icon:'check', period:'dzien',   status:'pending', norm:5},
+  {id:5, name:'Wymiana oliw',         desc:'Wymień olej w frytkownicy i sprawdź stan oleju w piecu konwekcyjnym. Przelej do pojemnika i utylizuj.', icon:'clean', period:'dzien', status:'pending', norm:8},
+  {id:6, name:'Kwiaty zewnętrzne',    desc:'Podlej kwiaty przy wejściu głównym i na tarasie. Sprawdź stan doniczek.',                             icon:'check', period:'dzien',   status:'overdue', norm:6},
+  {id:7, name:'Dezynfekcja blatów',   desc:'Zastosuj preparat dezynfekujący Sanet na wszystkie blaty robocze. Pozostaw na 5 minut, następnie wytrzyj.',  icon:'clean', period:'wieczor', status:'pending', norm:10},
+  {id:8, name:'Polarowanie sztućców', desc:'Wypoleruj wszystkie sztućce do połysku czystą, suchą ściereczką z mikrofibry. Posegreguj i ułóż do pojemników.', icon:'doc', period:'wieczor', status:'pending', norm:18},
+  {id:9, name:'Raport dzienny',       desc:'Wypełnij raport dzienny z wykonanych procedur w systemie CMS. Zaznacz odchyłki od normy.',              icon:'doc',   period:'wieczor', status:'pending', norm:7},
+  {id:10,name:'Zamknięcie kuchni',    desc:'Wyłącz wszystkie urządzenia, sprawdź zawory gazowe, zamknij okna i zablokuj drzwi.',                   icon:'warn',  period:'wieczor', status:'pending', norm:15},
+];
+
+// ─── MANAGER DATA ───
+const MGR_STATIONS = [
+  {name:'Kuchnia', icon:'food', total:10, done:8, running:1, overdue:0, tasks:[
+    {id:201,name:'Mycie pieca',         icon:'clean',period:'rano',   status:'done',   norm:12,elapsed:11},
+    {id:202,name:'Wyrabianie ciasta',   icon:'food', period:'rano',   status:'running',norm:15,startedAt:Date.now()-4*60000},
+    {id:203,name:'Przygotowanie sosu',  icon:'food', period:'rano',   status:'done',   norm:20,elapsed:18},
+    {id:204,name:'Sprawdzenie temp.',   icon:'check',period:'dzien',  status:'done',   norm:5, elapsed:5},
+    {id:205,name:'Wymiana oliw',        icon:'clean',period:'dzien',  status:'done',   norm:8, elapsed:9},
+    {id:206,name:'Kwiaty zewnętrzne',   icon:'check',period:'dzien',  status:'done',   norm:6, elapsed:6},
+    {id:207,name:'Dezynfekcja blatów',  icon:'clean',period:'wieczor',status:'pending',norm:10},
+    {id:208,name:'Polarowanie sztućców',icon:'doc',  period:'wieczor',status:'pending',norm:18},
+    {id:209,name:'Raport dzienny',      icon:'doc',  period:'wieczor',status:'done',   norm:7, elapsed:8},
+    {id:210,name:'Zamknięcie kuchni',   icon:'warn', period:'wieczor',status:'pending',norm:15},
+  ]},
+  {name:'Pizza', icon:'food', total:7, done:5, running:0, overdue:0, tasks:[
+    {id:301,name:'Nastawienie pieca',        icon:'food', period:'rano',   status:'done',   norm:8, elapsed:7},
+    {id:302,name:'Przygotowanie składników', icon:'check',period:'rano',   status:'done',   norm:15,elapsed:14},
+    {id:303,name:'Ciasto na pizze',          icon:'food', period:'rano',   status:'done',   norm:20,elapsed:22},
+    {id:304,name:'Mycie blatów',             icon:'clean',period:'dzien',  status:'done',   norm:12,elapsed:11},
+    {id:305,name:'Kontrola temp. pieca',     icon:'check',period:'dzien',  status:'done',   norm:5, elapsed:5},
+    {id:306,name:'Zamknięcie sekcji',        icon:'warn', period:'wieczor',status:'pending',norm:10},
+    {id:307,name:'Raport zmiany',            icon:'doc',  period:'wieczor',status:'pending',norm:6},
+  ]},
+  {name:'Sala', icon:'check', total:9, done:9, running:0, overdue:0, tasks:[
+    {id:401,name:'Nakrycie stołów',      icon:'check',period:'rano',   status:'done',norm:25,elapsed:23},
+    {id:402,name:'Sprawdzenie menu',     icon:'doc',  period:'rano',   status:'done',norm:5, elapsed:4},
+    {id:403,name:'Polerowanie szklanek', icon:'clean',period:'rano',   status:'done',norm:15,elapsed:14},
+    {id:404,name:'Uzupełnienie serwetek',icon:'check',period:'dzien',  status:'done',norm:8, elapsed:8},
+    {id:405,name:'Czyszczenie krzeseł',  icon:'clean',period:'dzien',  status:'done',norm:12,elapsed:11},
+    {id:406,name:'Kontrola oświetlenia', icon:'check',period:'dzien',  status:'done',norm:5, elapsed:5},
+    {id:407,name:'Porządek na sali',     icon:'clean',period:'wieczor',status:'done',norm:20,elapsed:18},
+    {id:408,name:'Odkurzanie',           icon:'clean',period:'wieczor',status:'done',norm:15,elapsed:16},
+    {id:409,name:'Zamknięcie sali',      icon:'warn', period:'wieczor',status:'done',norm:10,elapsed:9},
+  ]},
+  {name:'Dostawa', icon:'doc', total:6, done:3, running:2, overdue:1, tasks:[
+    {id:501,name:'Przyjęcie zamówień',   icon:'doc',  period:'rano',   status:'done',   norm:10,elapsed:9},
+    {id:502,name:'Przygotowanie tras',   icon:'check',period:'rano',   status:'done',   norm:8, elapsed:7},
+    {id:503,name:'Pakowanie zamówień',   icon:'clean',period:'dzien',  status:'done',   norm:15,elapsed:14},
+    {id:504,name:'Dostawa 1 — centrum', icon:'food', period:'dzien',  status:'running',norm:30,startedAt:Date.now()-15*60000},
+    {id:505,name:'Dostawa 2 — Mokotów', icon:'food', period:'dzien',  status:'running',norm:25,startedAt:Date.now()-8*60000},
+    {id:506,name:'Raport dostaw',        icon:'doc',  period:'wieczor',status:'overdue',norm:10},
+  ]},
+  {name:'Zarządzanie', icon:'doc', total:8, done:7, running:1, overdue:0, tasks:[
+    {id:601,name:'Otwarcie systemu',     icon:'check',period:'rano',   status:'done',   norm:5, elapsed:4},
+    {id:602,name:'Przydział zadań',      icon:'doc',  period:'rano',   status:'done',   norm:15,elapsed:14},
+    {id:603,name:'Kontrola stanów mag.', icon:'check',period:'rano',   status:'done',   norm:20,elapsed:19},
+    {id:604,name:'Spotkanie zmiany',     icon:'check',period:'dzien',  status:'done',   norm:10,elapsed:11},
+    {id:605,name:'Monitoring systemu',   icon:'doc',  period:'dzien',  status:'running',norm:60,startedAt:Date.now()-30*60000},
+    {id:606,name:'Faktury dostawców',    icon:'doc',  period:'dzien',  status:'done',   norm:25,elapsed:23},
+    {id:607,name:'Raport kierownika',    icon:'doc',  period:'wieczor',status:'done',   norm:15,elapsed:14},
+    {id:608,name:'Zamknięcie systemu',   icon:'warn', period:'wieczor',status:'pending',norm:10},
+  ]},
+];
+
+const PERIOD_LABELS = {rano:'Rano', dzien:'W ciągu dnia', wieczor:'Zamknięcie'};
+const PERIOD_COLORS = {rano:'#b08840', dzien:'#2563eb', wieczor:'#7c3aed'};
+
+// ─── STATE ───
+let currentStation = 'Kuchnia';
+let activeFilter   = 'all';
+let screenStack    = [];
+let currentTaskId  = null;
+let timerInterval  = null;
+let detTimerInt    = null;
+
+// ═══════════════════════════
+//  NAVIGATION
+// ═══════════════════════════
+function goTo(id) {
+  const screens = document.querySelectorAll('.screen');
+  const current  = [...screens].find(s => s.classList.contains('active'));
+  if (current) screenStack.push(current.id);
+  screens.forEach(s => s.classList.remove('active','slide-in','slide-back'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active','slide-in');
+}
+function goBack() {
+  if (!screenStack.length) return;
+  const prev = screenStack.pop();
+  const screens = document.querySelectorAll('.screen');
+  screens.forEach(s => s.classList.remove('active','slide-in','slide-back'));
+  const target = document.getElementById(prev);
+  if (target) target.classList.add('active','slide-back');
+}
+
+// ═══════════════════════════
+//  TOAST — works on any active screen
+// ═══════════════════════════
+function showToast(text, type) {
+  const active = document.querySelector('.screen.active');
+  if (!active) return;
+  const toast = active.querySelector('.m-toast');
+  const ico   = active.querySelector('.toast-ico');
+  const tt    = active.querySelector('.toast-t');
+  if (!toast) return;
+  const bg = {ok:'#dcfce7', run:'#eff6ff', warn:'#fffbeb', err:'#fef2f2'};
+  const ic = {ok:'#16a34a', run:'#2563eb', warn:'#d97706', err:'#dc2626'};
+  const t = type||'ok';
+  if (ico) { ico.style.background=bg[t]||bg.ok; ico.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="${ic[t]||ic.ok}" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>`; }
+  if (tt) tt.textContent = text;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════════
+//  LOGIN
+// ═══════════════════════════
+function showStations() {
+  document.getElementById('loginForm').style.display = 'none';
+  const sw = document.getElementById('stationsWrap');
+  sw.style.display = 'flex';
+}
+function pickStation(btn, name) {
+  currentStation = name;
+  document.querySelectorAll('.stn-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  setTimeout(() => {
+    document.getElementById('thStation').textContent = name;
+    screenStack = [];
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(s => s.classList.remove('active','slide-in','slide-back'));
+    document.getElementById('s-tasks').classList.add('active','slide-in');
+    screenStack = ['s-login'];
+    buildDayStrip();
+    renderTasks();
+  }, 220);
+}
+function goManagerLogin() {
+  screenStack = [];
+  goTo('s-manager');
+  buildManagerStations();
+}
+
+// ═══════════════════════════
+//  DAY STRIP
+// ═══════════════════════════
+function buildDayStrip() {
+  const days = ['PN','WT','ŚR','CZW','PT','SB','ND'];
+  const strip = document.getElementById('dayStrip');
+  if (!strip) return;
+  strip.innerHTML = '';
+  const today = new Date();
+  for (let i=-2; i<=4; i++) {
+    const d = new Date(today); d.setDate(d.getDate()+i);
+    const chip = document.createElement('button');
+    chip.className = 'day-chip'+(i===0?' cur':'');
+    chip.innerHTML = `<div class="dc-d">${days[d.getDay()===0?6:d.getDay()-1]}</div><div class="dc-n">${d.getDate()}</div>`;
+    strip.appendChild(chip);
+  }
+  const el = document.getElementById('thDate');
+  if (el) el.textContent = today.toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+}
+
+// ═══════════════════════════
+//  FILTER
+// ═══════════════════════════
+function setFilter(btn, filter) {
+  activeFilter = filter;
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderTasks();
+}
+
+// ═══════════════════════════
+//  RENDER TASK LIST
+// ═══════════════════════════
+function renderTasks() {
+  const scroll = document.getElementById('taskScroll');
+  if (!scroll) return;
+  scroll.innerHTML = '';
+  const filtered =
+    activeFilter==='all'     ? TASKS :
+    activeFilter==='pending' ? TASKS.filter(t=>t.status==='pending') :
+    activeFilter==='active'  ? TASKS.filter(t=>t.status==='running') :
+    activeFilter==='done'    ? TASKS.filter(t=>t.status==='done') :
+    activeFilter==='overdue' ? TASKS.filter(t=>t.status==='overdue') : TASKS;
+
+  let anyShown = false;
+  ['rano','dzien','wieczor'].forEach(period => {
+    const items = filtered.filter(t => t.period===period);
+    if (!items.length) return;
+    anyShown = true;
+    const sep = document.createElement('div');
+    sep.className = 'period-sep';
+    const col = PERIOD_COLORS[period];
+    sep.innerHTML = `<div class="period-line"></div><div class="period-label" style="color:${col}"><div class="period-dot" style="background:${col}"></div>${PERIOD_LABELS[period]}</div><div class="period-line"></div>`;
+    scroll.appendChild(sep);
+    items.forEach(task => scroll.appendChild(makeCard(task)));
+  });
+  if (!anyShown) scroll.innerHTML = `<div style="text-align:center;padding:48px 20px;color:#9ca3af;font-size:14px">Brak zadań w tej kategorii</div>`;
+  updateProgress();
+  startTimers();
+}
+
+// ═══════════════════════════
+//  MAKE CARD
+// ═══════════════════════════
+function makeCard(task) {
+  const wrap = document.createElement('div');
+  wrap.className = 'sw-wrap';
+  const avClass   = task.status==='running'?'av-run':`av-${task.icon}`;
+  const cardClass = task.status==='running'?'sw-card running':task.status==='done'?'sw-card done':'sw-card';
+  const badgeHtml = task.status==='running'
+    ? `<span class="t-badge tb-running"><span class="run-dot"></span>W trakcie</span>`
+    : task.status==='done'    ? `<span class="t-badge tb-done">Ukończone</span>`
+    : task.status==='overdue' ? `<span class="t-badge tb-overdue">Zaległe</span>`
+    : `<span class="t-badge tb-pending">Do zrobienia</span>`;
+  const timerHtml = task.status==='running'
+    ? `<div class="t-timer" id="timer-${task.id}">0:00</div>` : '';
+
+  wrap.innerHTML = `
+    <div class="sw-bg swbg-start"  style="z-index:1"><div style="font-size:11px;font-weight:600;color:#b08840">▶ START</div></div>
+    <div class="sw-bg swbg-finish" style="z-index:0"><div style="font-size:11px;font-weight:600;color:#16a34a">✓ KONIEC</div></div>
+    <div class="sw-bg swbg-pause"  style="z-index:0"><div style="font-size:11px;font-weight:600;color:#7c3aed">⏸ PAUZA</div></div>
+    <div class="sw-bg swbg-reject" style="z-index:0"><div style="font-size:11px;font-weight:600;color:#dc2626">✕ ODRZUĆ</div></div>
+    <div class="${cardClass}" style="z-index:2">
+      <div class="t-av ${avClass}">${ICONS[task.icon]||ICONS.doc}</div>
+      <div class="t-info">
+        <div class="t-name">${task.name}</div>
+        <div class="t-sub">norma ${task.norm}m</div>
+      </div>
+      <div class="t-right">${badgeHtml}${timerHtml}</div>
+    </div>`;
+
+  addSwipe(wrap, task);
+  return wrap;
+}
+
+// ═══════════════════════════
+//  SWIPE — TASK LIST
+// ═══════════════════════════
+function addSwipe(wrap, task) {
+  const card = wrap.querySelector('.sw-card');
+  const bgS  = wrap.querySelector('.swbg-start');
+  const bgF  = wrap.querySelector('.swbg-finish');
+  const bgP  = wrap.querySelector('.swbg-pause');
+  const bgR  = wrap.querySelector('.swbg-reject');
+
+  let startX=0, currentX=0, dragging=false, didSwipe=false;
+  const getX = e => e.touches ? e.touches[0].clientX : e.clientX;
+
+  const setZi = (s,f,p,r) => { bgS.style.zIndex=s; bgF.style.zIndex=f; bgP.style.zIndex=p; bgR.style.zIndex=r; };
+
+  const onStart = e => {
+    if (task.status==='done') return;
+    startX=getX(e); currentX=0; dragging=true; didSwipe=false;
+    card.style.transition='none';
+  };
+  const onMove = e => {
+    if (!dragging) return;
+    currentX = getX(e)-startX;
+    if (Math.abs(currentX)>6) { didSwipe=true; e.preventDefault&&e.preventDefault(); }
+    card.style.transform = `translateX(${currentX}px)`;
+    const isRun = task.status==='running';
+    if (currentX>0)       setZi(isRun?'0':'1', isRun?'1':'0', '0','0');
+    else if (currentX<0)  setZi('0','0', Math.abs(currentX)<160?'1':'0', Math.abs(currentX)>=160?'1':'0');
+    else                  setZi('0','0','0','0');
+  };
+  const onEnd = () => {
+    if (!dragging) return;
+    dragging=false;
+    card.style.transition='transform .3s cubic-bezier(.32,.72,0,1)';
+    const dx=currentX; currentX=0;
+    setZi('0','0','0','0');
+    if (task.status==='done') { card.style.transform='translateX(0)'; }
+    else if (dx>80)  { swipeAction(task, task.status==='running'?'finish':'start'); }
+    else if (dx<-80) { swipeAction(task, dx<-160?'reject':'pause'); }
+    else             { card.style.transform='translateX(0)'; }
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onEnd);
+  };
+
+  card.addEventListener('touchstart',onStart,{passive:true});
+  card.addEventListener('touchmove', onMove, {passive:false});
+  card.addEventListener('touchend',  onEnd);
+  card.addEventListener('mousedown', e=>{ onStart(e); document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',onEnd); });
+  // Click MUST be in addEventListener (not inline) so didSwipe can block it
+  card.addEventListener('click', e=>{
+    if (didSwipe) { e.stopImmediatePropagation(); e.preventDefault(); didSwipe=false; return; }
+    openDetail(task.id);
+  });
+}
+
+// ═══════════════════════════
+//  SWIPE ACTION
+// ═══════════════════════════
+function swipeAction(task, action) {
+  if (action==='start')  { task.status='running'; task.startedAt=Date.now(); }
+  if (action==='finish') { task.status='done'; task.elapsed=Math.round((Date.now()-task.startedAt)/60000); delete task.startedAt; }
+  if (action==='pause')  { task.status='pending'; delete task.startedAt; }
+  if (action==='reject') {
+    currentTaskId=task.id;
+    const rn=document.getElementById('rejName'); if(rn) rn.textContent=task.name;
+    const rs=document.getElementById('rejSub');  if(rs) rs.textContent=currentStation+' · '+PERIOD_LABELS[task.period];
+    document.querySelectorAll('.qr-chip').forEach(c=>c.classList.remove('on'));
+    const nota=document.getElementById('rejNote'); if(nota) nota.value='';
+    goTo('s-reject'); return;
+  }
+  const msgs={start:'Zadanie rozpoczęte',finish:'Zadanie ukończone!',pause:'Zadanie wstrzymane'};
+  showToast(msgs[action], action==='finish'?'ok':action==='start'?'run':'warn');
+  setTimeout(renderTasks, 300);
+}
+
+// ═══════════════════════════
+//  TIMERS
+// ═══════════════════════════
+function fmtTimer(ms) {
+  const s=Math.floor(ms/1000);
+  return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+}
+function startTimers() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    TASKS.filter(t=>t.status==='running'&&t.startedAt).forEach(t=>{
+      const el=document.getElementById('timer-'+t.id);
+      if(el) el.textContent=fmtTimer(Date.now()-t.startedAt);
+    });
+  },1000);
+}
+
+// ═══════════════════════════
+//  PROGRESS GAUGE
+// ═══════════════════════════
+function updateProgress() {
+  const done=TASKS.filter(t=>t.status==='done').length;
+  const run =TASKS.filter(t=>t.status==='running').length;
+  const over=TASKS.filter(t=>t.status==='overdue').length;
+  const pct=Math.round(done/TASKS.length*100);
+  const fg=document.getElementById('gaugeFill'); if(fg) fg.style.strokeDashoffset=208-(208*pct/100);
+  const gp=document.getElementById('gaugePct');  if(gp) gp.textContent=pct+'%';
+  const pt=document.getElementById('progTitle'); if(pt) pt.textContent=`${done} z ${TASKS.length} wykonanych`;
+  const cd=document.getElementById('chipDone');  if(cd) cd.textContent=`${done} wyk.`;
+  const cr=document.getElementById('chipRun');   if(cr) cr.textContent=`${run} w toku`;
+  const co=document.getElementById('chipOver');  if(co) co.textContent=`${over} zaległe`;
+}
+
+// ═══════════════════════════
+//  TASK DETAIL
+// ═══════════════════════════
+function openDetail(id) {
+  const task=TASKS.find(x=>x.id===id);
+  if (!task) return;
+  currentTaskId=id;
+
+  const set=(elId,val)=>{ const e=document.getElementById(elId); if(e) e.textContent=val; };
+  set('detTitle',   task.name);
+  set('detDesc',    task.desc||'Brak opisu.');
+  set('detStation', currentStation);
+  set('detPeriodChip', PERIOD_LABELS[task.period]||'');
+  set('detFreq',    'Codziennie');
+  set('detAvgTime', `~${task.norm} min`);
+  set('detSwName',  task.name);
+
+  updateDetailUI(task);
+  goTo('s-detail');
+
+  // Replace det-sw-card to clear old listeners, then add new swipe
+  const old=document.getElementById('detSwCard');
+  if (old) {
+    const fresh=old.cloneNode(true);
+    old.parentNode.replaceChild(fresh,old);
+    addDetailSwipe(fresh,task);
+  }
+
+  // Detail timer
+  if (detTimerInt) { clearInterval(detTimerInt); detTimerInt=null; }
+  if (task.status==='running'&&task.startedAt) {
+    const dtEl=document.getElementById('detTimer');
+    if(dtEl) { dtEl.style.display=''; dtEl.textContent=fmtTimer(Date.now()-task.startedAt); }
+    detTimerInt=setInterval(()=>{
+      const el=document.getElementById('detTimer');
+      if(el&&task.startedAt) el.textContent=fmtTimer(Date.now()-task.startedAt);
+    },1000);
+  }
+}
+
+function updateDetailUI(task) {
+  const card   =document.getElementById('detSwCard');
+  const hint   =document.getElementById('detSwHint');
+  const timer  =document.getElementById('detTimer');
+  const btnMain=document.getElementById('detBtnMain');
+  const btnRej =document.getElementById('detBtnReject');
+  const btnPause=document.getElementById('detBtnPause');
+  const hintR  =document.getElementById('detSwHintR');
+  const hintL  =document.getElementById('detSwHintL');
+  const bgL    =document.getElementById('detBgL');
+
+  if (!card) return;
+
+  if (task.status==='running') {
+    card.className='det-sw-card running';
+    if(hint)   hint.textContent='Przesuń w prawo, aby zakończyć';
+    if(timer)  timer.style.display='';
+    if(btnMain){ btnMain.textContent='ZAKOŃCZ'; btnMain.className='ab-brand'; btnMain.style.display=''; }
+    if(btnRej)  btnRej.style.display='none';
+    if(btnPause) btnPause.style.display='';
+    if(hintR)   hintR.textContent='Zakończ';
+    if(hintL)   { hintL.textContent='Pauza'; hintL.style.color='var(--pause)'; }
+    if(bgL)     bgL.className='det-sw-bg det-sw-bg-p';
+  } else if (task.status==='done') {
+    card.className='det-sw-card';
+    if(hint)    hint.textContent='Procedura ukończona';
+    if(timer)   timer.style.display='none';
+    if(btnMain) { btnMain.textContent='WRÓĆ DO LISTY'; btnMain.className='ab-brand'; btnMain.style.display=''; }
+    if(btnRej)  btnRej.style.display='none';
+    if(btnPause) btnPause.style.display='none';
+  } else {
+    card.className='det-sw-card';
+    if(hint)    hint.textContent='Przesuń w prawo, aby rozpocząć';
+    if(timer)   timer.style.display='none';
+    if(btnMain) { btnMain.textContent='ROZPOCZNIJ'; btnMain.className='ab-brand'; btnMain.style.display=''; }
+    if(btnRej)  { btnRej.style.display=''; btnRej.textContent='ODRZUĆ'; }
+    if(btnPause) btnPause.style.display='none';
+    if(hintR)   hintR.textContent='Rozpocznij';
+    if(hintL)   { hintL.textContent='Odrzuć'; hintL.style.color='var(--err)'; }
+    if(bgL)     bgL.className='det-sw-bg det-sw-bg-l';
+  }
+}
+
+// ─── SWIPE ON DETAIL CARD ───
+function addDetailSwipe(card, task) {
+  let startX=0, currentX=0, dragging=false;
+  const getX=e=>e.touches?e.touches[0].clientX:e.clientX;
+  const onStart=e=>{ if(task.status==='done')return; startX=getX(e);currentX=0;dragging=true;card.style.transition='none'; };
+  const onMove=e=>{ if(!dragging)return; currentX=getX(e)-startX; if(Math.abs(currentX)>6)e.preventDefault&&e.preventDefault(); card.style.transform=`translateX(${currentX}px)`; };
+  const onEnd=()=>{
+    if(!dragging)return; dragging=false;
+    card.style.transition='transform .3s cubic-bezier(.32,.72,0,1)';
+    const dx=currentX; currentX=0;
+    card.style.transform='translateX(0)';
+    if (dx>70)       detSwipeRight(task);
+    else if (dx<-70) detSwipeLeft(task);
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onEnd);
+  };
+  card.addEventListener('touchstart',onStart,{passive:true});
+  card.addEventListener('touchmove', onMove, {passive:false});
+  card.addEventListener('touchend',  onEnd);
+  card.addEventListener('mousedown', e=>{ onStart(e); document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',onEnd); });
+}
+
+function detSwipeRight(task) {
+  if (task.status==='running') {
+    task.status='done'; task.elapsed=Math.round((Date.now()-task.startedAt)/60000); delete task.startedAt;
+    if(detTimerInt){clearInterval(detTimerInt);detTimerInt=null;}
+    updateDetailUI(task); showToast('Zadanie ukończone!','ok'); setTimeout(renderTasks,300);
+  } else if (task.status!=='done') {
+    task.status='running'; task.startedAt=Date.now();
+    updateDetailUI(task);
+    if(detTimerInt)clearInterval(detTimerInt);
+    const dtEl=document.getElementById('detTimer');
+    if(dtEl){dtEl.style.display='';dtEl.textContent='0:00';}
+    detTimerInt=setInterval(()=>{ const el=document.getElementById('detTimer'); if(el&&task.startedAt)el.textContent=fmtTimer(Date.now()-task.startedAt); },1000);
+    showToast('Zadanie rozpoczęte','run'); setTimeout(renderTasks,300);
+  }
+}
+function detSwipeLeft(task) {
+  if (task.status==='running') {
+    task.status='pending'; delete task.startedAt;
+    if(detTimerInt){clearInterval(detTimerInt);detTimerInt=null;}
+    updateDetailUI(task); showToast('Zadanie wstrzymane','warn'); setTimeout(renderTasks,300);
+  } else { openReject(); }
+}
+
+function detMainAction() {
+  const task=TASKS.find(t=>t.id===currentTaskId); if(!task)return;
+  if (task.status==='done') goBack();
+  else if (task.status==='running') detSwipeRight(task);
+  else detSwipeRight(task);
+}
+function detPauseAction() {
+  const task=TASKS.find(t=>t.id===currentTaskId); if(!task||task.status!=='running')return;
+  detSwipeLeft(task);
+}
+
+// ═══════════════════════════
+//  REJECT
+// ═══════════════════════════
+function openReject() {
+  const task=TASKS.find(t=>t.id===currentTaskId);
+  if(task){ const rn=document.getElementById('rejName'); if(rn)rn.textContent=task.name; const rs=document.getElementById('rejSub'); if(rs)rs.textContent=currentStation+' · '+PERIOD_LABELS[task.period]; }
+  document.querySelectorAll('.qr-chip').forEach(c=>c.classList.remove('on'));
+  const nota=document.getElementById('rejNote'); if(nota)nota.value='';
+  goTo('s-reject');
+}
+function pickR(btn, text) {
+  document.querySelectorAll('.qr-chip').forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');
+}
+function submitReject() {
+  const task=TASKS.find(t=>t.id===currentTaskId);
+  if(task){ task.status='done'; task.rejected=true; delete task.startedAt; }
+  // Go straight to s-tasks skipping s-detail
+  screenStack=screenStack.filter(id=>id!=='s-detail');
+  if(detTimerInt){clearInterval(detTimerInt);detTimerInt=null;}
+  const screens=document.querySelectorAll('.screen');
+  screens.forEach(s=>s.classList.remove('active','slide-in','slide-back'));
+  document.getElementById('s-tasks').classList.add('active','slide-back');
+  setTimeout(()=>{ renderTasks(); setTimeout(()=>showToast('Procedura odrzucona','warn'),100); },300);
+}
+
+// ═══════════════════════════
+//  NEW TASK FORM
+// ═══════════════════════════
+function pickChip(groupId, btn, value) {
+  document.querySelectorAll(`#${groupId} .form-chip`).forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');
+}
+function saveNewTask() {
+  const nameEl=document.getElementById('newName');
+  const name=nameEl?nameEl.value.trim():'';
+  if (!name) { showToast('Podaj nazwę procedury','err'); return; }
+  const perChip=document.querySelector('#chipPeriod .form-chip.on');
+  const avgEl=document.getElementById('newAvgTime');
+  const norm=avgEl?parseInt(avgEl.value)||10:10;
+  let period='dzien';
+  if (perChip) {
+    const txt=perChip.textContent;
+    period=txt.includes('Rano')?'rano':txt.includes('dnia')?'dzien':'wieczor';
+  }
+  TASKS.push({id:TASKS.length+100,name,desc:document.getElementById('newDesc')?.value.trim()||'',icon:'doc',period,status:'pending',norm});
+  if(nameEl)nameEl.value='';
+  const descEl=document.getElementById('newDesc'); if(descEl)descEl.value='';
+  document.querySelectorAll('.form-chip').forEach(c=>c.classList.remove('on'));
+  showToast('Procedura dodana','ok');
+  setTimeout(()=>{
+    goBack();
+    activeFilter='all';
+    document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('on'));
+    const allBtn=[...document.querySelectorAll('.ftab')].find(b=>b.textContent==='Wszystkie');
+    if(allBtn) allBtn.classList.add('on');
+    renderTasks();
+  },500);
+}
+
+// ═══════════════════════════
+//  MANAGER
+// ═══════════════════════════
+function buildManagerStations() {
+  const scroll=document.getElementById('mgrScroll'); if(!scroll)return;
+  scroll.innerHTML='';
+  let totD=0,totR=0,totO=0,totA=0;
+  MGR_STATIONS.forEach(s=>{ totD+=s.done; totR+=s.running; totO+=(s.total-s.done-s.running); totA+=s.total; });
+  const set=(id,v)=>{ const e=document.getElementById(id); if(e)e.textContent=v; };
+  set('mgrTotalDone',totD); set('mgrTotalRun',totR); set('mgrTotalOver',Math.max(0,totO)); set('mgrTotal',totA);
+  const mgrDate=document.getElementById('mgrDate');
+  if(mgrDate) mgrDate.textContent=new Date().toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'}).toUpperCase();
+
+  MGR_STATIONS.forEach(s=>{
+    const pct=Math.round(s.done/s.total*100);
+    const rem=s.total-s.done-s.running;
+    const card=document.createElement('div');
+    card.className='stn-card';
+    card.onclick=()=>openStationDetail(s);
+    card.innerHTML=`
+      <div class="stn-card-top">
+        <div class="stn-card-ico">${ICONS[s.icon]||ICONS.doc}</div>
+        <div style="flex:1"><div class="stn-card-name">${s.name}</div><div class="stn-card-sub">${s.done}/${s.total} procedur</div></div>
+        <div class="stn-card-arr"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></div>
+      </div>
+      <div class="stn-prog-bar"><div class="stn-prog-fill${pct===100?' full':''}" style="width:${pct}%"></div></div>
+      <div class="stn-stats">
+        <div class="stn-stat"><div class="stn-stat-dot" style="background:#16a34a"></div>${s.done} wyk.</div>
+        ${s.running>0?`<div class="stn-stat" style="margin-left:10px"><div class="stn-stat-dot" style="background:#c59d5f"></div>${s.running} aktywne</div>`:''}
+        ${rem>0?`<div class="stn-stat" style="margin-left:10px"><div class="stn-stat-dot" style="background:#d97706"></div>${rem} czeka</div>`:''}
+      </div>`;
+    scroll.appendChild(card);
+  });
+}
+
+function openStationDetail(station) {
+  const title=document.getElementById('staTitle'); if(title)title.textContent=station.name;
+  const pct=Math.round(station.done/station.total*100);
+  const fill=document.getElementById('staProgFill'); if(fill)fill.style.width=pct+'%';
+  const txt=document.getElementById('staProgTxt');   if(txt) txt.textContent=`${station.done} / ${station.total} (${pct}%)`;
+  buildStationTasks(station);
+  goTo('s-station');
+}
+
+function buildStationTasks(station) {
+  const scroll=document.getElementById('staScroll'); if(!scroll)return;
+  scroll.innerHTML='';
+  ['rano','dzien','wieczor'].forEach(period=>{
+    const items=station.tasks.filter(t=>t.period===period);
+    if(!items.length)return;
+    const sep=document.createElement('div');
+    sep.className='period-sep';
+    const col=PERIOD_COLORS[period];
+    sep.innerHTML=`<div class="period-line"></div><div class="period-label" style="color:${col}"><div class="period-dot" style="background:${col}"></div>${PERIOD_LABELS[period]}</div><div class="period-line"></div>`;
+    scroll.appendChild(sep);
+    items.forEach(t=>{
+      const avCls=t.status==='running'?'av-run':`av-${t.icon}`;
+      const badge=t.status==='done'?`<span class="t-badge tb-done">Wyk.</span>`:t.status==='running'?`<span class="t-badge tb-running"><span class="run-dot"></span>Trwa</span>`:t.status==='overdue'?`<span class="t-badge tb-overdue">Zaległe</span>`:`<span class="t-badge tb-pending">Czeka</span>`;
+      const timeStr=t.elapsed?`${t.elapsed}m / ${t.norm}m`:t.startedAt?`${fmtTimer(Date.now()-t.startedAt)}`:`norma ${t.norm}m`;
+      const card=document.createElement('div');
+      card.className='ro-card';
+      card.innerHTML=`<div class="ro-av ${avCls}">${ICONS[t.icon]||ICONS.doc}</div><div class="ro-info"><div class="ro-name">${t.name}</div></div><div class="ro-right">${badge}<span class="ro-elapsed">${timeStr}</span></div>`;
+      scroll.appendChild(card);
+    });
+  });
+}
+
+// ─── CLOCK ───
+function updateClock() {
+  const el=document.getElementById('stTime'); if(!el)return;
+  const n=new Date(); el.textContent=n.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ═══════════════════════════
+//  INIT
+// ═══════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  screenStack=[];
+  buildDayStrip();
+  buildManagerStations();
+  updateClock();
+  setInterval(updateClock,30000);
+});
+</script>
+</body>
+</html>

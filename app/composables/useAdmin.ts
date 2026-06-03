@@ -16,13 +16,16 @@ export const useUsers = () => {
   async function fetch() {
     loading.value = true
     error.value = null
-    const { data, error: err } = await db
-      .from('profiles')
-      .select('*, roles(id, nazwa), stanowiska(nazwa)')
-      .order('created_at', { ascending: false })
-    if (err) error.value = err.message
-    else users.value = (data as any) ?? []
-    loading.value = false
+    try {
+      const { data, error: err } = await db
+        .from('profiles')
+        .select('*, roles(id, nazwa), stanowiska(nazwa)')
+        .order('created_at', { ascending: false })
+      if (err) error.value = err.message
+      else users.value = (data ?? []) as ProfilRow[]
+    } finally {
+      loading.value = false
+    }
   }
 
   async function setRole(userId: string, roleId: string) {
@@ -50,10 +53,13 @@ export const useRoles = () => {
   async function fetch() {
     loading.value = true
     error.value = null
-    const { data, error: err } = await db.from('roles').select('*').order('nazwa')
-    if (err) error.value = err.message
-    else roles.value = data ?? []
-    loading.value = false
+    try {
+      const { data, error: err } = await db.from('roles').select('*').order('nazwa')
+      if (err) error.value = err.message
+      else roles.value = data ?? []
+    } finally {
+      loading.value = false
+    }
   }
 
   return { roles, loading, error, fetch }

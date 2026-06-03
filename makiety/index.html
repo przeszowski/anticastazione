@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>L'Antica — Zarządzanie procedurami · Prototyp</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--brand:#c59d5f;--brand-h:#b08840;--brand-l:#fdf6ec;--t:#111827;--t2:#6b7280;--t3:#9ca3af;--b:#e5e7eb;--bg:#f9fafb;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;}
+.page{max-width:980px;margin:0 auto;padding:40px 24px;}
+.logo{font-size:13px;font-weight:600;color:var(--brand);letter-spacing:.04em;margin-bottom:4px;}
+h1{font-size:22px;font-weight:600;color:var(--t);margin-bottom:4px;}
+.sub{font-size:14px;color:var(--t2);margin-bottom:32px;}
+.section-title{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;margin-top:28px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;}
+.card{background:#fff;border:1px solid var(--b);border-radius:10px;padding:16px;cursor:pointer;text-decoration:none;display:block;transition:box-shadow .15s,border-color .15s;}
+.card:hover{border-color:var(--brand);box-shadow:0 4px 16px rgba(197,157,95,.15);}
+.card-num{font-size:11px;font-weight:600;color:var(--t3);margin-bottom:6px;}
+.card-title{font-size:13.5px;font-weight:600;color:var(--t);margin-bottom:4px;}
+.card-desc{font-size:12px;color:var(--t2);line-height:1.5;}
+.card-tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;margin-top:8px;}
+.tag-table{background:#eff6ff;color:#2563eb;}
+.tag-slide{background:var(--brand-l);color:var(--brand-h);}
+.tag-form{background:#f0fdf4;color:#16a34a;}
+.tag-custom{background:#f5f3ff;color:#7c3aed;}
+.tag-mobile{background:#fef2f2;color:#dc2626;}
+.divider{height:1px;background:var(--b);margin:28px 0 0;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="logo">L'ANTICA STAZIONE</div>
+  <h1>Zarządzanie procedurami · Prototyp UI</h1>
+  <div class="sub">Makiety interfejsu — moduł dodatkowy do aplikacji <a href="https://antica.netlify.app/" target="_blank" style="color:var(--brand)">antica.netlify.app</a></div>
+
+  <!-- DESKTOP -->
+  <div class="section-title">
+    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0H3"/></svg>
+    Widoki desktopowe
+  </div>
+  <div class="grid">
+    <a class="card" href="SCR-01-dashboard.html">
+      <div class="card-num">SCR-01</div>
+      <div class="card-title">Dashboard</div>
+      <div class="card-desc">Przegląd bieżący: KPI, stan stanowisk z procedurami (do zrobienia → w trakcie → wykonane), ostatnia aktywność.</div>
+      <span class="card-tag tag-custom">DASHBOARD</span>
+    </a>
+    <a class="card" href="SCR-02-procedury-lista.html">
+      <div class="card-num">SCR-02</div>
+      <div class="card-title">Procedury — Lista</div>
+      <div class="card-desc">Tabela procedur z filtrami, wyszukiwaniem i paginacją. Akcje: edytuj, duplikuj, archiwizuj.</div>
+      <span class="card-tag tag-table">TABLE-LIST</span>
+    </a>
+    <a class="card" href="SCR-03-procedura-szczegoly.html">
+      <div class="card-num">SCR-03</div>
+      <div class="card-title">Procedura — Szczegóły</div>
+      <div class="card-desc">Slideover z detalami procedury: opis, przypisanie, historia wykonań z czasem wykonania.</div>
+      <span class="card-tag tag-slide">SLIDEOVER</span>
+    </a>
+    <a class="card" href="SCR-04-procedura-formularz.html">
+      <div class="card-num">SCR-04</div>
+      <div class="card-title">Procedura — Formularz</div>
+      <div class="card-desc">Slideover formularz: nowa / edycja procedury. Pola: nazwa, opis, stanowisko, pora dnia, śr. czas wykonania.</div>
+      <span class="card-tag tag-form">FORM</span>
+    </a>
+    <a class="card" href="SCR-05-stanowiska-lista.html">
+      <div class="card-num">SCR-05</div>
+      <div class="card-title">Stanowiska — Lista</div>
+      <div class="card-desc">Tabela stanowisk z kategorią, liczbą procedur, godzinami otwarcia i statusem.</div>
+      <span class="card-tag tag-table">TABLE-LIST</span>
+    </a>
+    <a class="card" href="SCR-05b-stanowisko-formularz.html">
+      <div class="card-num">SCR-05b</div>
+      <div class="card-title">Stanowisko — Formularz</div>
+      <div class="card-desc">Formularz dodawania/edycji stanowiska: nazwa, dział, godziny, opis, status, przypisane procedury.</div>
+      <span class="card-tag tag-form">FORM</span>
+    </a>
+    <a class="card" href="SCR-06-stanowisko-szczegoly.html">
+      <div class="card-num">SCR-06</div>
+      <div class="card-title">Stanowisko — Szczegóły</div>
+      <div class="card-desc">Szczegóły stanowiska: dane podstawowe, godziny otwarcia, dział, status, lista przypisanych procedur.</div>
+      <span class="card-tag tag-table">DETAILS</span>
+    </a>
+    <a class="card" href="SCR-07-odpowiedzi-dzien.html">
+      <div class="card-num">SCR-07</div>
+      <div class="card-title">Raporty — Przegląd dzienny</div>
+      <div class="card-desc">Dzienny widok odpowiedzi pogrupowany po porze dnia z KPI i czasem wykonania każdej procedury.</div>
+      <span class="card-tag tag-custom">CUSTOM LIST</span>
+    </a>
+    <a class="card" href="SCR-08-odpowiedzi-stanowisko.html">
+      <div class="card-num">SCR-08</div>
+      <div class="card-title">Raporty — Szczegóły stanowiska</div>
+      <div class="card-desc">Slideover ze szczegółami odpowiedzi stanowiska: stats, pasek wydajności, lista procedur z czasami.</div>
+      <span class="card-tag tag-slide">SLIDEOVER</span>
+    </a>
+    <a class="card" href="SCR-09-odpowiedzi-tabela.html">
+      <div class="card-num">SCR-09</div>
+      <div class="card-title">Raporty — Tabela zbiorcza</div>
+      <div class="card-desc">Tabela zbiorcza z zakresem dat, filtrowaniem multi-column i kolumną odchyłki vs. norma.</div>
+      <span class="card-tag tag-table">TABLE-LIST</span>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MOBILE -->
+  <div class="section-title">
+    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 8.25h3"/></svg>
+    Widoki mobilne (wszystkie ekrany w jednym pliku)
+  </div>
+  <div class="grid">
+    <a class="card" href="SCR-10-16-mobile.html" style="grid-column:1/-1;max-width:480px">
+      <div class="card-num">SCR-10 → 16</div>
+      <div class="card-title">Aplikacja mobilna — Pracownik &amp; Kierownik</div>
+      <div class="card-desc">
+        Kompletny prototyp mobilny: logowanie, lista zadań z gestami swipe (start/finish/pause/reject),
+        szczegóły procedury, formularz odrzucenia, nowe zadanie, podgląd kierownika (wszystkie stanowiska)
+        oraz podgląd szczegółowy stanowiska (read-only).
+      </div>
+      <span class="card-tag tag-mobile">MOBILE · 7 SCREENS</span>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- INFO -->
+  <div style="margin-top:24px;background:#fff;border:1px solid var(--b);border-radius:10px;padding:16px 20px;font-size:13px;color:var(--t2);line-height:1.6">
+    <div style="font-weight:600;color:var(--t);margin-bottom:6px">Legenda kolorów pór dnia</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <span style="display:inline-flex;align-items:center;gap:6px"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#fdf6ec;border:1px solid #f0e0c0"></span>Rano (złoty)</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#eff6ff;border:1px solid #bfdbfe"></span>W ciągu dnia (niebieski)</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#f5f3ff;border:1px solid #ddd6fe"></span>Zamknięcie (fiolet)</span>
+    </div>
+    <div style="margin-top:10px;font-weight:600;color:var(--t);margin-bottom:6px">Kolory czasu wykonania</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <span style="color:#2563eb;font-weight:600">Niebieski</span> — szybciej niż norma (o &gt;20%)
+      <span style="color:#16a34a;font-weight:600">Zielony</span> — w normie (±20%)
+      <span style="color:#d97706;font-weight:600">Pomarańczowy</span> — wolniej niż norma
+    </div>
+  </div>
+
+  <div style="margin-top:20px;font-size:12px;color:var(--t3);text-align:center">
+    K-Development · Prototyp v0.1 · 2025
+  </div>
+</div>
+</body>
+</html>

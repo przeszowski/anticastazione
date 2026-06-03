@@ -88,7 +88,8 @@ as $$
   select coalesce(r.permissions, '{}')
   from public.profiles p
   left join public.roles r on r.id = p.role_id
-  where p.id = auth.uid();
+  where p.id = auth.uid()
+    and p.aktywny = true;
 $$;
 
 -- Czy zalogowany ma dane uprawnienie?
@@ -106,20 +107,28 @@ language sql security definer set search_path = public stable
 as $$
   select r.nazwa from public.profiles p
   left join public.roles r on r.id = p.role_id
-  where p.id = auth.uid();
+  where p.id = auth.uid()
+    and p.aktywny = true;
 $$;
 
 -- 5. RLS — dostęp oparty na uprawnieniach ────────────────────
 alter table roles    enable row level security;
 alter table profiles enable row level security;
 
--- ROLE: czytać może każdy zalogowany z roles:read; zarządzać z roles:create/update/delete
+-- ROLE: czytać może każdy zalogowany z roles:read; zarządzanie rozdzielone wg akcji
 drop policy if exists "role: czytaj" on roles;
 create policy "role: czytaj" on roles for select to authenticated
   using (has_perm('roles:read'));
 drop policy if exists "role: zarzadzaj" on roles;
-create policy "role: zarzadzaj" on roles for all to authenticated
+drop policy if exists "role: tworz" on roles;
+drop policy if exists "role: aktualizuj" on roles;
+drop policy if exists "role: usun" on roles;
+create policy "role: tworz" on roles for insert to authenticated
+  with check (has_perm('roles:create'));
+create policy "role: aktualizuj" on roles for update to authenticated
   using (has_perm('roles:update')) with check (has_perm('roles:update'));
+create policy "role: usun" on roles for delete to authenticated
+  using (has_perm('roles:delete'));
 
 -- PROFILE: każdy widzi swój; z users:read widzi wszystkie; zarządza z users:update
 drop policy if exists "profil: czytaj" on profiles;
@@ -139,15 +148,86 @@ drop policy if exists "public read procedury"   on procedury;
 drop policy if exists "public write procedury"  on procedury;
 drop policy if exists "public read wykonania"   on wykonania;
 drop policy if exists "public write wykonania"  on wykonania;
+drop policy if exists "stanowiska: pisz" on stanowiska;
+drop policy if exists "procedury: pisz" on procedury;
+drop policy if exists "wykonania: pisz" on wykonania;
+drop policy if exists "stanowiska: tworz" on stanowiska;
+drop policy if exists "stanowiska: aktualizuj" on stanowiska;
+drop policy if exists "stanowiska: usun" on stanowiska;
+drop policy if exists "procedury: tworz" on procedury;
+drop policy if exists "procedury: aktualizuj" on procedury;
+drop policy if exists "procedury: usun" on procedury;
+drop policy if exists "wykonania: tworz" on wykonania;
+drop policy if exists "wykonania: aktualizuj" on wykonania;
+drop policy if exists "wykonania: usun" on wykonania;
 
 create policy "stanowiska: czytaj" on stanowiska for select to authenticated using (has_perm('stanowiska:read'));
-create policy "stanowiska: pisz"   on stanowiska for all    to authenticated using (has_perm('stanowiska:update')) with check (has_perm('stanowiska:update'));
+create policy "stanowiska: tworz" on stanowiska for insert to authenticated
+  with check (has_perm('stanowiska:create'));
+create policy "stanowiska: aktualizuj" on stanowiska for update to authenticated
+  using (has_perm('stanowiska:update')) with check (has_perm('stanowiska:update'));
+create policy "stanowiska: usun" on stanowiska for delete to authenticated
+  using (has_perm('stanowiska:delete'));
 
 create policy "procedury: czytaj" on procedury for select to authenticated using (has_perm('procedury:read'));
-create policy "procedury: pisz"   on procedury for all    to authenticated using (has_perm('procedury:update')) with check (has_perm('procedury:update'));
+create policy "procedury: tworz" on procedury for insert to authenticated
+  with check (has_perm('procedury:create'));
+create policy "procedury: aktualizuj" on procedury for update to authenticated
+  using (has_perm('procedury:update')) with check (has_perm('procedury:update'));
+create policy "procedury: usun" on procedury for delete to authenticated
+  using (has_perm('procedury:delete'));
 
-create policy "wykonania: czytaj" on wykonania for select to authenticated using (has_perm('wykonania:read'));
-create policy "wykonania: pisz"   on wykonania for all    to authenticated using (has_perm('wykonania:update')) with check (has_perm('wykonania:update'));
+create policy "wykonania: czytaj" on wykonania for select to authenticated using (
+  has_perm('raporty:read')
+  or (
+    has_perm('wykonania:read')
+    and exists (
+      select 1 from profiles p
+      where p.id = auth.uid()
+        and p.aktywny = true
+        and p.stanowisko_id = wykonania.stanowisko_id
+    )
+  )
+);
+create policy "wykonania: tworz" on wykonania for insert to authenticated with check (
+  has_perm('raporty:read')
+  or (
+    has_perm('wykonania:create')
+    and exists (
+      select 1 from profiles p
+      where p.id = auth.uid()
+        and p.aktywny = true
+        and p.stanowisko_id = wykonania.stanowisko_id
+    )
+  )
+);
+create policy "wykonania: aktualizuj" on wykonania for update to authenticated
+  using (
+    has_perm('raporty:read')
+    or (
+      has_perm('wykonania:update')
+      and exists (
+        select 1 from profiles p
+        where p.id = auth.uid()
+          and p.aktywny = true
+          and p.stanowisko_id = wykonania.stanowisko_id
+      )
+    )
+  )
+  with check (
+    has_perm('raporty:read')
+    or (
+      has_perm('wykonania:update')
+      and exists (
+        select 1 from profiles p
+        where p.id = auth.uid()
+          and p.aktywny = true
+          and p.stanowisko_id = wykonania.stanowisko_id
+      )
+    )
+  );
+create policy "wykonania: usun" on wykonania for delete to authenticated
+  using (has_perm('wykonania:delete') and has_perm('raporty:read'));
 
 -- 7. STARTOWE ROLE I UPRAWNIENIA ─────────────────────────────
 -- Pełna lista uprawnień modułu procedur (wzór Antica: module:X + X:akcja)

@@ -27,27 +27,46 @@ export const useAuth = () => {
   }
 
   // Pobierz profil zalogowanego użytkownika wraz z rolą i uprawnieniami
-  async function odswiezProfil() {
-    if (!supaUser.value) {
+  async function odswiezProfil(uidArg?: string) {
+    const uid = uidArg || supaUser.value?.id
+    if (!uid) {
       profil.value = null
       uprawnienia.value = []
-      return
+      return null
     }
     const { data, error } = await client
       .from('profiles')
       .select('*, roles(nazwa, permissions)')
-      .eq('id', supaUser.value.id)
+      .eq('id', uid)
       .single()
-    if (!error && data) {
-      profil.value = data as any
-      uprawnienia.value = (data as any).roles?.permissions ?? []
+    if (error) {
+      console.warn('[useAuth] Nie udało się wczytać profilu:', error.message)
+      profil.value = null
+      uprawnienia.value = []
+      return null
     }
+    const nextProfil = data as Profil
+    if (!nextProfil.aktywny) {
+      profil.value = nextProfil
+      uprawnienia.value = []
+      return nextProfil
+    }
+    profil.value = nextProfil
+    uprawnienia.value = nextProfil.roles?.permissions ?? []
+    return nextProfil
   }
 
   async function login(email: string, haslo: string) {
-    const { error } = await client.auth.signInWithPassword({ email, password: haslo })
+    const { data, error } = await client.auth.signInWithPassword({ email, password: haslo })
     if (error) throw error
-    await odswiezProfil()
+    // przekazujemy id z odpowiedzi — ref użytkownika może nie być jeszcze gotowy
+    const userProfile = await odswiezProfil(data.user?.id)
+    if (userProfile && !userProfile.aktywny) {
+      await client.auth.signOut()
+      profil.value = null
+      uprawnienia.value = []
+      throw new Error('Konto jest nieaktywne. Skontaktuj się z administratorem.')
+    }
   }
 
   async function logout() {
