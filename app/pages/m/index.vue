@@ -26,6 +26,7 @@ const taskFilter = ref<TaskFilter>('all')
 const busyIds = ref(new Set<string>())
 const now = ref(Date.now())
 const rejectOpen = ref(false)
+const stationPickerOpen = ref(false)
 const rejectReason = ref('')
 const pendingReject = ref<WykonanieWithRelations | null>(null)
 let clock: ReturnType<typeof setInterval> | undefined
@@ -36,10 +37,8 @@ const dateLabel = new Intl.DateTimeFormat('pl-PL', {
   month: 'long'
 }).format(new Date())
 
-const stationOptions = computed(() =>
-  stanowiska.value
-    .filter(station => station.aktywne)
-    .map(station => ({ label: station.nazwa, value: station.id }))
+const activeStation = computed(() =>
+  stanowiska.value.find(station => station.id === selectedStation.value) ?? null
 )
 
 const tasks = computed(() =>
@@ -190,6 +189,16 @@ function closeTask() {
   selectedTaskId.value = null
 }
 
+function selectStation(stationId: string) {
+  selectedStation.value = stationId
+  stationPickerOpen.value = false
+}
+
+function stationMeta(station: { id: string, nazwa: string, dzial: string }) {
+  if (station.id === selectedStation.value) return 'Aktualnie wybrane'
+  return station.dzial !== station.nazwa ? station.dzial : 'Przełącz widok'
+}
+
 function detailPrimaryAction() {
   if (!selectedTask.value) return
   if (selectedState.value === 'running') handleAction(selectedTask.value, 'finish')
@@ -206,7 +215,7 @@ function detailPrimaryAction() {
         <div>
           <div class="text-[11px] font-medium uppercase tracking-wide text-primary-700">{{ dateLabel }}</div>
           <div class="mt-1 text-[22px] font-semibold text-gray-900">
-            {{ stanowiska.find(station => station.id === selectedStation)?.nazwa ?? 'Zadania' }}
+            {{ activeStation?.nazwa ?? 'Zadania' }}
           </div>
           <div class="mt-1 text-xs text-gray-500">{{ imieNazwisko || 'Pracownik' }}</div>
         </div>
@@ -215,14 +224,23 @@ function detailPrimaryAction() {
         </button>
       </div>
 
-      <USelect
-        v-model="selectedStation"
-        :items="stationOptions"
-        value-key="value"
-        icon="i-lucide-building-2"
-        size="lg"
-        class="relative z-10 mt-4 w-full"
-      />
+      <button
+        type="button"
+        class="station-switcher"
+        aria-haspopup="dialog"
+        @click="stationPickerOpen = true"
+      >
+        <span class="station-switcher-icon">
+          <UIcon name="i-lucide-map-pin" class="size-[19px]" />
+        </span>
+        <span class="min-w-0 flex-1 text-left">
+          <span class="station-switcher-label">Stanowisko</span>
+          <span class="station-switcher-name">{{ activeStation?.nazwa ?? 'Wybierz stanowisko' }}</span>
+        </span>
+        <span class="station-switcher-action">
+          <UIcon name="i-lucide-chevrons-up-down" class="size-4" />
+        </span>
+      </button>
     </header>
 
     <section class="progress-strip">
@@ -385,6 +403,45 @@ function detailPrimaryAction() {
       </template>
     </UModal>
 
+    <UModal v-model:open="stationPickerOpen">
+      <template #content>
+        <div class="station-picker">
+          <div class="station-picker-header">
+            <div>
+              <h2>Wybierz stanowisko</h2>
+              <p>Procedury zostaną dopasowane automatycznie.</p>
+            </div>
+            <button type="button" class="station-picker-close" title="Zamknij" @click="stationPickerOpen = false">
+              <UIcon name="i-lucide-x" class="size-[18px]" />
+            </button>
+          </div>
+
+          <div class="station-picker-list">
+            <button
+              v-for="station in stanowiska.filter(item => item.aktywne)"
+              :key="station.id"
+              type="button"
+              class="station-option"
+              :class="{ active: station.id === selectedStation }"
+              @click="selectStation(station.id)"
+            >
+              <span class="station-option-icon">
+                <UIcon name="i-lucide-building-2" class="size-[19px]" />
+              </span>
+              <span class="min-w-0 flex-1 text-left">
+                <span class="station-option-name">{{ station.nazwa }}</span>
+                <span class="station-option-meta">{{ stationMeta(station) }}</span>
+              </span>
+              <span v-if="station.id === selectedStation" class="station-option-check">
+                <UIcon name="i-lucide-check" class="size-4" />
+              </span>
+              <UIcon v-else name="i-lucide-chevron-right" class="size-4 text-gray-300" />
+            </button>
+          </div>
+        </div>
+      </template>
+    </UModal>
+
     <UModal v-model:open="rejectOpen">
       <template #content>
         <div class="p-5">
@@ -443,6 +500,167 @@ function detailPrimaryAction() {
   border-radius: 50%;
   color: #6b7280;
   background: rgb(255 255 255 / 75%);
+}
+
+.station-switcher {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  width: 100%;
+  min-height: 58px;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  border: 1px solid rgb(197 157 95 / 22%);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 82%);
+  padding: 8px 10px;
+  box-shadow:
+    0 1px 1px rgb(82 62 30 / 4%),
+    0 8px 24px rgb(82 62 30 / 7%);
+  backdrop-filter: blur(12px);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.station-switcher:active { transform: scale(0.99); }
+
+.station-switcher:focus-visible {
+  outline: 3px solid rgb(197 157 95 / 20%);
+  outline-offset: 2px;
+}
+
+.station-switcher-icon,
+.station-option-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border-radius: 11px;
+  color: #8a6830;
+  background: #fdf6ec;
+}
+
+.station-switcher-label {
+  display: block;
+  color: #9ca3af;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.station-switcher-name {
+  display: block;
+  overflow: hidden;
+  margin-top: 3px;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.station-switcher-action {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  border-radius: 10px;
+  color: #8a6830;
+  background: #f8f3e9;
+}
+
+.station-picker {
+  overflow: hidden;
+  background: #f7f6f3;
+}
+
+.station-picker-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #ebe7df;
+  background: #fff;
+  padding: 20px;
+}
+
+.station-picker-header h2 {
+  color: #111827;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.station-picker-header p {
+  margin-top: 4px;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.station-picker-close {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  color: #6b7280;
+  background: #f3f4f6;
+}
+
+.station-picker-list {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.station-option {
+  display: flex;
+  width: 100%;
+  min-height: 62px;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  background: #fff;
+  padding: 10px 12px;
+  box-shadow: 0 1px 4px rgb(15 23 42 / 4%);
+}
+
+.station-option.active {
+  border-color: rgb(197 157 95 / 45%);
+  background: #fffcf7;
+  box-shadow: 0 6px 18px rgb(82 62 30 / 7%);
+}
+
+.station-option-name {
+  display: block;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.station-option-meta {
+  display: block;
+  margin-top: 2px;
+  color: #9ca3af;
+  font-size: 11px;
+}
+
+.station-option-check {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: #c59d5f;
 }
 
 .progress-strip {
