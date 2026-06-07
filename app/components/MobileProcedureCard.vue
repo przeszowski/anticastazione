@@ -263,12 +263,14 @@ function onClick() {
 
 .procedure-card.state-running {
   border-left: 3px solid #c59d5f;
-  background: linear-gradient(90deg, rgb(197 157 95 / 7%), #fff 34%);
+  background-color: #fff;
+  background-image: linear-gradient(90deg, rgb(197 157 95 / 7%), transparent 34%);
 }
 
 .procedure-card.state-paused {
   border-left: 3px solid #7c3aed;
-  background: linear-gradient(90deg, rgb(124 58 237 / 6%), #fff 34%);
+  background-color: #fff;
+  background-image: linear-gradient(90deg, rgb(124 58 237 / 6%), transparent 34%);
 }
 
 .procedure-card.state-done,
