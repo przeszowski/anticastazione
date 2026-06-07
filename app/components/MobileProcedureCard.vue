@@ -51,6 +51,18 @@ const rightLabel = computed(() => {
 
 const leftLabel = computed(() => leftAction.value === 'pause' ? 'PAUZA' : 'ODRZUĆ')
 
+const rightIcon = computed(() => rightAction.value === 'finish'
+  ? 'i-lucide-circle-check'
+  : rightAction.value === 'resume'
+    ? 'i-lucide-rotate-ccw'
+    : 'i-lucide-play'
+)
+
+const leftIcon = computed(() => leftAction.value === 'pause'
+  ? 'i-lucide-pause'
+  : 'i-lucide-trash-2'
+)
+
 const statusLabel = computed(() => ({
   pending: 'Do zrobienia',
   running: 'W trakcie',
@@ -125,17 +137,22 @@ function onClick() {
 
 <template>
   <div class="swipe-wrap">
-    <div class="swipe-bg swipe-bg-right" :class="`swipe-${rightAction}`" aria-hidden="true">
-      <UIcon :name="rightAction === 'finish' ? 'i-lucide-check' : 'i-lucide-play'" class="size-5" />
-      <span>{{ rightLabel }}</span>
-    </div>
-    <div
-      class="swipe-bg swipe-bg-left"
-      :class="leftAction === 'pause' ? 'swipe-pause' : 'swipe-reject'"
-      aria-hidden="true"
-    >
-      <span>{{ leftLabel }}</span>
-      <UIcon :name="leftAction === 'pause' ? 'i-lucide-pause' : 'i-lucide-x'" class="size-5" />
+    <div class="swipe-actions" aria-hidden="true">
+      <div class="swipe-action swipe-action-start" :class="`swipe-${rightAction}`">
+        <span class="swipe-action-icon">
+          <UIcon :name="rightIcon" class="size-[22px]" />
+        </span>
+        <span>{{ rightLabel }}</span>
+      </div>
+      <div
+        class="swipe-action swipe-action-end"
+        :class="leftAction === 'pause' ? 'swipe-pause' : 'swipe-reject'"
+      >
+        <span>{{ leftLabel }}</span>
+        <span class="swipe-action-icon">
+          <UIcon :name="leftIcon" class="size-[22px]" />
+        </span>
+      </div>
     </div>
 
     <button
@@ -186,24 +203,43 @@ function onClick() {
   border-radius: 16px;
 }
 
-.swipe-bg {
+.swipe-actions {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 0 20px;
-  font-size: 11px;
-  font-weight: 700;
 }
 
-.swipe-bg-right {
+.swipe-action {
+  display: flex;
+  width: 50%;
+  align-items: center;
+  gap: 9px;
+  padding: 0 16px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.swipe-action-start {
   justify-content: flex-start;
   color: #9a6d24;
   background: #fdf6ec;
 }
 
-.swipe-bg-left { justify-content: flex-end; }
+.swipe-action-end { justify-content: flex-end; }
+
+.swipe-action-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  place-items: center;
+  border-radius: 50%;
+  color: currentColor;
+  background: rgb(255 255 255 / 72%);
+  box-shadow: 0 2px 8px rgb(15 23 42 / 9%);
+}
+
 .swipe-finish { color: #15803d; background: #f0fdf4; }
 .swipe-pause { color: #7c3aed; background: #f5f3ff; }
 .swipe-reject { color: #dc2626; background: #fef2f2; }
