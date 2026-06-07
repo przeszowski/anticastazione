@@ -1,5 +1,7 @@
 // Composable opakowujący @nuxtjs/supabase z typami naszej bazy
 import type { Database, StatusWykonania } from '~/types/database.types'
+import type { ExecutionTimerAction } from '~/utils/executionTimer'
+import { buildTimerMutation } from '~/utils/executionTimer'
 
 type Stanowisko = Database['public']['Tables']['stanowiska']['Row']
 type Procedura = Database['public']['Tables']['procedury']['Row']
@@ -7,7 +9,7 @@ type ProceduraWithStanowisko = Procedura & {
   stanowiska: Pick<Stanowisko, 'nazwa' | 'dzial'> | null
 }
 export type WykonanieWithRelations = Database['public']['Tables']['wykonania']['Row'] & {
-  procedury: Pick<Procedura, 'nazwa' | 'pora_dnia' | 'norma_min'> | null
+  procedury: Pick<Procedura, 'nazwa' | 'opis' | 'pora_dnia' | 'norma_min'> | null
   stanowiska: Pick<Stanowisko, 'nazwa'> | null
 }
 
@@ -131,7 +133,7 @@ export const useWykonania = () => {
     try {
       let q = db
         .from('wykonania')
-        .select('*, procedury(nazwa, pora_dnia, norma_min), stanowiska(nazwa)')
+        .select('*, procedury(nazwa, opis, pora_dnia, norma_min), stanowiska(nazwa)')
         .eq('data_dnia', data_dnia)
         .order('created_at', { ascending: false })
       if (stanowiskoId) q = q.eq('stanowisko_id', stanowiskoId)
@@ -156,5 +158,34 @@ export const useWykonania = () => {
     return data
   }
 
-  return { wykonania, loading, error, fetchDzien, updateStatus }
+  async function updateOne(
+    id: string,
+    payload: Database['public']['Tables']['wykonania']['Update']
+  ) {
+    const { data, error: err } = await db.from('wykonania').update(payload).eq('id', id).select().single()
+    if (err) throw err
+
+    const index = wykonania.value.findIndex(item => item.id === id)
+    const current = wykonania.value[index]
+    if (current) {
+      wykonania.value[index] = {
+        ...current,
+        ...data,
+        procedury: current.procedury,
+        stanowiska: current.stanowiska
+      }
+    }
+    return data
+  }
+
+  async function applyTimerAction(
+    execution: WykonanieWithRelations,
+    action: ExecutionTimerAction,
+    note?: string
+  ) {
+    const mutation = buildTimerMutation(execution, action, new Date(), note)
+    await updateOne(execution.id, mutation.payload)
+  }
+
+  return { wykonania, loading, error, fetchDzien, updateStatus, applyTimerAction }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WykonanieWithRelations } from '~/composables/useSupabase'
+import { executionElapsedMs, executionNote, executionTimerState } from '~/utils/executionTimer'
 import {
   ALL_SELECT_VALUE,
   badgePoryDnia,
@@ -32,20 +33,16 @@ const stationOptions = computed(() => [
 const filtered = computed(() => wykonania.value)
 
 function odchylenie(w: WykonanieWithRelations): string {
-  if (!w.czas_start || !w.czas_koniec) return '—'
-  const start = new Date(w.czas_start)
-  const koniec = new Date(w.czas_koniec)
-  const min = Math.round((koniec.getTime() - start.getTime()) / 60000)
+  if (w.status !== 'wykonane') return '—'
+  const min = Math.round(executionElapsedMs(w) / 60_000)
   const diff = min - (w.procedury?.norma_min ?? 0)
   if (diff === 0) return '±0 min'
   return diff > 0 ? `+${diff} min` : `${diff} min`
 }
 
 function odchylenieClass(w: WykonanieWithRelations): string {
-  if (!w.czas_start || !w.czas_koniec) return 'text-muted'
-  const start = new Date(w.czas_start)
-  const koniec = new Date(w.czas_koniec)
-  const min = Math.round((koniec.getTime() - start.getTime()) / 60000)
+  if (w.status !== 'wykonane') return 'text-muted'
+  const min = Math.round(executionElapsedMs(w) / 60_000)
   const diff = min - (w.procedury?.norma_min ?? 0)
   if (diff <= 0) return 'text-success font-medium'
   if (diff <= 5) return 'text-warning font-medium'
@@ -53,10 +50,16 @@ function odchylenieClass(w: WykonanieWithRelations): string {
 }
 
 function czasTrwania(w: WykonanieWithRelations): string {
-  if (!w.czas_start || !w.czas_koniec) return '—'
-  const start = new Date(w.czas_start)
-  const koniec = new Date(w.czas_koniec)
-  return Math.round((koniec.getTime() - start.getTime()) / 60000) + ' min'
+  if (w.status !== 'wykonane') return '—'
+  return `${Math.round(executionElapsedMs(w) / 60_000)} min`
+}
+
+function statusLabel(w: WykonanieWithRelations) {
+  return executionTimerState(w) === 'paused' ? 'Wstrzymane' : statusWykonaniaLabel[w.status]
+}
+
+function statusColor(w: WykonanieWithRelations) {
+  return executionTimerState(w) === 'paused' ? 'warning' : statusWykonaniaBadge[w.status]
 }
 
 // Statystyki podsumowujące
@@ -193,8 +196,8 @@ const stats = computed(() => {
                 </UBadge>
               </td>
               <td class="px-4 py-2.5">
-                <UBadge :color="statusWykonaniaBadge[w.status]" variant="subtle" size="sm">
-                  {{ statusWykonaniaLabel[w.status] }}
+                <UBadge :color="statusColor(w)" variant="subtle" size="sm">
+                  {{ statusLabel(w) }}
                 </UBadge>
               </td>
               <td class="px-4 py-2.5 text-muted text-xs">
@@ -203,7 +206,7 @@ const stats = computed(() => {
               <td class="px-4 py-2.5 text-right text-xs">{{ czasTrwania(w) }}</td>
               <td class="px-4 py-2.5 text-right text-xs text-muted">{{ w.procedury?.norma_min ?? '—' }} min</td>
               <td class="px-4 py-2.5 text-right text-xs" :class="odchylenieClass(w)">{{ odchylenie(w) }}</td>
-              <td class="px-4 py-2.5 text-xs text-muted max-w-[160px] truncate">{{ w.uwagi ?? '—' }}</td>
+              <td class="px-4 py-2.5 text-xs text-muted max-w-[160px] truncate">{{ executionNote(w) ?? '—' }}</td>
             </tr>
           </tbody>
         </table>

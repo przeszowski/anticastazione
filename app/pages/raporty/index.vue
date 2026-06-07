@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { StatusWykonania } from '~/types/database.types'
 import type { WykonanieWithRelations } from '~/composables/useSupabase'
+import { executionElapsedMs } from '~/utils/executionTimer'
 import {
   ALL_SELECT_VALUE,
   badgePoryDnia,
@@ -40,7 +41,8 @@ const stats = computed(() => {
   const running = filtered.value.filter(w => w.status === 'w_trakcie').length
   const todo = filtered.value.filter(w => w.status === 'do_zrobienia').length
   const percent = total ? Math.round((done / total) * 100) : 0
-  const time = filtered.value.reduce((sum, w) => sum + (w.czas_min ?? czasMin(w) ?? 0), 0)
+  const time = filtered.value.reduce((sum, w) =>
+    sum + (w.status === 'wykonane' ? Math.round(executionElapsedMs(w) / 60_000) : 0), 0)
   const norm = filtered.value.reduce((sum, w) => sum + (w.procedury?.norma_min ?? 0), 0)
   return { total, done, running, todo, percent, time, norm, diff: time - norm }
 })
@@ -63,16 +65,9 @@ const dateLabel = computed(() =>
   })
 )
 
-function czasMin(w: WykonanieWithRelations) {
-  if (!w.czas_start || !w.czas_koniec) return null
-  const start = new Date(w.czas_start).getTime()
-  const end = new Date(w.czas_koniec).getTime()
-  return Math.max(0, Math.round((end - start) / 60000))
-}
-
 function czasLabel(w: WykonanieWithRelations) {
-  const minutes = w.czas_min ?? czasMin(w)
-  return minutes == null ? '—' : `${minutes} min`
+  if (w.status !== 'wykonane') return '—'
+  return `${Math.round(executionElapsedMs(w) / 60_000)} min`
 }
 
 function startLabel(w: WykonanieWithRelations) {
