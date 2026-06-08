@@ -22,11 +22,11 @@ onMounted(async () => {
 })
 
 const stationOptions = computed(() => [
-  { label: 'Wszystkie stanowiska', value: ALL_SELECT_VALUE },
+  { label: 'Wszystkie', value: ALL_SELECT_VALUE },
   ...stanowiska.value.map(s => ({ label: s.nazwa, value: s.id }))
 ])
 
-const periodOptions = [{ label: 'Wszystkie pory', value: ALL_SELECT_VALUE }, ...poraDniaOptions]
+const periodOptions = [{ label: 'Wszystkie', value: ALL_SELECT_VALUE }, ...poraDniaOptions]
 const statusOptions = [
   { label: 'Wszystkie statusy', value: ALL_SELECT_VALUE },
   { label: 'Aktywne', value: 'active' },
