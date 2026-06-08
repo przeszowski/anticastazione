@@ -9,6 +9,12 @@ export default defineNuxtConfig({
 
   modules: ['@nuxt/ui', '@nuxtjs/supabase'],
 
+  nitro: {
+    externals: {
+      inline: ['@vueuse/core', '@vueuse/shared']
+    }
+  },
+
   colorMode: {
     preference: 'light',
     fallback: 'light',
