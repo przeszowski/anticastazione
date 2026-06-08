@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ALL_SELECT_VALUE } from '~/utils/procedureMeta'
+import { matchesOption, matchesText } from '~/utils/tableFilters'
+
 definePageMeta({ layout: 'default' })
 
 const { users, loading, error, fetch, setRole, setActive } = useUsers()
@@ -7,14 +10,57 @@ const { can } = useAuth()
 
 const toast = useToast()
 const zapisywanie = ref<string | null>(null)
+const filterName = ref('')
+const filterEmail = ref('')
+const filterPhone = ref('')
+const filterVerified = ref(ALL_SELECT_VALUE)
+const filterRole = ref(ALL_SELECT_VALUE)
+const filterActive = ref(ALL_SELECT_VALUE)
 
 onMounted(async () => {
   await Promise.all([fetch(), fetchRoles()])
 })
 
-const roleOptions = computed(() =>
-  roles.value.map(r => ({ label: r.nazwa, value: r.id }))
+const roleOptions = computed(() => roles.value.map(r => ({ label: r.nazwa, value: r.id })))
+const roleFilterOptions = computed(() => [
+  { label: 'Wszystkie role', value: ALL_SELECT_VALUE },
+  ...roleOptions.value
+])
+const yesNoOptions = [
+  { label: 'Wszystkie', value: ALL_SELECT_VALUE },
+  { label: 'Tak', value: 'yes' },
+  { label: 'Nie', value: 'no' }
+]
+const activeOptions = [
+  { label: 'Wszystkie', value: ALL_SELECT_VALUE },
+  { label: 'Aktywni', value: 'active' },
+  { label: 'Nieaktywni', value: 'inactive' }
+]
+
+const filtered = computed(() => users.value.filter(user =>
+  matchesText(`${user.imie ?? ''} ${user.nazwisko ?? ''} ${user.stanowiska?.nazwa ?? ''}`, filterName.value)
+  && matchesText(user.email, filterEmail.value)
+  && matchesText(user.telefon, filterPhone.value)
+  && matchesOption(user.email_zweryfikowany ? 'yes' : 'no', filterVerified.value)
+  && matchesOption(user.role_id, filterRole.value)
+  && matchesOption(user.aktywny ? 'active' : 'inactive', filterActive.value)
+))
+
+const hasFilters = computed(() =>
+  Boolean(filterName.value.trim() || filterEmail.value.trim() || filterPhone.value.trim())
+  || filterVerified.value !== ALL_SELECT_VALUE
+  || filterRole.value !== ALL_SELECT_VALUE
+  || filterActive.value !== ALL_SELECT_VALUE
 )
+
+function resetFilters() {
+  filterName.value = ''
+  filterEmail.value = ''
+  filterPhone.value = ''
+  filterVerified.value = ALL_SELECT_VALUE
+  filterRole.value = ALL_SELECT_VALUE
+  filterActive.value = ALL_SELECT_VALUE
+}
 
 const columns = [
   { accessorKey: 'imie', header: 'Imię i nazwisko' },
@@ -66,15 +112,62 @@ async function przelaczAktywny(userId: string, val: boolean) {
       </UButton>
     </div>
 
-    <div class="p-5">
+    <div class="p-5 flex flex-col gap-4">
       <UAlert v-if="error" color="error" icon="i-lucide-alert-circle" :description="error" class="mb-4" />
 
+      <div class="flex items-center gap-2">
+        <span class="ml-auto text-xs text-muted">
+          {{ loading ? 'Ładowanie...' : `${filtered.length} z ${users.length} użytkowników` }}
+        </span>
+        <UButton
+          v-if="hasFilters"
+          color="neutral"
+          variant="ghost"
+          size="xs"
+          icon="i-lucide-filter-x"
+          @click="resetFilters"
+        >
+          Wyczyść
+        </UButton>
+      </div>
+
       <UTable
-        :data="users"
+        :data="filtered"
         :columns="columns"
         :loading="loading"
         class="border border-muted rounded-xl overflow-hidden"
       >
+        <template #imie-header>
+          <TableFilterHeader label="Imię i nazwisko">
+            <UInput v-model="filterName" placeholder="Osoba lub stanowisko" icon="i-lucide-search" size="xs" class="w-52" />
+          </TableFilterHeader>
+        </template>
+        <template #email-header>
+          <TableFilterHeader label="Email">
+            <UInput v-model="filterEmail" placeholder="Email" size="xs" class="w-44" />
+          </TableFilterHeader>
+        </template>
+        <template #telefon-header>
+          <TableFilterHeader label="Telefon">
+            <UInput v-model="filterPhone" placeholder="Telefon" size="xs" class="w-36" />
+          </TableFilterHeader>
+        </template>
+        <template #email_zweryfikowany-header>
+          <TableFilterHeader label="Email zweryf.">
+            <USelect v-model="filterVerified" :items="yesNoOptions" value-key="value" size="xs" class="w-32" />
+          </TableFilterHeader>
+        </template>
+        <template #role_id-header>
+          <TableFilterHeader label="Rola">
+            <USelect v-model="filterRole" :items="roleFilterOptions" value-key="value" size="xs" class="w-36" />
+          </TableFilterHeader>
+        </template>
+        <template #aktywny-header>
+          <TableFilterHeader label="Aktywny">
+            <USelect v-model="filterActive" :items="activeOptions" value-key="value" size="xs" class="w-32" />
+          </TableFilterHeader>
+        </template>
+
         <template #imie-cell="{ row }">
           <div class="font-medium">
             {{ [row.original.imie, row.original.nazwisko].filter(Boolean).join(' ') || '—' }}
@@ -123,8 +216,8 @@ async function przelaczAktywny(userId: string, val: boolean) {
         </template>
       </UTable>
 
-      <p v-if="!loading && users.length === 0" class="text-sm text-muted text-center py-8">
-        Brak użytkowników.
+      <p v-if="!loading && filtered.length === 0" class="text-sm text-muted text-center py-8">
+        Brak użytkowników spełniających filtry.
       </p>
     </div>
   </div>

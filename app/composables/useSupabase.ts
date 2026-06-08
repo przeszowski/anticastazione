@@ -158,6 +158,12 @@ export const useWykonania = () => {
     return data
   }
 
+  async function create(payload: Database['public']['Tables']['wykonania']['Insert']) {
+    const { data, error: err } = await db.from('wykonania').insert(payload).select().single()
+    if (err) throw err
+    return data
+  }
+
   async function updateOne(
     id: string,
     payload: Database['public']['Tables']['wykonania']['Update']
@@ -187,5 +193,5 @@ export const useWykonania = () => {
     await updateOne(execution.id, mutation.payload)
   }
 
-  return { wykonania, loading, error, fetchDzien, updateStatus, applyTimerAction }
+  return { wykonania, loading, error, fetchDzien, create, updateStatus, applyTimerAction }
 }

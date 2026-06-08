@@ -56,6 +56,12 @@ export const useAuth = () => {
     return nextProfil
   }
 
+  async function ensureProfile() {
+    if (profil.value) return profil.value
+    const { data } = await client.auth.getUser()
+    return data.user ? odswiezProfil(data.user.id) : null
+  }
+
   async function login(email: string, haslo: string) {
     const { data, error } = await client.auth.signInWithPassword({ email, password: haslo })
     if (error) throw error
@@ -69,11 +75,12 @@ export const useAuth = () => {
     }
   }
 
-  async function logout() {
+  async function logout(redirectTo: string | Event = '/login') {
+    const target = typeof redirectTo === 'string' ? redirectTo : '/login'
     await client.auth.signOut()
     profil.value = null
     uprawnienia.value = []
-    await navigateTo('/login')
+    await navigateTo(target)
   }
 
   return {
@@ -86,6 +93,7 @@ export const useAuth = () => {
     can,
     login,
     logout,
-    odswiezProfil
+    odswiezProfil,
+    ensureProfile
   }
 }

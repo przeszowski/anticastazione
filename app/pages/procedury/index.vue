@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ALL_SELECT_VALUE, badgePoryDnia, formatPoraDnia, poraDniaOptions } from '~/utils/procedureMeta'
+import { matchesNumberRange, matchesOption, matchesText } from '~/utils/tableFilters'
 
 definePageMeta({ layout: 'default' })
 
@@ -11,6 +12,9 @@ const toast = useToast()
 const search = ref('')
 const filterStation = ref(ALL_SELECT_VALUE)
 const filterPeriod = ref(ALL_SELECT_VALUE)
+const filterStatus = ref(ALL_SELECT_VALUE)
+const filterNormMin = ref<number | null>(null)
+const filterNormMax = ref<number | null>(null)
 
 // Pobierz dane przy montowaniu
 onMounted(async () => {
@@ -23,15 +27,40 @@ const stationOptions = computed(() => [
 ])
 
 const periodOptions = [{ label: 'Wszystkie pory', value: ALL_SELECT_VALUE }, ...poraDniaOptions]
+const statusOptions = [
+  { label: 'Wszystkie statusy', value: ALL_SELECT_VALUE },
+  { label: 'Aktywne', value: 'active' },
+  { label: 'Archiwum', value: 'archive' }
+]
 
 const filtered = computed(() =>
   procedury.value.filter(p => {
-    const matchSearch = p.nazwa.toLowerCase().includes(search.value.toLowerCase())
-    const matchStation = filterStation.value === ALL_SELECT_VALUE || p.stanowisko_id === filterStation.value
-    const matchPeriod = filterPeriod.value === ALL_SELECT_VALUE || p.pora_dnia === filterPeriod.value
-    return matchSearch && matchStation && matchPeriod
+    const status = p.aktywna ? 'active' : 'archive'
+    return matchesText(`${p.nazwa} ${p.opis ?? ''}`, search.value)
+      && matchesOption(p.stanowisko_id, filterStation.value)
+      && matchesOption(p.pora_dnia, filterPeriod.value)
+      && matchesOption(status, filterStatus.value)
+      && matchesNumberRange(p.norma_min, filterNormMin.value, filterNormMax.value)
   })
 )
+
+const hasFilters = computed(() =>
+  Boolean(search.value.trim())
+  || filterStation.value !== ALL_SELECT_VALUE
+  || filterPeriod.value !== ALL_SELECT_VALUE
+  || filterStatus.value !== ALL_SELECT_VALUE
+  || filterNormMin.value != null
+  || filterNormMax.value != null
+)
+
+function resetFilters() {
+  search.value = ''
+  filterStation.value = ALL_SELECT_VALUE
+  filterPeriod.value = ALL_SELECT_VALUE
+  filterStatus.value = ALL_SELECT_VALUE
+  filterNormMin.value = null
+  filterNormMax.value = null
+}
 
 const columns = [
   { accessorKey: 'nazwa', header: 'Procedura' },
@@ -76,14 +105,20 @@ async function toggleActive(row: any) {
     </div>
 
     <div class="p-5 flex flex-col gap-4">
-      <!-- Filtry -->
-      <div class="flex items-center gap-2 flex-wrap">
-        <UInput v-model="search" placeholder="Szukaj procedury…" icon="i-lucide-search" size="sm" class="w-56" />
-        <USelect v-model="filterStation" :items="stationOptions" value-key="value" size="sm" class="w-48" />
-        <USelect v-model="filterPeriod" :items="periodOptions" value-key="value" size="sm" class="w-40" />
+      <div class="flex items-center gap-2">
         <span class="ml-auto text-xs text-muted">
-          {{ loading ? 'Ładowanie…' : `${filtered.length} procedur` }}
+          {{ loading ? 'Ładowanie...' : `${filtered.length} z ${procedury.length} procedur` }}
         </span>
+        <UButton
+          v-if="hasFilters"
+          color="neutral"
+          variant="ghost"
+          size="xs"
+          icon="i-lucide-filter-x"
+          @click="resetFilters"
+        >
+          Wyczyść
+        </UButton>
       </div>
 
       <!-- Error -->
@@ -97,6 +132,38 @@ async function toggleActive(row: any) {
         @select="openDetails"
         class="border border-muted rounded-xl overflow-hidden cursor-pointer"
       >
+        <template #nazwa-header>
+          <TableFilterHeader label="Procedura">
+            <UInput v-model="search" placeholder="Szukaj..." icon="i-lucide-search" size="xs" class="w-52" />
+          </TableFilterHeader>
+        </template>
+        <template #stanowiska-header>
+          <TableFilterHeader label="Stanowisko">
+            <USelect v-model="filterStation" :items="stationOptions" value-key="value" size="xs" class="w-44" />
+          </TableFilterHeader>
+        </template>
+        <template #pora_dnia-header>
+          <TableFilterHeader label="Pora dnia">
+            <USelect v-model="filterPeriod" :items="periodOptions" value-key="value" size="xs" class="w-40" />
+          </TableFilterHeader>
+        </template>
+        <template #norma_min-header>
+          <TableFilterHeader label="Norma" align="right">
+            <div class="grid w-36 grid-cols-2 gap-1">
+              <UInput v-model.number="filterNormMin" type="number" placeholder="Od" size="xs" />
+              <UInput v-model.number="filterNormMax" type="number" placeholder="Do" size="xs" />
+            </div>
+          </TableFilterHeader>
+        </template>
+        <template #aktywna-header>
+          <TableFilterHeader label="Status">
+            <USelect v-model="filterStatus" :items="statusOptions" value-key="value" size="xs" class="w-36" />
+          </TableFilterHeader>
+        </template>
+        <template #actions-header>
+          <span class="sr-only">Akcje</span>
+        </template>
+
         <template #nazwa-cell="{ row }">
           <div class="font-medium">{{ row.original.nazwa }}</div>
           <div v-if="row.original.opis" class="text-xs text-muted mt-0.5 truncate max-w-xs">{{ row.original.opis }}</div>

@@ -16,8 +16,11 @@ type TaskFilter = 'all' | 'todo' | 'active' | 'done'
 
 const { stanowiska, fetch: fetchStanowiska } = useStanowiska()
 const { wykonania, loading, error, fetchDzien, applyTimerAction } = useWykonania()
-const { imieNazwisko, logout } = useAuth()
+const { imieNazwisko, logout, can } = useAuth()
+const route = useRoute()
 const toast = useToast()
+const canManage = computed(() => can('raporty:read'))
+const canCreate = computed(() => can('procedury:create'))
 
 const today = new Date().toISOString().slice(0, 10)
 const selectedStation = ref('')
@@ -102,7 +105,9 @@ const filters: { value: TaskFilter; label: string }[] = [
 
 onMounted(async () => {
   await fetchStanowiska()
-  const firstStation = stanowiska.value.find(station => station.aktywne)
+  const requestedStation = String(route.query.stanowisko ?? '')
+  const firstStation = stanowiska.value.find(station => station.id === requestedStation && station.aktywne)
+    ?? stanowiska.value.find(station => station.aktywne)
   if (firstStation) selectedStation.value = firstStation.id
   await fetchDzien(today, selectedStation.value || undefined)
   clock = setInterval(() => { now.value = Date.now() }, 1000)
@@ -219,9 +224,20 @@ function detailPrimaryAction() {
           </div>
           <div class="mt-1 text-xs text-gray-500">{{ imieNazwisko || 'Pracownik' }}</div>
         </div>
-        <button type="button" class="header-action" title="Wyloguj" @click="logout">
-          <UIcon name="i-lucide-log-out" class="size-[18px]" />
-        </button>
+        <div class="flex gap-2">
+          <button
+            v-if="canManage"
+            type="button"
+            class="header-action"
+            title="Panel kierownika"
+            @click="navigateTo('/m/kierownik')"
+          >
+            <UIcon name="i-lucide-chart-no-axes-column-increasing" class="size-[18px]" />
+          </button>
+          <button type="button" class="header-action" title="Wyloguj" @click="logout('/m/login')">
+            <UIcon name="i-lucide-log-out" class="size-[18px]" />
+          </button>
+        </div>
       </div>
 
       <button
@@ -311,6 +327,16 @@ function detailPrimaryAction() {
         <span>Start / koniec <UIcon name="i-lucide-arrow-right" /></span>
       </div>
     </main>
+
+    <button
+      v-if="canCreate"
+      type="button"
+      class="mobile-fab"
+      title="Nowa procedura"
+      @click="navigateTo({ path: '/m/nowa', query: { stanowisko: selectedStation } })"
+    >
+      <UIcon name="i-lucide-plus" class="size-6" />
+    </button>
 
     <UModal :open="Boolean(selectedTask)" @update:open="open => { if (!open) closeTask() }">
       <template #content>
@@ -501,6 +527,24 @@ function detailPrimaryAction() {
   color: #6b7280;
   background: rgb(255 255 255 / 75%);
 }
+
+.mobile-fab {
+  position: fixed;
+  right: max(18px, calc((100vw - 430px) / 2 + 18px));
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  z-index: 30;
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: #b08840;
+  box-shadow: 0 12px 30px rgb(82 62 30 / 28%);
+}
+
+.mobile-fab:active { transform: scale(0.96); }
 
 .station-switcher {
   position: relative;

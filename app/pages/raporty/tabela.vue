@@ -5,10 +5,12 @@ import {
   ALL_SELECT_VALUE,
   badgePoryDnia,
   formatPoraDnia,
+  poraDniaOptions,
   raportTabs,
   statusWykonaniaBadge,
   statusWykonaniaLabel
 } from '~/utils/procedureMeta'
+import { matchesNumberRange, matchesOption, matchesText } from '~/utils/tableFilters'
 
 definePageMeta({ layout: 'default' })
 
@@ -17,6 +19,17 @@ const { stanowiska, fetch: fetchStanowiska } = useStanowiska()
 
 const selectedDate = ref(new Date().toISOString().slice(0, 10))
 const filterStation = ref(ALL_SELECT_VALUE)
+const filterProcedure = ref('')
+const filterPeriod = ref(ALL_SELECT_VALUE)
+const filterStatus = ref(ALL_SELECT_VALUE)
+const filterStart = ref('')
+const filterDurationMin = ref<number | null>(null)
+const filterDurationMax = ref<number | null>(null)
+const filterNormMin = ref<number | null>(null)
+const filterNormMax = ref<number | null>(null)
+const filterDeviationMin = ref<number | null>(null)
+const filterDeviationMax = ref<number | null>(null)
+const filterNote = ref('')
 
 onMounted(async () => {
   await fetchStanowiska()
@@ -29,29 +42,94 @@ const stationOptions = computed(() => [
   { label: 'Wszystkie stanowiska', value: ALL_SELECT_VALUE },
   ...stanowiska.value.map(s => ({ label: s.nazwa, value: s.id }))
 ])
+const periodOptions = [{ label: 'Wszystkie pory', value: ALL_SELECT_VALUE }, ...poraDniaOptions]
+const statusOptions = [
+  { label: 'Wszystkie statusy', value: ALL_SELECT_VALUE },
+  { label: 'Do zrobienia', value: 'do_zrobienia' },
+  { label: 'W trakcie', value: 'w_trakcie' },
+  { label: 'Wstrzymane', value: 'paused' },
+  { label: 'Wykonane', value: 'wykonane' },
+  { label: 'Odrzucone', value: 'odrzucone' }
+]
 
-const filtered = computed(() => wykonania.value)
+function durationMinutes(w: WykonanieWithRelations) {
+  return w.status === 'wykonane' ? Math.round(executionElapsedMs(w) / 60_000) : null
+}
+
+function deviationMinutes(w: WykonanieWithRelations) {
+  const duration = durationMinutes(w)
+  return duration == null ? null : duration - (w.procedury?.norma_min ?? 0)
+}
+
+function startTime(w: WykonanieWithRelations) {
+  return w.czas_start
+    ? new Date(w.czas_start).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
+    : ''
+}
+
+function statusFilterValue(w: WykonanieWithRelations) {
+  return executionTimerState(w) === 'paused' ? 'paused' : w.status
+}
+
+const filtered = computed(() => wykonania.value.filter(w =>
+  matchesText(w.procedury?.nazwa, filterProcedure.value)
+  && matchesOption(w.procedury?.pora_dnia, filterPeriod.value)
+  && matchesOption(statusFilterValue(w), filterStatus.value)
+  && (!filterStart.value || startTime(w) === filterStart.value)
+  && matchesNumberRange(durationMinutes(w), filterDurationMin.value, filterDurationMax.value)
+  && matchesNumberRange(w.procedury?.norma_min, filterNormMin.value, filterNormMax.value)
+  && matchesNumberRange(deviationMinutes(w), filterDeviationMin.value, filterDeviationMax.value)
+  && matchesText(executionNote(w), filterNote.value)
+))
+
+const hasFilters = computed(() =>
+  filterStation.value !== ALL_SELECT_VALUE
+  || filterPeriod.value !== ALL_SELECT_VALUE
+  || filterStatus.value !== ALL_SELECT_VALUE
+  || Boolean(filterProcedure.value.trim() || filterStart.value || filterNote.value.trim())
+  || [
+    filterDurationMin.value,
+    filterDurationMax.value,
+    filterNormMin.value,
+    filterNormMax.value,
+    filterDeviationMin.value,
+    filterDeviationMax.value
+  ].some(value => value != null)
+)
+
+function resetFilters() {
+  filterStation.value = ALL_SELECT_VALUE
+  filterProcedure.value = ''
+  filterPeriod.value = ALL_SELECT_VALUE
+  filterStatus.value = ALL_SELECT_VALUE
+  filterStart.value = ''
+  filterDurationMin.value = null
+  filterDurationMax.value = null
+  filterNormMin.value = null
+  filterNormMax.value = null
+  filterDeviationMin.value = null
+  filterDeviationMax.value = null
+  filterNote.value = ''
+}
 
 function odchylenie(w: WykonanieWithRelations): string {
-  if (w.status !== 'wykonane') return '—'
-  const min = Math.round(executionElapsedMs(w) / 60_000)
-  const diff = min - (w.procedury?.norma_min ?? 0)
+  const diff = deviationMinutes(w)
+  if (diff == null) return '—'
   if (diff === 0) return '±0 min'
   return diff > 0 ? `+${diff} min` : `${diff} min`
 }
 
 function odchylenieClass(w: WykonanieWithRelations): string {
-  if (w.status !== 'wykonane') return 'text-muted'
-  const min = Math.round(executionElapsedMs(w) / 60_000)
-  const diff = min - (w.procedury?.norma_min ?? 0)
+  const diff = deviationMinutes(w)
+  if (diff == null) return 'text-muted'
   if (diff <= 0) return 'text-success font-medium'
   if (diff <= 5) return 'text-warning font-medium'
   return 'text-error font-medium'
 }
 
 function czasTrwania(w: WykonanieWithRelations): string {
-  if (w.status !== 'wykonane') return '—'
-  return `${Math.round(executionElapsedMs(w) / 60_000)} min`
+  const duration = durationMinutes(w)
+  return duration == null ? '—' : `${duration} min`
 }
 
 function statusLabel(w: WykonanieWithRelations) {
@@ -114,21 +192,23 @@ const stats = computed(() => {
         </NuxtLink>
       </div>
 
-      <!-- Filtry -->
       <div class="flex items-center gap-3 flex-wrap">
         <UInput v-model="selectedDate" type="date" size="sm" icon="i-lucide-calendar" class="w-44" />
-        <USelect
-          v-model="filterStation"
-          :items="stationOptions"
-          value-key="value"
-          size="sm"
-          class="w-48"
-        />
-        <span class="ml-auto text-xs text-muted">{{ filtered.length }} wykonań</span>
+        <span class="ml-auto text-xs text-muted">{{ filtered.length }} z {{ wykonania.length }} wykonań</span>
+        <UButton
+          v-if="hasFilters"
+          color="neutral"
+          variant="ghost"
+          size="xs"
+          icon="i-lucide-filter-x"
+          @click="resetFilters"
+        >
+          Wyczyść
+        </UButton>
       </div>
 
       <!-- Podsumowanie KPI -->
-      <div class="grid grid-cols-4 gap-3">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <div class="bg-elevated border border-muted rounded-xl p-4">
           <div class="text-xs text-muted mb-1">Wykonane</div>
           <div class="text-2xl font-semibold text-success">{{ stats.done }}</div>
@@ -159,18 +239,18 @@ const stats = computed(() => {
       <UAlert v-if="error" color="error" icon="i-lucide-alert-circle" :description="error" />
 
       <!-- Tabela -->
-      <div class="border border-muted rounded-xl overflow-hidden">
+      <div class="border border-muted rounded-xl overflow-x-auto">
         <div v-if="loading" class="p-8 flex justify-center">
           <UIcon name="i-lucide-loader-circle" class="w-5 h-5 text-muted animate-spin" />
         </div>
 
         <div v-else-if="filtered.length === 0" class="p-8 text-center text-sm text-muted">
-          Brak danych dla wybranego dnia
+          Brak danych spełniających filtry
         </div>
 
-        <table v-else class="w-full text-sm">
+        <table v-else class="w-full min-w-[1480px] text-sm">
           <thead>
-            <tr class="border-b border-muted bg-elevated">
+            <tr class="bg-elevated">
               <th class="text-left px-4 py-2.5 text-xs font-medium text-muted">Procedura</th>
               <th class="text-left px-4 py-2.5 text-xs font-medium text-muted">Stanowisko</th>
               <th class="text-left px-4 py-2.5 text-xs font-medium text-muted">Pora</th>
@@ -180,6 +260,44 @@ const stats = computed(() => {
               <th class="text-right px-4 py-2.5 text-xs font-medium text-muted">Norma</th>
               <th class="text-right px-4 py-2.5 text-xs font-medium text-muted">Odchylenie</th>
               <th class="text-left px-4 py-2.5 text-xs font-medium text-muted">Uwagi</th>
+            </tr>
+            <tr class="border-b border-muted bg-elevated">
+              <th class="px-2 pb-2 text-left">
+                <UInput v-model="filterProcedure" placeholder="Szukaj..." icon="i-lucide-search" size="xs" class="w-48" />
+              </th>
+              <th class="px-2 pb-2 text-left">
+                <USelect v-model="filterStation" :items="stationOptions" value-key="value" size="xs" class="w-44" />
+              </th>
+              <th class="px-2 pb-2 text-left">
+                <USelect v-model="filterPeriod" :items="periodOptions" value-key="value" size="xs" class="w-36" />
+              </th>
+              <th class="px-2 pb-2 text-left">
+                <USelect v-model="filterStatus" :items="statusOptions" value-key="value" size="xs" class="w-40" />
+              </th>
+              <th class="px-2 pb-2 text-left">
+                <UInput v-model="filterStart" type="time" size="xs" class="w-28" />
+              </th>
+              <th class="px-2 pb-2">
+                <div class="flex justify-end gap-1">
+                  <UInput v-model.number="filterDurationMin" type="number" placeholder="Od" size="xs" class="w-20" />
+                  <UInput v-model.number="filterDurationMax" type="number" placeholder="Do" size="xs" class="w-20" />
+                </div>
+              </th>
+              <th class="px-2 pb-2">
+                <div class="flex justify-end gap-1">
+                  <UInput v-model.number="filterNormMin" type="number" placeholder="Od" size="xs" class="w-20" />
+                  <UInput v-model.number="filterNormMax" type="number" placeholder="Do" size="xs" class="w-20" />
+                </div>
+              </th>
+              <th class="px-2 pb-2">
+                <div class="flex justify-end gap-1">
+                  <UInput v-model.number="filterDeviationMin" type="number" placeholder="Od" size="xs" class="w-20" />
+                  <UInput v-model.number="filterDeviationMax" type="number" placeholder="Do" size="xs" class="w-20" />
+                </div>
+              </th>
+              <th class="px-2 pb-2 text-left">
+                <UInput v-model="filterNote" placeholder="Szukaj..." size="xs" class="w-40" />
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -201,7 +319,7 @@ const stats = computed(() => {
                 </UBadge>
               </td>
               <td class="px-4 py-2.5 text-muted text-xs">
-                {{ w.czas_start ? new Date(w.czas_start).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) : '—' }}
+                {{ startTime(w) || '—' }}
               </td>
               <td class="px-4 py-2.5 text-right text-xs">{{ czasTrwania(w) }}</td>
               <td class="px-4 py-2.5 text-right text-xs text-muted">{{ w.procedury?.norma_min ?? '—' }} min</td>
