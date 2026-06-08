@@ -9,6 +9,12 @@ export default defineNuxtConfig({
 
   modules: ['@nuxt/ui', '@nuxtjs/supabase'],
 
+  colorMode: {
+    preference: 'light',
+    fallback: 'light',
+    storageKey: 'antica-color-mode'
+  },
+
   // Ikony lokalnie (pakiet @iconify-json/lucide) — bez pobierania z sieci przy renderze.
   icon: {
     serverBundle: 'local'

@@ -23,6 +23,8 @@
 
 /* ── NuxtUI v3: override --ui-primary do złotego brandu ─────────── */
 :root {
+  color-scheme: light;
+
   --ui-primary: oklch(68% 0.105 62);       /* #c59d5f */
   --ui-primary-50: oklch(97% 0.02 80);     /* #fdf6ec */
   --ui-primary-100: oklch(93% 0.04 75);
@@ -37,3 +39,14 @@
   --ui-primary-950: oklch(18% 0.04 55);
 }
 
+html,
+body,
+#__nuxt {
+  min-height: 100%;
+  color-scheme: light;
+  background: #ffffff;
+}
+
+html.dark {
+  color-scheme: light;
+}
