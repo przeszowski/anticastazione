@@ -239,4 +239,18 @@ function activityTime(item: WykonanieWithRelations) {
 @media (max-width: 1100px) {
   .station-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+@media (max-width: 767px) {
+  .station-grid { grid-template-columns: 1fr; }
+
+  .activity-row {
+    flex-wrap: wrap;
+    padding: 10px 12px;
+  }
+
+  .activity-row time {
+    width: 100%;
+    padding-left: 17px;
+  }
+}
 </style>

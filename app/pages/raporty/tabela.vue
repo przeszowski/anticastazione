@@ -180,7 +180,7 @@ const stats = computed(() => {
         </NuxtLink>
       </div>
 
-      <div class="flex items-center gap-3 flex-wrap">
+      <div class="antica-responsive-filters flex items-center gap-3 flex-wrap">
         <UInput v-model="selectedDate" type="date" size="sm" icon="i-lucide-calendar" class="w-44" />
         <span class="ml-auto text-xs text-muted">{{ filtered.length }} z {{ wykonania.length }} wykonań</span>
         <UButton

@@ -100,7 +100,7 @@ async function przelaczAktywny(userId: string, val: boolean) {
 
 <template>
   <div class="flex flex-col flex-1">
-    <div class="h-[52px] border-b border-muted flex items-center px-5 gap-3 bg-default sticky top-0 z-10">
+    <div class="antica-topbar">
       <span class="text-sm font-semibold flex-1">Użytkownicy</span>
       <UButton
         v-if="can('users:create')"
@@ -113,7 +113,7 @@ async function przelaczAktywny(userId: string, val: boolean) {
       </UButton>
     </div>
 
-    <div class="p-5 flex flex-col gap-4">
+    <div class="antica-content flex flex-col gap-4">
       <UAlert v-if="error" color="error" icon="i-lucide-alert-circle" :description="error" class="mb-4" />
 
       <div class="flex items-center gap-2">
@@ -136,7 +136,7 @@ async function przelaczAktywny(userId: string, val: boolean) {
         :data="filtered"
         :columns="columns"
         :loading="loading"
-        class="overflow-hidden rounded-[10px] border border-[#e5e7eb] bg-white"
+        class="overflow-x-auto rounded-[10px] border border-[#e5e7eb] bg-white"
       >
         <template #imie-header>
           <TableFilterHeader label="Imię i nazwisko">

@@ -87,7 +87,7 @@ async function doDelete() {
 
 <template>
   <div class="flex flex-col flex-1">
-    <div class="h-[52px] border-b border-muted flex items-center px-5 gap-3 bg-default sticky top-0 z-10">
+    <div class="antica-topbar">
       <UButton color="neutral" variant="ghost" icon="i-lucide-arrow-left" size="sm" @click="navigateTo('/stanowiska')" />
       <span class="text-sm font-semibold flex-1">Edycja stanowiska</span>
       <UButton v-if="!loading && canDelete" color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" @click="confirmDelete = true" />
@@ -98,7 +98,7 @@ async function doDelete() {
       <UIcon name="i-lucide-loader-circle" class="w-5 h-5 text-muted animate-spin" />
     </div>
 
-    <div v-else class="p-5 max-w-lg flex flex-col gap-4">
+    <div v-else class="antica-content max-w-lg flex flex-col gap-4">
       <div class="flex flex-col gap-4 rounded-[10px] border border-[#e5e7eb] bg-white p-5">
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-medium text-muted">Nazwa stanowiska *</label>
@@ -121,7 +121,7 @@ async function doDelete() {
           <UTextarea v-model="form.opis" placeholder="Opcjonalny opis stanowiska…" :rows="3" />
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-medium text-muted">Godziny od</label>
             <UInput v-model="form.godziny_od" type="time" />

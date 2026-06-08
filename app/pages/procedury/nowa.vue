@@ -54,13 +54,13 @@ async function save() {
 
 <template>
   <div class="flex flex-col flex-1">
-    <div class="h-[52px] border-b border-muted flex items-center px-5 gap-3 bg-default sticky top-0 z-10">
+    <div class="antica-topbar">
       <UButton color="neutral" variant="ghost" icon="i-lucide-arrow-left" size="sm" @click="navigateTo('/procedury')" />
       <span class="text-sm font-semibold flex-1">Nowa procedura</span>
       <UButton color="primary" size="sm" :loading="saving" @click="save">Zapisz</UButton>
     </div>
 
-    <div class="p-5 max-w-lg flex flex-col gap-4">
+    <div class="antica-content max-w-lg flex flex-col gap-4">
       <div class="flex flex-col gap-4 rounded-[10px] border border-[#e5e7eb] bg-white p-5">
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-medium text-muted">Nazwa procedury *</label>
@@ -82,7 +82,7 @@ async function save() {
           />
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-medium text-muted">Pora dnia</label>
             <USelect

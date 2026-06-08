@@ -17,11 +17,11 @@ function akcje(perms: string[]) {
 
 <template>
   <div class="flex flex-col flex-1">
-    <div class="h-[52px] border-b border-muted flex items-center px-5 gap-3 bg-default sticky top-0 z-10">
+    <div class="antica-topbar">
       <span class="text-sm font-semibold flex-1">Role systemowe</span>
     </div>
 
-    <div class="p-5 flex flex-col gap-4">
+    <div class="antica-content flex flex-col gap-4">
       <UAlert v-if="error" color="error" icon="i-lucide-alert-circle" :description="error" />
 
       <div v-if="loading" class="flex justify-center py-8">

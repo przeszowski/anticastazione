@@ -63,6 +63,7 @@ html.dark {
 
 body {
   font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  overflow-x: hidden;
 }
 
 button,
@@ -77,6 +78,44 @@ select,
 textarea {
   color: var(--antica-text);
   background: #fff;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: #fff;
+}
+
+.app-main {
+  display: flex;
+  min-width: 0;
+  min-height: 100vh;
+  flex-direction: column;
+  margin-left: 220px;
+}
+
+.app-page {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.app-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 40;
+  display: flex;
+  width: 220px;
+  flex-direction: column;
+  overflow-y: auto;
+  border-right: 1px solid var(--antica-border);
+  background: #fff;
+}
+
+.mobile-appbar,
+.sidebar-close,
+.sidebar-backdrop {
+  display: none;
 }
 
 .antica-topbar {
@@ -287,5 +326,136 @@ textarea {
 @media (max-width: 1100px) {
   .antica-kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  body.mobile-menu-open {
+    overflow: hidden;
+  }
+
+  .app-main {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .mobile-appbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    min-height: 56px;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--antica-border);
+    padding: 7px 12px;
+    background: rgba(255, 255, 255, .98);
+  }
+
+  .mobile-menu-button,
+  .sidebar-close {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    place-items: center;
+    border-radius: 8px;
+    color: var(--antica-text);
+  }
+
+  .mobile-menu-button:hover,
+  .sidebar-close:hover {
+    background: var(--antica-background);
+  }
+
+  .mobile-menu-button:focus-visible,
+  .sidebar-close:focus-visible {
+    outline: 2px solid var(--antica-brand);
+    outline-offset: 2px;
+  }
+
+  .app-sidebar {
+    z-index: 50;
+    width: min(86vw, 320px);
+    box-shadow: 12px 0 32px rgba(17, 24, 39, .14);
+    transform: translateX(-105%);
+    transition: transform 180ms ease;
+  }
+
+  .app-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    display: block;
+    border: 0;
+    background: rgba(17, 24, 39, .34);
+  }
+
+  .antica-topbar {
+    top: 56px;
+    min-height: 50px;
+    padding: 0 12px;
+  }
+
+  .antica-content,
+  .antica-dashboard-content {
+    padding: 14px 12px;
+  }
+
+  .antica-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .antica-toolbar > .antica-search,
+  .antica-toolbar > .antica-filter {
+    width: 100% !important;
+  }
+
+  .antica-responsive-filters > * {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .antica-execution-row {
+    flex-wrap: wrap;
+  }
+
+  .antica-execution-row > .flex-1 {
+    width: 100%;
+    flex-basis: 100%;
+  }
+
+  .antica-table-frame,
+  .antica-content > .overflow-x-auto {
+    max-width: calc(100vw - 24px);
+  }
+
+  .antica-pagination {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 520px) {
+  .antica-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .antica-kpi {
+    padding: 14px;
+  }
+
+  .antica-kpi-value {
+    font-size: 23px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar {
+    transition: none;
   }
 }

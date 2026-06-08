@@ -100,7 +100,7 @@ function startLabel(w: WykonanieWithRelations) {
         </NuxtLink>
       </div>
 
-      <div class="flex items-center gap-3 flex-wrap">
+      <div class="antica-responsive-filters flex items-center gap-3 flex-wrap">
         <UInput v-model="selectedDate" type="date" size="sm" icon="i-lucide-calendar" class="w-44" />
         <USelect v-model="filterStation" :items="stationOptions" value-key="value" size="sm" class="w-52" />
         <span class="ml-auto text-xs text-muted capitalize">{{ dateLabel }}</span>
@@ -164,7 +164,7 @@ function startLabel(w: WykonanieWithRelations) {
           <div
             v-for="item in group.items"
             :key="item.id"
-            class="mb-1.5 flex items-center gap-3 rounded-lg border border-[#e5e7eb] bg-white px-3 py-2.5 transition-colors hover:bg-[#f9fafb]"
+            class="antica-execution-row mb-1.5 flex items-center gap-3 rounded-lg border border-[#e5e7eb] bg-white px-3 py-2.5 transition-colors hover:bg-[#f9fafb]"
           >
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium truncate">{{ item.procedury?.nazwa ?? '—' }}</div>

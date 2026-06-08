@@ -1,4 +1,7 @@
 <script setup lang="ts">
+defineProps<{ open?: boolean, mobile?: boolean }>()
+const emit = defineEmits<{ close: [] }>()
+
 const route = useRoute()
 const { imieNazwisko, rola, can, logout } = useAuth()
 
@@ -14,19 +17,32 @@ const navItems = computed(() => [
 ].filter(item => can(item.perm)))
 
 const isActive = (to: string) => to === '/' ? route.path === '/' : route.path.startsWith(to)
+
+async function signOut() {
+  emit('close')
+  await logout()
+}
 </script>
 
 <template>
   <aside
-    class="fixed top-0 left-0 bottom-0 z-20 flex flex-col overflow-y-auto border-r bg-white"
-    style="width: 220px; border-color: var(--antica-border);"
+    id="app-sidebar"
+    class="app-sidebar"
+    :class="{ 'is-open': open }"
+    :inert="mobile && !open"
+    :aria-hidden="mobile && !open ? 'true' : undefined"
   >
     <!-- Logo -->
-    <div class="border-b px-5 pb-4 pt-5" style="border-color: var(--antica-border);">
-      <div class="text-[13px] font-semibold tracking-[.04em]" style="color: var(--antica-brand);">
-        L'ANTICA STAZIONE
+    <div class="flex items-start gap-3 border-b px-5 pb-4 pt-5" style="border-color: var(--antica-border);">
+      <div class="min-w-0 flex-1">
+        <div class="text-[13px] font-semibold tracking-[.04em]" style="color: var(--antica-brand);">
+          L'ANTICA STAZIONE
+        </div>
+        <div class="mt-0.5 text-[11px]" style="color: var(--antica-tertiary);">Panel zarządzania</div>
       </div>
-      <div class="mt-0.5 text-[11px]" style="color: var(--antica-tertiary);">Panel zarządzania</div>
+      <button type="button" class="sidebar-close" aria-label="Zamknij menu" @click="emit('close')">
+        <UIcon name="i-lucide-x" class="size-5" />
+      </button>
     </div>
 
     <!-- Nav -->
@@ -39,6 +55,7 @@ const isActive = (to: string) => to === '/' ? route.path === '/' : route.path.st
         :class="isActive(item.to)
           ? 'bg-[#fdf6ec] text-[#b08840]'
           : 'text-[#6b7280] hover:bg-[#f9fafb] hover:text-[#111827]'"
+        @click="emit('close')"
       >
         <UIcon :name="item.icon" class="w-4 h-4 shrink-0" />
         {{ item.label }}
@@ -58,7 +75,7 @@ const isActive = (to: string) => to === '/' ? route.path === '/' : route.path.st
         size="sm"
         icon="i-lucide-log-out"
         label="Wyloguj"
-        @click="logout"
+        @click="signOut"
       />
     </div>
   </aside>
