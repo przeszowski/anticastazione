@@ -1,5 +1,5 @@
-/* DM Sans z Google Fonts — musi być pierwszy */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap');
+/* Fonty użyte w prototypach */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&family=Playfair+Display:wght@400;500&display=swap');
 
 @import "tailwindcss";
 @import "@nuxt/ui";
@@ -25,6 +25,15 @@
 :root {
   color-scheme: light;
 
+  --antica-brand: #c59d5f;
+  --antica-brand-hover: #b08840;
+  --antica-brand-light: #fdf6ec;
+  --antica-text: #111827;
+  --antica-muted: #6b7280;
+  --antica-tertiary: #9ca3af;
+  --antica-border: #e5e7eb;
+  --antica-background: #f9fafb;
+
   --ui-primary: oklch(68% 0.105 62);       /* #c59d5f */
   --ui-primary-50: oklch(97% 0.02 80);     /* #fdf6ec */
   --ui-primary-100: oklch(93% 0.04 75);
@@ -45,8 +54,238 @@ body,
   min-height: 100%;
   color-scheme: light;
   background: #ffffff;
+  color: var(--antica-text);
 }
 
 html.dark {
   color-scheme: light;
+}
+
+body {
+  font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  color: var(--antica-text);
+  background: #fff;
+}
+
+.antica-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--antica-border);
+  padding: 0 20px;
+  background: #fff;
+}
+
+.antica-topbar-title {
+  color: var(--antica-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.antica-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.antica-dashboard-content {
+  flex: 1;
+  padding: 28px;
+  background: var(--antica-background);
+}
+
+.antica-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.antica-kpi {
+  min-width: 0;
+  border: 1px solid var(--antica-border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  background: #fff;
+}
+
+.antica-kpi-label,
+.antica-section-label {
+  color: var(--antica-tertiary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.antica-kpi-value {
+  margin-top: 8px;
+  color: var(--antica-text);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.antica-kpi-sub {
+  margin-top: 5px;
+  color: var(--antica-muted);
+  font-size: 12px;
+}
+
+.antica-progress {
+  height: 4px;
+  overflow: hidden;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: var(--antica-border);
+}
+
+.antica-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--antica-brand);
+}
+
+.antica-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.antica-table-frame {
+  overflow: auto;
+  border: 1px solid var(--antica-border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.antica-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.antica-table th {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--antica-border);
+  color: var(--antica-text);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.antica-table .antica-filter-row th {
+  padding: 6px 12px;
+  border-bottom: 2px solid var(--antica-border);
+  background: #fff;
+}
+
+.antica-table td {
+  padding: 11px 12px;
+  color: var(--antica-text);
+  font-size: 13.5px;
+}
+
+.antica-table tbody tr {
+  border-bottom: 1px solid var(--antica-border);
+  transition: background 120ms ease;
+}
+
+.antica-table tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.antica-table tbody tr[data-clickable='true'] {
+  cursor: pointer;
+}
+
+.antica-table tbody tr[data-clickable='true']:hover {
+  background: var(--antica-background);
+}
+
+.antica-filter {
+  width: 100%;
+  min-height: 30px;
+  border: 1px solid var(--antica-border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  outline: none;
+  color: var(--antica-text);
+  background: #fff;
+  font-size: 12px;
+}
+
+.antica-filter:focus {
+  border-color: var(--antica-brand);
+}
+
+.antica-search {
+  position: relative;
+}
+
+.antica-search > svg {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  color: var(--antica-tertiary);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.antica-search .antica-filter {
+  padding-left: 27px;
+}
+
+.antica-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  color: var(--antica-muted);
+  font-size: 13px;
+}
+
+.antica-empty {
+  padding: 36px 20px;
+  color: var(--antica-tertiary);
+  font-size: 13px;
+  text-align: center;
+}
+
+.antica-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.antica-badge-brand { color: #8a6830; background: #fdf6ec; }
+.antica-badge-blue { color: #2563eb; background: #eff6ff; }
+.antica-badge-purple { color: #7c3aed; background: #f5f3ff; }
+.antica-badge-green { color: #16a34a; background: #f0fdf4; }
+.antica-badge-gray { color: #6b7280; background: #f3f4f6; }
+
+@media (max-width: 1100px) {
+  .antica-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

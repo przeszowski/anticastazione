@@ -70,7 +70,7 @@ async function save() {
     </div>
 
     <div class="p-5 max-w-lg flex flex-col gap-4">
-      <div class="bg-elevated border border-muted rounded-xl p-5 flex flex-col gap-4">
+      <div class="flex flex-col gap-4 rounded-[10px] border border-[#e5e7eb] bg-white p-5">
         <div class="grid grid-cols-2 gap-3">
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-medium text-muted">Imię</label>

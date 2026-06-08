@@ -23,6 +23,7 @@ const canManage = computed(() => can('raporty:read'))
 const canCreate = computed(() => can('procedury:create'))
 
 const today = new Date().toISOString().slice(0, 10)
+const selectedDate = ref(today)
 const selectedStation = ref('')
 const selectedTaskId = ref<string | null>(null)
 const taskFilter = ref<TaskFilter>('all')
@@ -34,11 +35,23 @@ const rejectReason = ref('')
 const pendingReject = ref<WykonanieWithRelations | null>(null)
 let clock: ReturnType<typeof setInterval> | undefined
 
-const dateLabel = new Intl.DateTimeFormat('pl-PL', {
+const dateLabel = computed(() => new Intl.DateTimeFormat('pl-PL', {
   weekday: 'long',
   day: 'numeric',
-  month: 'long'
-}).format(new Date())
+  month: 'long',
+  year: 'numeric'
+}).format(new Date(`${selectedDate.value}T12:00:00`)))
+
+const dayOptions = computed(() => Array.from({ length: 6 }, (_, index) => {
+  const date = new Date()
+  date.setDate(date.getDate() + index - 3)
+  const value = date.toISOString().slice(0, 10)
+  return {
+    value,
+    day: new Intl.DateTimeFormat('pl-PL', { weekday: 'short' }).format(date).replace('.', ''),
+    number: date.getDate()
+  }
+}))
 
 const activeStation = computed(() =>
   stanowiska.value.find(station => station.id === selectedStation.value) ?? null
@@ -99,7 +112,7 @@ const selectedElapsed = computed(() =>
 const filters: { value: TaskFilter; label: string }[] = [
   { value: 'todo', label: 'Do zrobienia' },
   { value: 'active', label: 'Aktywne' },
-  { value: 'done', label: 'Zakończone' },
+  { value: 'done', label: 'Ukończone' },
   { value: 'all', label: 'Wszystkie' }
 ]
 
@@ -109,7 +122,7 @@ onMounted(async () => {
   const firstStation = stanowiska.value.find(station => station.id === requestedStation && station.aktywne)
     ?? stanowiska.value.find(station => station.aktywne)
   if (firstStation) selectedStation.value = firstStation.id
-  await fetchDzien(today, selectedStation.value || undefined)
+  await fetchDzien(selectedDate.value, selectedStation.value || undefined)
   clock = setInterval(() => { now.value = Date.now() }, 1000)
 })
 
@@ -117,10 +130,10 @@ onBeforeUnmount(() => {
   if (clock) clearInterval(clock)
 })
 
-watch(selectedStation, async (stationId, previousId) => {
-  if (!previousId || stationId === previousId) return
+watch([selectedStation, selectedDate], async ([stationId, date], [previousStation, previousDate]) => {
+  if (!previousStation || (stationId === previousStation && date === previousDate)) return
   selectedTaskId.value = null
-  await fetchDzien(today, stationId)
+  await fetchDzien(date, stationId)
 })
 
 function setBusy(id: string, busy: boolean) {
@@ -225,6 +238,9 @@ function detailPrimaryAction() {
           <div class="mt-1 text-xs text-gray-500">{{ imieNazwisko || 'Pracownik' }}</div>
         </div>
         <div class="flex gap-2">
+          <button type="button" class="header-action" title="Zmień stanowisko" @click="stationPickerOpen = true">
+            <UIcon name="i-lucide-map-pin" class="size-[18px]" />
+          </button>
           <button
             v-if="canManage"
             type="button"
@@ -240,23 +256,19 @@ function detailPrimaryAction() {
         </div>
       </div>
 
-      <button
-        type="button"
-        class="station-switcher"
-        aria-haspopup="dialog"
-        @click="stationPickerOpen = true"
-      >
-        <span class="station-switcher-icon">
-          <UIcon name="i-lucide-map-pin" class="size-[19px]" />
-        </span>
-        <span class="min-w-0 flex-1 text-left">
-          <span class="station-switcher-label">Stanowisko</span>
-          <span class="station-switcher-name">{{ activeStation?.nazwa ?? 'Wybierz stanowisko' }}</span>
-        </span>
-        <span class="station-switcher-action">
-          <UIcon name="i-lucide-chevrons-up-down" class="size-4" />
-        </span>
-      </button>
+      <div class="day-strip">
+        <button
+          v-for="day in dayOptions"
+          :key="day.value"
+          type="button"
+          class="day-chip"
+          :class="{ current: selectedDate === day.value }"
+          @click="selectedDate = day.value"
+        >
+          <span>{{ day.day }}</span>
+          <strong>{{ day.number }}</strong>
+        </button>
+      </div>
     </header>
 
     <section class="progress-strip">
@@ -510,7 +522,7 @@ function detailPrimaryAction() {
   position: relative;
   overflow: hidden;
   flex: 0 0 auto;
-  padding: max(24px, env(safe-area-inset-top)) 20px 18px;
+  padding: max(26px, env(safe-area-inset-top)) 20px 20px;
   background:
     radial-gradient(ellipse 270px 170px at 100% 15%, rgb(197 157 95 / 25%), transparent 70%),
     linear-gradient(160deg, #fff 0%, #fdf6ec 62%, #f5e8cc 100%);
@@ -527,6 +539,51 @@ function detailPrimaryAction() {
   color: #6b7280;
   background: rgb(255 255 255 / 75%);
 }
+
+.day-strip {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin-top: 16px;
+  scrollbar-width: none;
+}
+
+.day-strip::-webkit-scrollbar { display: none; }
+
+.day-chip {
+  display: flex;
+  min-width: 48px;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  border: 0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  color: #111827;
+  background: rgb(17 24 39 / 6%);
+}
+
+.day-chip span {
+  color: #9ca3af;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.day-chip strong {
+  margin-top: 2px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.day-chip.current {
+  color: #fff;
+  background: #c59d5f;
+}
+
+.day-chip.current span { color: rgb(255 255 255 / 85%); }
 
 .mobile-fab {
   position: fixed;
@@ -546,34 +603,6 @@ function detailPrimaryAction() {
 
 .mobile-fab:active { transform: scale(0.96); }
 
-.station-switcher {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  width: 100%;
-  min-height: 58px;
-  align-items: center;
-  gap: 12px;
-  margin-top: 16px;
-  border: 1px solid rgb(197 157 95 / 22%);
-  border-radius: 14px;
-  background: rgb(255 255 255 / 82%);
-  padding: 8px 10px;
-  box-shadow:
-    0 1px 1px rgb(82 62 30 / 4%),
-    0 8px 24px rgb(82 62 30 / 7%);
-  backdrop-filter: blur(12px);
-  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
-}
-
-.station-switcher:active { transform: scale(0.99); }
-
-.station-switcher:focus-visible {
-  outline: 3px solid rgb(197 157 95 / 20%);
-  outline-offset: 2px;
-}
-
-.station-switcher-icon,
 .station-option-icon {
   display: grid;
   width: 40px;
@@ -583,39 +612,6 @@ function detailPrimaryAction() {
   border-radius: 11px;
   color: #8a6830;
   background: #fdf6ec;
-}
-
-.station-switcher-label {
-  display: block;
-  color: #9ca3af;
-  font-size: 9px;
-  font-weight: 700;
-  line-height: 1.2;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.station-switcher-name {
-  display: block;
-  overflow: hidden;
-  margin-top: 3px;
-  color: #111827;
-  font-size: 14px;
-  font-weight: 650;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.station-switcher-action {
-  display: grid;
-  width: 32px;
-  height: 32px;
-  flex: 0 0 32px;
-  place-items: center;
-  border-radius: 10px;
-  color: #8a6830;
-  background: #f8f3e9;
 }
 
 .station-picker {

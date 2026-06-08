@@ -135,7 +135,7 @@ async function przelaczAktywny(userId: string, val: boolean) {
         :data="filtered"
         :columns="columns"
         :loading="loading"
-        class="border border-muted rounded-xl overflow-hidden"
+        class="overflow-hidden rounded-[10px] border border-[#e5e7eb] bg-white"
       >
         <template #imie-header>
           <TableFilterHeader label="Imię i nazwisko">

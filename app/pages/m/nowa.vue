@@ -87,14 +87,8 @@ async function save() {
         <UIcon name="i-lucide-arrow-left" class="size-5" />
       </button>
       <div class="min-w-0 flex-1">
-        <p>Nowe zadanie</p>
-        <h1>Dodaj procedurę</h1>
+        <h1>Nowa procedura</h1>
       </div>
-      <button type="button" class="save-button" :disabled="saving" @click="save">
-        <UIcon v-if="saving" name="i-lucide-loader-circle" class="size-4 animate-spin" />
-        <UIcon v-else name="i-lucide-check" class="size-4" />
-        Zapisz
-      </button>
     </header>
 
     <main class="form-content">
@@ -110,14 +104,17 @@ async function save() {
 
       <label class="field">
         <span>Stanowisko</span>
-        <USelect
-          v-model="form.stanowisko_id"
-          :items="stationOptions"
-          value-key="value"
-          placeholder="Wybierz stanowisko"
-          size="lg"
-          class="w-full"
-        />
+        <div class="choice-chips">
+          <button
+            v-for="station in stationOptions"
+            :key="station.value"
+            type="button"
+            :class="{ active: form.stanowisko_id === station.value }"
+            @click="form.stanowisko_id = station.value"
+          >
+            {{ station.label }}
+          </button>
+        </div>
       </label>
 
       <fieldset class="field">
@@ -151,6 +148,15 @@ async function save() {
         </div>
       </label>
     </main>
+
+    <footer class="form-actions">
+      <button type="button" class="cancel-button" @click="navigateTo('/m')">Anuluj</button>
+      <button type="button" class="save-button" :disabled="saving" @click="save">
+        <UIcon v-if="saving" name="i-lucide-loader-circle" class="size-4 animate-spin" />
+        <UIcon v-else name="i-lucide-check" class="size-4" />
+        Zapisz procedurę
+      </button>
+    </footer>
   </div>
 </template>
 
@@ -174,18 +180,9 @@ async function save() {
   backdrop-filter: blur(16px);
 }
 
-.form-header p {
-  color: #9a6d24;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
 .form-header h1 {
-  margin-top: 2px;
   color: #111827;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
 }
 
@@ -203,16 +200,19 @@ async function save() {
 
 .save-button {
   display: flex;
-  min-height: 38px;
+  min-height: 44px;
+  flex: 2;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   border: 0;
-  border-radius: 10px;
-  padding: 0 12px;
+  border-radius: 12px;
+  padding: 0 14px;
   color: #fff;
-  background: #b08840;
-  font-size: 12px;
+  background: linear-gradient(135deg, #c59d5f, #b08840);
+  font-size: 13px;
   font-weight: 700;
+  text-transform: uppercase;
 }
 
 .save-button:disabled { opacity: 0.55; }
@@ -221,7 +221,7 @@ async function save() {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  padding: 22px 18px calc(32px + env(safe-area-inset-bottom));
+  padding: 22px 18px calc(116px + env(safe-area-inset-bottom));
 }
 
 .field {
@@ -270,6 +270,29 @@ async function save() {
   box-shadow: inset 0 0 0 1px rgb(176 136 64 / 12%);
 }
 
+.choice-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.choice-chips button {
+  border: 1.5px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: #6b7280;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.choice-chips button.active {
+  border-color: #c59d5f;
+  color: #8a6830;
+  background: #fdf6ec;
+  font-weight: 650;
+}
+
 .number-field {
   position: relative;
 }
@@ -283,5 +306,30 @@ async function save() {
   font-size: 12px;
   transform: translateY(-50%);
   pointer-events: none;
+}
+
+.form-actions {
+  position: fixed;
+  right: max(0px, calc((100vw - 430px) / 2));
+  bottom: 0;
+  left: max(0px, calc((100vw - 430px) / 2));
+  z-index: 25;
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid #e5e7eb;
+  padding: 12px 14px calc(16px + env(safe-area-inset-bottom));
+  background: #fff;
+}
+
+.cancel-button {
+  min-height: 44px;
+  flex: 1;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  color: #111827;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 </style>

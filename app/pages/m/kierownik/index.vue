@@ -80,7 +80,7 @@ onMounted(async () => {
       <div class="flex items-start justify-between gap-3">
         <div>
           <p>Panel kierownika</p>
-          <h1>Przegląd zmiany</h1>
+          <h1>Przegląd</h1>
           <span>{{ dateLabel }}</span>
         </div>
         <div class="flex gap-2">
@@ -259,21 +259,21 @@ onMounted(async () => {
 
 .station-card {
   width: 100%;
-  border: 1px solid #ebe7df;
-  border-radius: 8px;
+  border: 0;
+  border-radius: 18px;
   background: #fff;
-  padding: 13px;
-  box-shadow: 0 2px 10px rgb(15 23 42 / 4%);
+  padding: 16px;
+  box-shadow: 0 1px 6px rgb(15 23 42 / 6%);
 }
 
 .station-card-top { display: flex; align-items: center; gap: 10px; }
 .station-icon {
   display: grid;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
   place-items: center;
-  border-radius: 10px;
+  border-radius: 13px;
   color: #8a6830;
   background: #fdf6ec;
 }

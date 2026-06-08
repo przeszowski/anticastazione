@@ -45,7 +45,7 @@ function przypomnienieHasla() {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-elevated px-4">
+  <div class="min-h-screen flex items-center justify-center bg-[#f9fafb] px-4">
     <div class="w-full max-w-md">
       <!-- Logo nad kartą -->
       <div class="text-center mb-6">
@@ -56,10 +56,10 @@ function przypomnienieHasla() {
       </div>
 
       <!-- Karta logowania -->
-      <div class="bg-default border border-muted rounded-2xl shadow-sm p-8">
+      <div class="rounded-[10px] border border-[#e5e7eb] bg-white p-8 shadow-sm">
         <!-- Ikona + nagłówek -->
         <div class="flex flex-col items-center text-center mb-7">
-          <div class="w-12 h-12 rounded-full bg-elevated flex items-center justify-center mb-3">
+          <div class="mb-3 flex size-12 items-center justify-center rounded-full bg-[#fdf6ec]">
             <UIcon name="i-lucide-user" class="w-6 h-6 text-muted" />
           </div>
           <h1 class="text-xl font-bold text-default">Witaj ponownie!</h1>

@@ -5,9 +5,10 @@ import { matchesOption, matchesText } from '~/utils/tableFilters'
 definePageMeta({ layout: 'default' })
 
 const { stanowiska, loading, error, fetch } = useStanowiska()
+const { procedury, fetch: fetchProcedury } = useProcedury()
 const { can } = useAuth()
 
-onMounted(fetch)
+onMounted(() => Promise.all([fetch(), fetchProcedury()]))
 const canCreate = computed(() => can('stanowiska:create'))
 
 const search = ref('')
@@ -53,28 +54,39 @@ function resetFilters() {
   filterStatus.value = ALL_SELECT_VALUE
 }
 
-const columns = [
-  { accessorKey: 'nazwa', header: 'Stanowisko' },
-  { accessorKey: 'dzial', header: 'Dział' },
-  { accessorKey: 'godziny_od', header: 'Godziny otwarcia' },
-  { accessorKey: 'aktywne', header: 'Status' },
-  { id: 'actions', header: '' }
-]
+function procedureCount(stationId: string, activeOnly = false) {
+  return procedury.value.filter(item =>
+    item.stanowisko_id === stationId && (!activeOnly || item.aktywna)
+  ).length
+}
 </script>
 
 <template>
   <div class="flex flex-col flex-1">
-    <div class="h-[52px] border-b border-muted flex items-center px-5 gap-3 bg-default sticky top-0 z-10">
-      <span class="text-sm font-semibold flex-1">Stanowiska</span>
+    <div class="antica-topbar">
+      <UIcon name="i-lucide-building-2" class="size-4 text-[#6b7280]" />
+      <span class="antica-topbar-title flex-1">Stanowiska</span>
       <UButton v-if="canCreate" color="primary" size="sm" icon="i-lucide-plus" @click="navigateTo('/stanowiska/nowe')">
         Nowe stanowisko
       </UButton>
     </div>
 
-    <div class="p-5 flex flex-col gap-4">
+    <div class="antica-content">
       <UAlert v-if="error" color="error" icon="i-lucide-alert-circle" :description="error" class="mb-4" />
 
-      <div class="flex items-center gap-2">
+      <div class="antica-toolbar flex-wrap">
+        <div class="antica-search w-[280px]">
+          <UIcon name="i-lucide-search" class="size-3.5" />
+          <input v-model="search" class="antica-filter" placeholder="Szukaj stanowiska...">
+        </div>
+        <select v-model="filterDepartment" class="antica-filter w-44">
+          <option v-for="option in departmentOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+        </select>
+        <select v-model="filterStatus" class="antica-filter w-44">
+          <option v-for="option in statusOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+        </select>
+        <input v-model="filterOpenFrom" type="time" class="antica-filter w-32" title="Otwarte od">
+        <input v-model="filterOpenTo" type="time" class="antica-filter w-32" title="Otwarte do">
         <span class="ml-auto text-xs text-muted">
           {{ loading ? 'Ładowanie...' : `${filtered.length} z ${stanowiska.length} stanowisk` }}
         </span>
@@ -90,61 +102,63 @@ const columns = [
         </UButton>
       </div>
 
-      <UTable
-        :data="filtered"
-        :columns="columns"
-        :loading="loading"
-        @select="(row) => navigateTo('/stanowiska/' + row.original.id)"
-        class="border border-muted rounded-xl overflow-hidden cursor-pointer"
-      >
-        <template #nazwa-header>
-          <TableFilterHeader label="Stanowisko">
-            <UInput v-model="search" placeholder="Szukaj..." icon="i-lucide-search" size="xs" class="w-52" />
-          </TableFilterHeader>
-        </template>
-        <template #dzial-header>
-          <TableFilterHeader label="Dział">
-            <USelect v-model="filterDepartment" :items="departmentOptions" value-key="value" size="xs" class="w-40" />
-          </TableFilterHeader>
-        </template>
-        <template #godziny_od-header>
-          <TableFilterHeader label="Godziny otwarcia">
-            <div class="grid w-40 grid-cols-2 gap-1">
-              <UInput v-model="filterOpenFrom" type="time" size="xs" />
-              <UInput v-model="filterOpenTo" type="time" size="xs" />
-            </div>
-          </TableFilterHeader>
-        </template>
-        <template #aktywne-header>
-          <TableFilterHeader label="Status">
-            <USelect v-model="filterStatus" :items="statusOptions" value-key="value" size="xs" class="w-36" />
-          </TableFilterHeader>
-        </template>
-        <template #actions-header>
-          <span class="sr-only">Akcje</span>
-        </template>
+      <div class="antica-table-frame mt-3">
+        <table class="antica-table min-w-[800px]">
+          <thead>
+            <tr>
+              <th>Stanowisko</th>
+              <th>Dział</th>
+              <th>Procedury</th>
+              <th>Godziny otwarcia</th>
+              <th>Status</th>
+              <th aria-label="Akcje" />
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="loading"><td colspan="6" class="antica-empty">Ładowanie stanowisk...</td></tr>
+            <tr v-else-if="!filtered.length"><td colspan="6" class="antica-empty">Brak stanowisk spełniających filtry.</td></tr>
+            <template v-else>
+              <tr
+                v-for="item in filtered"
+                :key="item.id"
+                data-clickable="true"
+                :class="{ 'opacity-60': !item.aktywne }"
+                @click="navigateTo('/stanowiska/' + item.id)"
+              >
+                <td>
+                  <div class="flex items-center gap-2.5">
+                    <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-[#fdf6ec] text-[#c59d5f]">
+                      <UIcon name="i-lucide-building-2" class="size-4" />
+                    </span>
+                    <span class="min-w-0">
+                      <strong class="block font-semibold">{{ item.nazwa }}</strong>
+                      <small v-if="item.opis" class="mt-0.5 block max-w-sm truncate text-xs text-[#6b7280]">{{ item.opis }}</small>
+                    </span>
+                  </div>
+                </td>
+                <td><span class="antica-badge antica-badge-brand">{{ item.dzial }}</span></td>
+                <td>
+                  <strong class="block font-semibold">{{ procedureCount(item.id) }}</strong>
+                  <small class="text-xs text-[#6b7280]">{{ procedureCount(item.id, true) }} aktywnych</small>
+                </td>
+                <td class="text-[#6b7280]">{{ item.godziny_od?.slice(0,5) }} – {{ item.godziny_do?.slice(0,5) }}</td>
+                <td>
+                  <span class="antica-badge" :class="item.aktywne ? 'antica-badge-green' : 'antica-badge-gray'">
+                    {{ item.aktywne ? 'Aktywne' : 'Archiwalne' }}
+                  </span>
+                </td>
+                <td class="w-12">
+                  <UButton color="neutral" variant="ghost" icon="i-lucide-ellipsis" size="xs" @click.stop />
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
 
-        <template #nazwa-cell="{ row }">
-          <div class="font-medium">{{ row.original.nazwa }}</div>
-          <div v-if="row.original.opis" class="text-xs text-muted mt-0.5">{{ row.original.opis }}</div>
-        </template>
-        <template #dzial-cell="{ row }">
-          <UBadge color="primary" variant="subtle" size="sm">{{ row.original.dzial }}</UBadge>
-        </template>
-        <template #godziny_od-cell="{ row }">
-          <span class="text-sm text-muted">{{ row.original.godziny_od?.slice(0,5) }} – {{ row.original.godziny_do?.slice(0,5) }}</span>
-        </template>
-        <template #aktywne-cell="{ row }">
-          <UBadge :color="row.original.aktywne ? 'success' : 'neutral'" variant="subtle" size="sm">
-            {{ row.original.aktywne ? 'Aktywne' : 'Nieaktywne' }}
-          </UBadge>
-        </template>
-        <template #actions-cell="{ row }">
-          <div class="flex justify-end">
-            <UButton color="neutral" variant="ghost" icon="i-lucide-ellipsis" size="xs" @click.stop />
-          </div>
-        </template>
-      </UTable>
+      <div class="antica-pagination">
+        <span>Wyświetlono {{ filtered.length }} z {{ stanowiska.length }} stanowisk</span>
+      </div>
     </div>
   </div>
 </template>

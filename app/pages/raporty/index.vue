@@ -79,12 +79,12 @@ function startLabel(w: WykonanieWithRelations) {
 
 <template>
   <div class="flex flex-col flex-1">
-    <div class="h-[52px] border-b border-muted flex items-center px-5 gap-2 bg-default sticky top-0 z-10">
-      <UIcon name="i-lucide-bar-chart-2" class="w-4 h-4 text-muted" />
-      <span class="text-sm font-semibold">Raporty</span>
+    <div class="antica-topbar">
+      <UIcon name="i-lucide-bar-chart-2" class="size-4 text-[#6b7280]" />
+      <span class="antica-topbar-title">Raporty</span>
     </div>
 
-    <div class="p-5 flex flex-col gap-4">
+    <div class="antica-content flex flex-col gap-4">
       <div class="flex border-b border-muted gap-4">
         <NuxtLink
           v-for="tab in raportTabs"
@@ -105,32 +105,32 @@ function startLabel(w: WykonanieWithRelations) {
         <span class="ml-auto text-xs text-muted capitalize">{{ dateLabel }}</span>
       </div>
 
-      <div class="grid grid-cols-4 gap-3">
-        <div class="bg-elevated border border-muted rounded-xl p-4">
-          <div class="text-xs text-muted mb-1">Procedur dziś</div>
-          <div class="text-2xl font-semibold">{{ stats.total }}</div>
-          <div class="text-xs text-muted mt-0.5">{{ stats.running }} w trakcie</div>
+      <div class="antica-kpi-grid">
+        <div class="antica-kpi">
+          <div class="antica-kpi-label">Procedur dziś</div>
+          <div class="antica-kpi-value">{{ stats.total }}</div>
+          <div class="antica-kpi-sub">{{ stats.running }} w trakcie</div>
         </div>
-        <div class="bg-elevated border border-muted rounded-xl p-4">
-          <div class="text-xs text-muted mb-1">Realizacja</div>
-          <div class="text-2xl font-semibold text-primary">{{ stats.percent }}%</div>
-          <div class="text-xs text-muted mt-0.5">{{ stats.done }} wykonane</div>
+        <div class="antica-kpi">
+          <div class="antica-kpi-label">Realizacja</div>
+          <div class="antica-kpi-value text-[#b08840]">{{ stats.percent }}%</div>
+          <div class="antica-kpi-sub">{{ stats.done }} wykonane</div>
         </div>
-        <div class="bg-elevated border border-muted rounded-xl p-4">
-          <div class="text-xs text-muted mb-1">Odchylenie od normy</div>
-          <div class="text-2xl font-semibold" :class="stats.diff <= 0 ? 'text-success' : 'text-warning'">
+        <div class="antica-kpi">
+          <div class="antica-kpi-label">Odchylenie od normy</div>
+          <div class="antica-kpi-value" :class="stats.diff <= 0 ? 'text-success' : 'text-warning'">
             {{ stats.diff > 0 ? '+' : '' }}{{ stats.diff }}m
           </div>
-          <div class="text-xs text-muted mt-0.5">{{ stats.time }}m / {{ stats.norm }}m</div>
+          <div class="antica-kpi-sub">{{ stats.time }}m / {{ stats.norm }}m</div>
         </div>
-        <div class="bg-elevated border border-muted rounded-xl p-4">
-          <div class="text-xs text-muted mb-1">Do zrobienia</div>
-          <div class="text-2xl font-semibold">{{ stats.todo }}</div>
-          <div class="text-xs text-muted mt-0.5">pozostałe zadania</div>
+        <div class="antica-kpi">
+          <div class="antica-kpi-label">Do zrobienia</div>
+          <div class="antica-kpi-value">{{ stats.todo }}</div>
+          <div class="antica-kpi-sub">pozostałe zadania</div>
         </div>
       </div>
 
-      <div class="bg-elevated border border-muted rounded-xl p-4">
+      <div class="rounded-[10px] border border-[#e5e7eb] bg-white p-4">
         <div class="flex items-center justify-between mb-2">
           <span class="text-sm font-medium">Postęp dnia</span>
           <span class="text-xs text-muted">{{ stats.done }}/{{ stats.total }} procedur</span>
@@ -146,7 +146,7 @@ function startLabel(w: WykonanieWithRelations) {
         <UIcon name="i-lucide-loader-circle" class="w-5 h-5 text-muted animate-spin" />
       </div>
 
-      <div v-else-if="filtered.length === 0" class="p-8 text-center text-sm text-muted border border-muted rounded-xl">
+      <div v-else-if="filtered.length === 0" class="antica-empty rounded-[10px] border border-[#e5e7eb] bg-white">
         Brak danych dla wybranego dnia.
       </div>
 
@@ -163,7 +163,7 @@ function startLabel(w: WykonanieWithRelations) {
           <div
             v-for="item in group.items"
             :key="item.id"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-muted bg-default mb-1.5 hover:bg-elevated transition-colors"
+            class="mb-1.5 flex items-center gap-3 rounded-lg border border-[#e5e7eb] bg-white px-3 py-2.5 transition-colors hover:bg-[#f9fafb]"
           >
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium truncate">{{ item.procedury?.nazwa ?? '—' }}</div>

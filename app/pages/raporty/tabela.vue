@@ -171,12 +171,12 @@ const stats = computed(() => {
 
 <template>
   <div class="flex flex-col flex-1">
-    <div class="h-[52px] border-b border-muted flex items-center px-5 gap-2 bg-default sticky top-0 z-10">
-      <UIcon name="i-lucide-bar-chart-2" class="w-4 h-4 text-muted" />
-      <span class="text-sm font-semibold">Raporty</span>
+    <div class="antica-topbar">
+      <UIcon name="i-lucide-bar-chart-2" class="size-4 text-[#6b7280]" />
+      <span class="antica-topbar-title">Raporty</span>
     </div>
 
-    <div class="p-5 flex flex-col gap-4">
+    <div class="antica-content flex flex-col gap-4">
       <!-- Sub-tabs -->
       <div class="flex border-b border-muted gap-4">
         <NuxtLink
@@ -208,38 +208,38 @@ const stats = computed(() => {
       </div>
 
       <!-- Podsumowanie KPI -->
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="bg-elevated border border-muted rounded-xl p-4">
-          <div class="text-xs text-muted mb-1">Wykonane</div>
-          <div class="text-2xl font-semibold text-success">{{ stats.done }}</div>
-          <div class="text-xs text-muted mt-0.5">z {{ stats.total }} łącznie</div>
+      <div class="antica-kpi-grid">
+        <div class="antica-kpi">
+          <div class="antica-kpi-label">Wykonane</div>
+          <div class="antica-kpi-value text-success">{{ stats.done }}</div>
+          <div class="antica-kpi-sub">z {{ stats.total }} łącznie</div>
         </div>
-        <div class="bg-elevated border border-muted rounded-xl p-4">
-          <div class="text-xs text-muted mb-1">W trakcie</div>
-          <div class="text-2xl font-semibold text-primary">{{ stats.running }}</div>
-          <div class="text-xs text-muted mt-0.5">aktualnie</div>
+        <div class="antica-kpi">
+          <div class="antica-kpi-label">W trakcie</div>
+          <div class="antica-kpi-value text-[#b08840]">{{ stats.running }}</div>
+          <div class="antica-kpi-sub">aktualnie</div>
         </div>
-        <div class="bg-elevated border border-muted rounded-xl p-4">
-          <div class="text-xs text-muted mb-1">Sumaryczny czas</div>
-          <div class="text-2xl font-semibold">{{ stats.sumaCzas }} min</div>
-          <div class="text-xs text-muted mt-0.5">norma: {{ stats.sumaNorma }} min</div>
+        <div class="antica-kpi">
+          <div class="antica-kpi-label">Sumaryczny czas</div>
+          <div class="antica-kpi-value">{{ stats.sumaCzas }} min</div>
+          <div class="antica-kpi-sub">norma: {{ stats.sumaNorma }} min</div>
         </div>
-        <div class="bg-elevated border border-muted rounded-xl p-4">
-          <div class="text-xs text-muted mb-1">Odchylenie łączne</div>
+        <div class="antica-kpi">
+          <div class="antica-kpi-label">Odchylenie łączne</div>
           <div
-            class="text-2xl font-semibold"
+            class="antica-kpi-value"
             :class="stats.odchylenieTotal <= 0 ? 'text-success' : stats.odchylenieTotal <= 15 ? 'text-warning' : 'text-error'"
           >
             {{ stats.odchylenieTotal > 0 ? '+' : '' }}{{ stats.odchylenieTotal }} min
           </div>
-          <div class="text-xs text-muted mt-0.5">vs norma</div>
+          <div class="antica-kpi-sub">vs norma</div>
         </div>
       </div>
 
       <UAlert v-if="error" color="error" icon="i-lucide-alert-circle" :description="error" />
 
       <!-- Tabela -->
-      <div class="border border-muted rounded-xl overflow-x-auto">
+      <div class="antica-table-frame">
         <div v-if="loading" class="p-8 flex justify-center">
           <UIcon name="i-lucide-loader-circle" class="w-5 h-5 text-muted animate-spin" />
         </div>
@@ -248,20 +248,20 @@ const stats = computed(() => {
           Brak danych spełniających filtry
         </div>
 
-        <table v-else class="w-full min-w-[1480px] text-sm">
+        <table v-else class="antica-table min-w-[1480px]">
           <thead>
-            <tr class="bg-elevated">
-              <th class="text-left px-4 py-2.5 text-xs font-medium text-muted">Procedura</th>
-              <th class="text-left px-4 py-2.5 text-xs font-medium text-muted">Stanowisko</th>
-              <th class="text-left px-4 py-2.5 text-xs font-medium text-muted">Pora</th>
-              <th class="text-left px-4 py-2.5 text-xs font-medium text-muted">Status</th>
-              <th class="text-left px-4 py-2.5 text-xs font-medium text-muted">Start</th>
-              <th class="text-right px-4 py-2.5 text-xs font-medium text-muted">Czas</th>
-              <th class="text-right px-4 py-2.5 text-xs font-medium text-muted">Norma</th>
-              <th class="text-right px-4 py-2.5 text-xs font-medium text-muted">Odchylenie</th>
-              <th class="text-left px-4 py-2.5 text-xs font-medium text-muted">Uwagi</th>
+            <tr>
+              <th>Procedura</th>
+              <th>Stanowisko</th>
+              <th>Pora</th>
+              <th>Status</th>
+              <th>Start</th>
+              <th class="text-right">Czas</th>
+              <th class="text-right">Norma</th>
+              <th class="text-right">Odchylenie</th>
+              <th>Uwagi</th>
             </tr>
-            <tr class="border-b border-muted bg-elevated">
+            <tr class="antica-filter-row">
               <th class="px-2 pb-2 text-left">
                 <UInput v-model="filterProcedure" placeholder="Szukaj..." icon="i-lucide-search" size="xs" class="w-48" />
               </th>
@@ -304,7 +304,7 @@ const stats = computed(() => {
             <tr
               v-for="w in filtered"
               :key="w.id"
-              class="border-b border-muted last:border-0 hover:bg-elevated/50 transition-colors"
+              class="border-b border-[#e5e7eb] transition-colors last:border-0 hover:bg-[#f9fafb]"
             >
               <td class="px-4 py-2.5 font-medium">{{ w.procedury?.nazwa ?? '—' }}</td>
               <td class="px-4 py-2.5 text-muted">{{ w.stanowiska?.nazwa ?? '—' }}</td>

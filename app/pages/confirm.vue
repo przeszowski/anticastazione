@@ -14,7 +14,7 @@ watch(user, async (u) => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-elevated">
+  <div class="min-h-screen flex items-center justify-center bg-[#f9fafb]">
     <div class="text-muted text-sm">Logowanie…</div>
   </div>
 </template>

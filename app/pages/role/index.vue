@@ -32,7 +32,7 @@ function akcje(perms: string[]) {
         v-for="rola in roles"
         v-else
         :key="rola.id"
-        class="border border-muted rounded-xl p-5 bg-default"
+        class="rounded-[10px] border border-[#e5e7eb] bg-white p-5"
       >
         <div class="flex items-center gap-2 mb-3">
           <span class="text-base font-semibold">{{ rola.nazwa }}</span>
