@@ -133,13 +133,13 @@ create policy "role: usun" on roles for delete to authenticated
 -- PROFILE: każdy widzi swój; z users:read widzi wszystkie; zarządza z users:update
 drop policy if exists "profil: czytaj" on profiles;
 create policy "profil: czytaj" on profiles for select to authenticated
-  using (id = auth.uid() or has_perm('users:read'));
+  using (id = (select auth.uid()) or has_perm('users:read'));
 drop policy if exists "profil: zarzadzaj" on profiles;
-create policy "profil: zarzadzaj" on profiles for all to authenticated
-  using (has_perm('users:update')) with check (has_perm('users:update'));
 drop policy if exists "profil: edytuj swoj" on profiles;
-create policy "profil: edytuj swoj" on profiles for update to authenticated
-  using (id = auth.uid()) with check (id = auth.uid());
+drop policy if exists "profil: aktualizuj" on profiles;
+create policy "profil: aktualizuj" on profiles for update to authenticated
+  using (has_perm('users:update'))
+  with check (has_perm('users:update'));
 
 -- 6. ZAOSTRZENIE REGUŁ NA TABELACH BIZNESOWYCH ───────────────
 drop policy if exists "public read stanowiska"  on stanowiska;
@@ -148,6 +148,12 @@ drop policy if exists "public read procedury"   on procedury;
 drop policy if exists "public write procedury"  on procedury;
 drop policy if exists "public read wykonania"   on wykonania;
 drop policy if exists "public write wykonania"  on wykonania;
+drop policy if exists "pub_r_s" on stanowiska;
+drop policy if exists "pub_w_s" on stanowiska;
+drop policy if exists "pub_r_p" on procedury;
+drop policy if exists "pub_w_p" on procedury;
+drop policy if exists "pub_r_w" on wykonania;
+drop policy if exists "pub_w_w" on wykonania;
 drop policy if exists "stanowiska: pisz" on stanowiska;
 drop policy if exists "procedury: pisz" on procedury;
 drop policy if exists "wykonania: pisz" on wykonania;
@@ -183,7 +189,7 @@ create policy "wykonania: czytaj" on wykonania for select to authenticated using
     has_perm('wykonania:read')
     and exists (
       select 1 from profiles p
-      where p.id = auth.uid()
+      where p.id = (select auth.uid())
         and p.aktywny = true
         and p.stanowisko_id = wykonania.stanowisko_id
     )
@@ -195,7 +201,7 @@ create policy "wykonania: tworz" on wykonania for insert to authenticated with c
     has_perm('wykonania:create')
     and exists (
       select 1 from profiles p
-      where p.id = auth.uid()
+      where p.id = (select auth.uid())
         and p.aktywny = true
         and p.stanowisko_id = wykonania.stanowisko_id
     )
@@ -208,7 +214,7 @@ create policy "wykonania: aktualizuj" on wykonania for update to authenticated
       has_perm('wykonania:update')
       and exists (
         select 1 from profiles p
-        where p.id = auth.uid()
+        where p.id = (select auth.uid())
           and p.aktywny = true
           and p.stanowisko_id = wykonania.stanowisko_id
       )
@@ -220,7 +226,7 @@ create policy "wykonania: aktualizuj" on wykonania for update to authenticated
       has_perm('wykonania:update')
       and exists (
         select 1 from profiles p
-        where p.id = auth.uid()
+        where p.id = (select auth.uid())
           and p.aktywny = true
           and p.stanowisko_id = wykonania.stanowisko_id
       )
@@ -228,6 +234,20 @@ create policy "wykonania: aktualizuj" on wykonania for update to authenticated
   );
 create policy "wykonania: usun" on wykonania for delete to authenticated
   using (has_perm('wykonania:delete') and has_perm('raporty:read'));
+
+create index if not exists idx_procedury_stanowisko on procedury(stanowisko_id);
+create index if not exists idx_wykonania_procedura on wykonania(procedura_id);
+create index if not exists idx_wykonania_stanowisko on wykonania(stanowisko_id, data_dnia);
+create index if not exists idx_profiles_role_id on profiles(role_id);
+create index if not exists idx_profiles_stanowisko_id on profiles(stanowisko_id);
+
+revoke execute on function handle_new_user() from public, anon, authenticated;
+revoke execute on function has_perm(text) from public, anon;
+revoke execute on function my_permissions() from public, anon;
+revoke execute on function my_role() from public, anon;
+grant execute on function has_perm(text) to authenticated;
+grant execute on function my_permissions() to authenticated;
+grant execute on function my_role() to authenticated;
 
 -- 7. STARTOWE ROLE I UPRAWNIENIA ─────────────────────────────
 -- Pełna lista uprawnień modułu procedur (wzór Antica: module:X + X:akcja)

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { errorMessage } from '~/utils/errors'
+
 definePageMeta({ layout: false })
 
 const { login } = useAuth()
@@ -26,10 +28,11 @@ async function zaloguj() {
   try {
     await login(email.value, haslo.value)
     await navigateTo('/raporty')
-  } catch (e: any) {
-    blad.value = e?.message === 'Invalid login credentials'
+  } catch (caught) {
+    const message = errorMessage(caught, 'Błąd logowania. Spróbuj ponownie.')
+    blad.value = message === 'Invalid login credentials'
       ? 'Nieprawidłowy email lub hasło.'
-      : (e?.message || 'Błąd logowania. Spróbuj ponownie.')
+      : message
   } finally {
     ladowanie.value = false
   }
@@ -108,7 +111,13 @@ function przypomnienieHasla() {
               class="w-full"
             >
               <template #trailing>
-                <button type="button" class="text-muted hover:text-default" @click="pokazHaslo = !pokazHaslo">
+                <button
+                  type="button"
+                  class="text-muted hover:text-default"
+                  :aria-label="pokazHaslo ? 'Ukryj hasło' : 'Pokaż hasło'"
+                  :title="pokazHaslo ? 'Ukryj hasło' : 'Pokaż hasło'"
+                  @click="pokazHaslo = !pokazHaslo"
+                >
                   <UIcon :name="pokazHaslo ? 'i-lucide-eye-off' : 'i-lucide-eye'" class="w-4 h-4" />
                 </button>
               </template>

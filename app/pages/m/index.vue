@@ -2,6 +2,7 @@
 import type { WykonanieWithRelations } from '~/composables/useSupabase'
 import type { PoraDnia } from '~/types/database.types'
 import type { ExecutionTimerAction, ExecutionTimerState } from '~/utils/executionTimer'
+import { localDateInput } from '~/utils/date'
 import {
   executionElapsedMs,
   executionNote,
@@ -22,7 +23,7 @@ const toast = useToast()
 const canManage = computed(() => can('raporty:read'))
 const canCreate = computed(() => can('procedury:create'))
 
-const today = new Date().toISOString().slice(0, 10)
+const today = localDateInput()
 const selectedDate = ref(today)
 const selectedStation = ref('')
 const selectedTaskId = ref<string | null>(null)
@@ -45,7 +46,7 @@ const dateLabel = computed(() => new Intl.DateTimeFormat('pl-PL', {
 const dayOptions = computed(() => Array.from({ length: 6 }, (_, index) => {
   const date = new Date()
   date.setDate(date.getDate() + index - 3)
-  const value = date.toISOString().slice(0, 10)
+  const value = localDateInput(date)
   return {
     value,
     day: new Intl.DateTimeFormat('pl-PL', { weekday: 'short' }).format(date).replace('.', ''),

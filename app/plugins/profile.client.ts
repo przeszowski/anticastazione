@@ -2,15 +2,11 @@
 // Działa po stronie klienta (.client), bo zależy od sesji w przeglądarce.
 export default defineNuxtPlugin(() => {
   const client = useSupabaseClient()
-  const { odswiezProfil } = useAuth()
+  const { clearProfile, odswiezProfil } = useAuth()
 
-  // 1. Istniejąca sesja przy wejściu na stronę (np. po odświeżeniu)
-  client.auth.getSession().then(({ data }) => {
-    if (data.session?.user) odswiezProfil(data.session.user.id)
-  })
-
-  // 2. Każda zmiana stanu logowania (logowanie, odświeżenie tokenu, wylogowanie)
+  // INITIAL_SESSION obsługuje istniejącą sesję, kolejne zdarzenia jej zmiany.
   client.auth.onAuthStateChange((_event, session) => {
-    if (session?.user) odswiezProfil(session.user.id)
+    if (session?.user) void odswiezProfil(session.user.id)
+    else clearProfile()
   })
 })

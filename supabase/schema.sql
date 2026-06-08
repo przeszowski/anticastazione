@@ -79,18 +79,26 @@ create index if not exists idx_wykonania_data on wykonania(data_dnia);
 create index if not exists idx_wykonania_stanowisko on wykonania(stanowisko_id, data_dnia);
 create index if not exists idx_procedury_stanowisko on procedury(stanowisko_id);
 
--- ── RLS (Row Level Security) — na razie wyłączone dla dev ────────────
+-- ── RLS (Row Level Security) ──────────────────────────────────────────
 alter table stanowiska enable row level security;
 alter table procedury   enable row level security;
 alter table wykonania   enable row level security;
 
--- Tymczasowe polityki — pełny dostęp (zmień przed produkcją!)
-create policy "public read stanowiska"  on stanowiska for select using (true);
-create policy "public write stanowiska" on stanowiska for all    using (true);
-create policy "public read procedury"   on procedury  for select using (true);
-create policy "public write procedury"  on procedury  for all    using (true);
-create policy "public read wykonania"   on wykonania  for select using (true);
-create policy "public write wykonania"  on wykonania  for all    using (true);
+drop policy if exists "public read stanowiska" on stanowiska;
+drop policy if exists "public write stanowiska" on stanowiska;
+drop policy if exists "public read procedury" on procedury;
+drop policy if exists "public write procedury" on procedury;
+drop policy if exists "public read wykonania" on wykonania;
+drop policy if exists "public write wykonania" on wykonania;
+drop policy if exists "pub_r_s" on stanowiska;
+drop policy if exists "pub_w_s" on stanowiska;
+drop policy if exists "pub_r_p" on procedury;
+drop policy if exists "pub_w_p" on procedury;
+drop policy if exists "pub_r_w" on wykonania;
+drop policy if exists "pub_w_w" on wykonania;
+
+-- Polityki dostępu oparte o role tworzy auth_schema.sql.
+-- Po wykonaniu tylko tego pliku tabele pozostają niedostępne przez API.
 
 -- ── Dane przykładowe ─────────────────────────────────────────────────
 insert into stanowiska (nazwa, dzial, opis, godziny_od, godziny_do)

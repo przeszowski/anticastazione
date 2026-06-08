@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WykonanieWithRelations } from '~/composables/useSupabase'
+import { localDateInput } from '~/utils/date'
 import { executionElapsedMs, executionNote, executionTimerState } from '~/utils/executionTimer'
 import {
   ALL_SELECT_VALUE,
@@ -17,7 +18,7 @@ definePageMeta({ layout: 'default' })
 const { wykonania, loading, error, fetchDzien } = useWykonania()
 const { stanowiska, fetch: fetchStanowiska } = useStanowiska()
 
-const selectedDate = ref(new Date().toISOString().slice(0, 10))
+const selectedDate = ref(localDateInput())
 const filterStation = ref(ALL_SELECT_VALUE)
 const filterProcedure = ref('')
 const filterPeriod = ref(ALL_SELECT_VALUE)
@@ -147,22 +148,9 @@ const stats = computed(() => {
   const running = filtered.value.filter(w => w.status === 'w_trakcie').length
   const todo = filtered.value.filter(w => w.status === 'do_zrobienia').length
   const odrzucone = filtered.value.filter(w => w.status === 'odrzucone').length
-
-  const czasy = filtered.value
-    .filter(w => w.czas_start && w.czas_koniec)
-    .map(w => {
-      if (!w.czas_start || !w.czas_koniec) return 0
-      const start = new Date(w.czas_start)
-      const koniec = new Date(w.czas_koniec)
-      return Math.round((koniec.getTime() - start.getTime()) / 60000)
-    })
-
-  const normy = filtered.value
-    .filter(w => w.czas_start && w.czas_koniec)
-    .map(w => w.procedury?.norma_min ?? 0)
-
-  const sumaCzas = czasy.reduce((a, b) => a + b, 0)
-  const sumaNorma = normy.reduce((a, b) => a + b, 0)
+  const finished = filtered.value.filter(w => w.status === 'wykonane')
+  const sumaCzas = finished.reduce((sum, w) => sum + (durationMinutes(w) ?? 0), 0)
+  const sumaNorma = finished.reduce((sum, w) => sum + (w.procedury?.norma_min ?? 0), 0)
   const odchylenieTotal = sumaCzas - sumaNorma
 
   return { total, done, running, todo, odrzucone, sumaCzas, sumaNorma, odchylenieTotal }

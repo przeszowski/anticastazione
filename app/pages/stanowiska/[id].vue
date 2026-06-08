@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { dzialOptions } from '~/utils/procedureMeta'
+import { errorMessage } from '~/utils/errors'
 
 definePageMeta({ layout: 'default' })
 
@@ -36,8 +37,8 @@ onMounted(async () => {
     form.godziny_do = data.godziny_do?.slice(0, 5) ?? '23:00'
     form.aktywne = data.aktywne
     form.kolejnosc = data.kolejnosc
-  } catch (e: any) {
-    toast.add({ title: 'Błąd ładowania', description: e.message, color: 'error' })
+  } catch (caught) {
+    toast.add({ title: 'Błąd ładowania', description: errorMessage(caught), color: 'error' })
     navigateTo('/stanowiska')
   } finally {
     loading.value = false
@@ -62,8 +63,8 @@ async function save() {
     })
     toast.add({ title: 'Zapisano zmiany', color: 'success' })
     navigateTo('/stanowiska')
-  } catch (e: any) {
-    toast.add({ title: 'Błąd', description: e.message, color: 'error' })
+  } catch (caught) {
+    toast.add({ title: 'Błąd', description: errorMessage(caught), color: 'error' })
   } finally {
     saving.value = false
   }
@@ -75,8 +76,8 @@ async function doDelete() {
     await remove(id)
     toast.add({ title: 'Stanowisko usunięte', color: 'success' })
     navigateTo('/stanowiska')
-  } catch (e: any) {
-    toast.add({ title: 'Błąd', description: e.message, color: 'error' })
+  } catch (caught) {
+    toast.add({ title: 'Błąd', description: errorMessage(caught), color: 'error' })
   } finally {
     deleting.value = false
     confirmDelete.value = false

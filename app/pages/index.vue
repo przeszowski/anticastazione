@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { WykonanieWithRelations } from '~/composables/useSupabase'
 import { executionElapsedMs, executionTimerState } from '~/utils/executionTimer'
+import { localDateInput } from '~/utils/date'
 import { formatPoraDnia } from '~/utils/procedureMeta'
 
 definePageMeta({ layout: 'default' })
 
 const { stanowiska, fetch: fetchStanowiska } = useStanowiska()
 const { wykonania, loading, error, fetchDzien } = useWykonania()
-const today = new Date().toISOString().slice(0, 10)
+const today = localDateInput()
 
 onMounted(() => Promise.all([fetchStanowiska(), fetchDzien(today)]))
 

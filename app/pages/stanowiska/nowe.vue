@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { dzialOptions } from '~/utils/procedureMeta'
+import { errorMessage } from '~/utils/errors'
 
 definePageMeta({ layout: 'default' })
 
@@ -35,8 +36,8 @@ async function save() {
     })
     toast.add({ title: 'Stanowisko utworzone', color: 'success' })
     navigateTo('/stanowiska')
-  } catch (e: any) {
-    toast.add({ title: 'Błąd', description: e.message, color: 'error' })
+  } catch (caught) {
+    toast.add({ title: 'Błąd', description: errorMessage(caught), color: 'error' })
   } finally {
     saving.value = false
   }

@@ -5,7 +5,7 @@ import { buildTimerMutation } from '~/utils/executionTimer'
 
 type Stanowisko = Database['public']['Tables']['stanowiska']['Row']
 type Procedura = Database['public']['Tables']['procedury']['Row']
-type ProceduraWithStanowisko = Procedura & {
+export type ProceduraWithStanowisko = Procedura & {
   stanowiska: Pick<Stanowisko, 'nazwa' | 'dzial'> | null
 }
 export type WykonanieWithRelations = Database['public']['Tables']['wykonania']['Row'] & {
@@ -145,19 +145,6 @@ export const useWykonania = () => {
     }
   }
 
-  async function updateStatus(
-    id: string,
-    status: StatusWykonania,
-    extra: Database['public']['Tables']['wykonania']['Update'] = {}
-  ) {
-    const payload: Database['public']['Tables']['wykonania']['Update'] = { status, ...extra }
-    if (status === 'w_trakcie') payload.czas_start = new Date().toISOString()
-    if (status === 'wykonane') payload.czas_koniec = new Date().toISOString()
-    const { data, error: err } = await db.from('wykonania').update(payload).eq('id', id).select().single()
-    if (err) throw err
-    return data
-  }
-
   async function create(payload: Database['public']['Tables']['wykonania']['Insert']) {
     const { data, error: err } = await db.from('wykonania').insert(payload).select().single()
     if (err) throw err
@@ -193,5 +180,5 @@ export const useWykonania = () => {
     await updateOne(execution.id, mutation.payload)
   }
 
-  return { wykonania, loading, error, fetchDzien, create, updateStatus, applyTimerAction }
+  return { wykonania, loading, error, fetchDzien, create, applyTimerAction }
 }

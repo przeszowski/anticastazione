@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NO_STATION_VALUE } from '~/utils/procedureMeta'
+import { errorMessage } from '~/utils/errors'
 
 definePageMeta({ layout: 'default' })
 
@@ -49,10 +50,10 @@ async function save() {
     })
     toast.add({ title: 'Użytkownik utworzony', color: 'success' })
     navigateTo('/uzytkownicy')
-  } catch (e: any) {
+  } catch (caught) {
     toast.add({
       title: 'Nie udało się utworzyć użytkownika',
-      description: e?.statusMessage || e?.data?.statusMessage || e?.message,
+      description: errorMessage(caught),
       color: 'error'
     })
   } finally {

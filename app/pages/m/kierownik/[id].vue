@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { WykonanieWithRelations } from '~/composables/useSupabase'
 import type { PoraDnia } from '~/types/database.types'
+import { localDateInput } from '~/utils/date'
 import {
   executionElapsedMs,
   executionTimerState,
@@ -56,7 +57,7 @@ onMounted(async () => {
 
   await Promise.all([
     fetchStanowiska(),
-    fetchDzien(new Date().toISOString().slice(0, 10), stationId)
+    fetchDzien(localDateInput(), stationId)
   ])
   clock = setInterval(() => { now.value = Date.now() }, 1000)
 })

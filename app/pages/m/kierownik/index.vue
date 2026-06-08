@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { executionTimerState } from '~/utils/executionTimer'
+import { localDateInput } from '~/utils/date'
 
 definePageMeta({ layout: 'mobile', middleware: 'mobile-auth' })
 
@@ -18,7 +19,7 @@ const {
   fetchDzien
 } = useWykonania()
 
-const today = new Date().toISOString().slice(0, 10)
+const today = localDateInput()
 const dateLabel = new Intl.DateTimeFormat('pl-PL', {
   weekday: 'long',
   day: 'numeric',
@@ -72,6 +73,8 @@ onMounted(async () => {
   }
   await Promise.all([fetchStanowiska(), fetchDzien(today)])
 })
+
+const canCreate = computed(() => can('procedury:create'))
 </script>
 
 <template>
@@ -153,7 +156,7 @@ onMounted(async () => {
       </div>
     </main>
 
-    <button type="button" class="manager-fab" title="Nowa procedura" @click="navigateTo('/m/nowa')">
+    <button v-if="canCreate" type="button" class="manager-fab" title="Nowa procedura" @click="navigateTo('/m/nowa')">
       <UIcon name="i-lucide-plus" class="size-6" />
     </button>
   </div>

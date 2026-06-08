@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ALL_SELECT_VALUE } from '~/utils/procedureMeta'
+import { errorMessage } from '~/utils/errors'
 import { matchesOption, matchesText } from '~/utils/tableFilters'
 
 definePageMeta({ layout: 'default' })
@@ -78,8 +79,8 @@ async function zmienRole(userId: string, roleId: string) {
   try {
     await setRole(userId, roleId)
     toast.add({ title: 'Rola zaktualizowana', color: 'success' })
-  } catch (e: any) {
-    toast.add({ title: 'Błąd zapisu', description: e?.message, color: 'error' })
+  } catch (caught) {
+    toast.add({ title: 'Błąd zapisu', description: errorMessage(caught), color: 'error' })
   } finally {
     zapisywanie.value = null
   }
@@ -89,8 +90,8 @@ async function przelaczAktywny(userId: string, val: boolean) {
   zapisywanie.value = userId
   try {
     await setActive(userId, val)
-  } catch (e: any) {
-    toast.add({ title: 'Błąd zapisu', description: e?.message, color: 'error' })
+  } catch (caught) {
+    toast.add({ title: 'Błąd zapisu', description: errorMessage(caught), color: 'error' })
   } finally {
     zapisywanie.value = null
   }

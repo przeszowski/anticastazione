@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PoraDnia } from '~/types/database.types'
+import { localDateInput } from '~/utils/date'
 import { poraDniaOptions } from '~/utils/procedureMeta'
 
 definePageMeta({ layout: 'mobile', middleware: 'mobile-auth' })
@@ -62,7 +63,7 @@ async function save() {
     await createExecution({
       procedura_id: procedure.id,
       stanowisko_id: form.stanowisko_id,
-      data_dnia: new Date().toISOString().slice(0, 10),
+      data_dnia: localDateInput(),
       status: 'do_zrobienia'
     })
 

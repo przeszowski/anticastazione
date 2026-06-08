@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NO_STATION_VALUE, poraDniaOptions } from '~/utils/procedureMeta'
+import { errorMessage } from '~/utils/errors'
 
 definePageMeta({ layout: 'default' })
 
@@ -43,8 +44,8 @@ async function save() {
     })
     toast.add({ title: 'Procedura utworzona', color: 'success' })
     navigateTo('/procedury')
-  } catch (e: any) {
-    toast.add({ title: 'Błąd', description: e.message, color: 'error' })
+  } catch (caught) {
+    toast.add({ title: 'Błąd', description: errorMessage(caught), color: 'error' })
   } finally {
     saving.value = false
   }

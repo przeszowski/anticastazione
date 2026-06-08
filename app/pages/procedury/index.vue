@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import type { ProceduraWithStanowisko } from '~/composables/useSupabase'
 import { ALL_SELECT_VALUE, badgePoryDnia, formatPoraDnia, poraDniaOptions } from '~/utils/procedureMeta'
 import { matchesNumberRange, matchesOption, matchesText } from '~/utils/tableFilters'
 
 definePageMeta({ layout: 'default' })
 
-const { procedury, loading, error, fetch } = useProcedury()
+const { procedury, loading, error, fetch, update } = useProcedury()
 const { stanowiska, fetch: fetchStanowiska } = useStanowiska()
 const { can } = useAuth()
 const toast = useToast()
@@ -73,16 +74,15 @@ function periodBadge(period: string) {
 
 // Slideover szczegółów
 const slideoverOpen = ref(false)
-const selected = ref<any>(null)
+const selected = ref<ProceduraWithStanowisko | null>(null)
 
-function openDetails(row: any) {
-  selected.value = row.original
+function openDetails(item: ProceduraWithStanowisko) {
+  selected.value = item
   slideoverOpen.value = true
 }
 
-async function toggleActive(row: any) {
+async function toggleActive(row: ProceduraWithStanowisko) {
   if (!canUpdate.value) return
-  const { update } = useProcedury()
   try {
     await update(row.id, { aktywna: !row.aktywna })
     await fetch()
@@ -180,7 +180,7 @@ async function toggleActive(row: any) {
                 v-for="item in filtered"
                 :key="item.id"
                 data-clickable="true"
-                @click="openDetails({ original: item })"
+                @click="openDetails(item)"
               >
                 <td>
                   <div class="font-semibold">{{ item.nazwa }}</div>

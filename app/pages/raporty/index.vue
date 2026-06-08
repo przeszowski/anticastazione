@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { StatusWykonania } from '~/types/database.types'
 import type { WykonanieWithRelations } from '~/composables/useSupabase'
+import { localDateInput } from '~/utils/date'
 import { executionElapsedMs } from '~/utils/executionTimer'
 import {
   ALL_SELECT_VALUE,
@@ -16,7 +17,7 @@ definePageMeta({ layout: 'default' })
 const { wykonania, loading, error, fetchDzien } = useWykonania()
 const { stanowiska, fetch: fetchStanowiska } = useStanowiska()
 
-const selectedDate = ref(new Date().toISOString().slice(0, 10))
+const selectedDate = ref(localDateInput())
 const filterStation = ref(ALL_SELECT_VALUE)
 
 onMounted(async () => {

@@ -1,7 +1,5 @@
 import { ALL_SELECT_VALUE } from '~/utils/procedureMeta'
 
-export const TABLE_ALL_VALUE = ALL_SELECT_VALUE
-
 export function matchesText(value: unknown, query: string) {
   const needle = query.trim().toLocaleLowerCase('pl-PL')
   if (!needle) return true

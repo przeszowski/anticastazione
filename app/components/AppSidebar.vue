@@ -1,11 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
-const { imieNazwisko, rola, can, logout, odswiezProfil, profil } = useAuth()
-
-// Załaduj profil użytkownika przy wejściu (jeśli jeszcze nie wczytany)
-onMounted(() => {
-  if (!profil.value) odswiezProfil()
-})
+const { imieNazwisko, rola, can, logout } = useAuth()
 
 // Pozycje menu z wymaganym uprawnieniem; jeśli brak — pozycja ukryta
 const navItems = computed(() => [

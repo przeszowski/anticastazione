@@ -26,12 +26,16 @@ export const useAuth = () => {
     return uprawnienia.value.includes(permission)
   }
 
+  function clearProfile() {
+    profil.value = null
+    uprawnienia.value = []
+  }
+
   // Pobierz profil zalogowanego użytkownika wraz z rolą i uprawnieniami
   async function odswiezProfil(uidArg?: string) {
     const uid = uidArg || supaUser.value?.id
     if (!uid) {
-      profil.value = null
-      uprawnienia.value = []
+      clearProfile()
       return null
     }
     const { data, error } = await client
@@ -41,8 +45,7 @@ export const useAuth = () => {
       .single()
     if (error) {
       console.warn('[useAuth] Nie udało się wczytać profilu:', error.message)
-      profil.value = null
-      uprawnienia.value = []
+      clearProfile()
       return null
     }
     const nextProfil = data as Profil
@@ -69,8 +72,7 @@ export const useAuth = () => {
     const userProfile = await odswiezProfil(data.user?.id)
     if (userProfile && !userProfile.aktywny) {
       await client.auth.signOut()
-      profil.value = null
-      uprawnienia.value = []
+      clearProfile()
       throw new Error('Konto jest nieaktywne. Skontaktuj się z administratorem.')
     }
   }
@@ -78,8 +80,7 @@ export const useAuth = () => {
   async function logout(redirectTo: string | Event = '/login') {
     const target = typeof redirectTo === 'string' ? redirectTo : '/login'
     await client.auth.signOut()
-    profil.value = null
-    uprawnienia.value = []
+    clearProfile()
     await navigateTo(target)
   }
 
@@ -91,6 +92,7 @@ export const useAuth = () => {
     rola,
     imieNazwisko,
     can,
+    clearProfile,
     login,
     logout,
     odswiezProfil,
