@@ -25,7 +25,7 @@ export default defineNuxtConfig({
       login: '/login',
       callback: '/confirm',
       // /m to osobna aplikacja mobilna z własnym logowaniem i ochroną (middleware mobile-auth)
-      exclude: ['/login', '/confirm', '/m', '/m/login']
+      exclude: ['/login', '/confirm', '/m', '/m/*']
     }
   },
 
